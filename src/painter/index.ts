@@ -27,16 +27,16 @@ export interface KonvaCanvas {
 
 // Painter 类定义
 export class Painter {
-    private konvaCanvasStore: Map<number, KonvaCanvas> = new Map()
-    private editorStore: Map<string, Editor> = new Map()
-    private pdfViewerApplication: PDFViewerApplication
-    private pdfjsEventBus: EventBus
-    private webSelection: WebSelection
-    private currentAnnotation: IAnnotationType | null = null
-    private store: Store
-    private selector: Selector
-    private tempDataTransfer: string | null
-    public readonly setDefaultMode: () => void
+    private konvaCanvasStore: Map<number, KonvaCanvas> = new Map() // 存储 KonvaCanvas 实例
+    private editorStore: Map<string, Editor> = new Map() // 存储编辑器实例
+    private pdfViewerApplication: PDFViewerApplication // PDFViewerApplication 实例
+    private pdfjsEventBus: EventBus // PDF.js EventBus 实例
+    private webSelection: WebSelection // WebSelection 实例
+    private currentAnnotation: IAnnotationType | null = null // 当前批注类型
+    private store: Store // 存储实例
+    private selector: Selector // 选择器实例
+    private tempDataTransfer: string | null // 临时数据传输
+    public readonly setDefaultMode: () => void // 设置默认模式的函数引用
 
     /**
      * 构造函数，初始化 PDFViewerApplication, EventBus, 和 WebSelection
@@ -51,11 +51,12 @@ export class Painter {
         PDFJS_EventBus: EventBus
         setDefaultMode: () => void
     }) {
-        this.pdfViewerApplication = PDFViewerApplication
-        this.pdfjsEventBus = PDFJS_EventBus
-        this.setDefaultMode = setDefaultMode
-        this.store = new Store({ PDFViewerApplication })
+        this.pdfViewerApplication = PDFViewerApplication // 初始化 PDFViewerApplication
+        this.pdfjsEventBus = PDFJS_EventBus // 初始化 PDF.js EventBus
+        this.setDefaultMode = setDefaultMode // 设置默认模式的函数
+        this.store = new Store({ PDFViewerApplication }) // 初始化存储实例
         this.selector = new Selector({
+            // 初始化选择器实例
             konvaCanvasStore: this.konvaCanvasStore,
             getAnnotationStore: (id: string) => {
                 return this.store.annotation(id)
@@ -74,6 +75,7 @@ export class Painter {
             }
         })
         this.webSelection = new WebSelection({
+            // 初始化 WebSelection 实例
             onSelect: (pageNumber, elements) => {
                 const canvas = this.konvaCanvasStore.get(pageNumber)
                 if (canvas) {
@@ -94,14 +96,14 @@ export class Painter {
                 }
             }
         })
-        this.bindGlobalEvents()
+        this.bindGlobalEvents() // 绑定全局事件
     }
 
     /**
      * 绑定全局事件。
      */
     private bindGlobalEvents(): void {
-        window.addEventListener('keyup', this.globalKeyUpHandler)
+        window.addEventListener('keyup', this.globalKeyUpHandler) // 监听全局键盘事件
     }
 
     /**
@@ -110,8 +112,8 @@ export class Painter {
      */
     private globalKeyUpHandler = (e: KeyboardEvent): void => {
         if (e.code === 'Escape' && (this.currentAnnotation.type === AnnotationType.SIGNATURE || this.currentAnnotation.type === AnnotationType.STAMP)) {
-            removeCssCustomProperty(CURSOR_CSS_PROPERTY)
-            this.setDefaultMode()
+            removeCssCustomProperty(CURSOR_CSS_PROPERTY) // 移除自定义 CSS 属性
+            this.setDefaultMode() // 设置默认模式
         }
     }
 
@@ -122,27 +124,29 @@ export class Painter {
      * @returns 绘图容器元素
      */
     private createPainterWrapper(pageView: PDFPageView, pageNumber: number): HTMLDivElement {
-        const wrapper = document.createElement('div')
-        wrapper.id = `${PAINTER_WRAPPER_PREFIX}_page_${pageNumber}`
-        wrapper.setAttribute('data-main-rotation', `${pageView.viewport.rotation}`)
-        wrapper.classList.add(PAINTER_WRAPPER_PREFIX)
+        const wrapper = document.createElement('div') // 创建 div 元素作为绘图容器
+        wrapper.id = `${PAINTER_WRAPPER_PREFIX}_page_${pageNumber}` // 设置 id
+        wrapper.setAttribute('data-main-rotation', `${pageView.viewport.rotation}`) // 设置视口旋转角度
+        wrapper.classList.add(PAINTER_WRAPPER_PREFIX) // 添加类名
 
-        const { width, height } = { width: pageView.viewport.viewBox[2], height: pageView.viewport.viewBox[3] }
-        const scaleFactor = 'var(--scale-factor)'
-        wrapper.style.width = `calc(${scaleFactor} * ${width}px)`
-        wrapper.style.height = `calc(${scaleFactor} * ${height}px)`
+        const { width, height } = {
+            width: pageView.viewport.viewBox[2],
+            height: pageView.viewport.viewBox[3]
+        } // 获取视口宽度和高度
+        const scaleFactor = 'var(--scale-factor)' // 获取缩放因子
+        wrapper.style.width = `calc(${scaleFactor} * ${width}px)` // 设置宽度样式
+        wrapper.style.height = `calc(${scaleFactor} * ${height}px)` // 设置高度样式
 
-        // 将绘图层容器添加到 PDF 页面容器中
         pageView.div.appendChild(wrapper)
 
         return wrapper
     }
 
     /**
-     * 创建 Konva 舞台
+     * 创建 Konva Stage
      * @param container - 绘图容器元素
      * @param viewport - 当前 PDF 页面视口
-     * @returns Konva 舞台对象
+     * @returns Konva Stage
      */
     private createKonvaStage(container: HTMLDivElement, viewport: PageViewport): Konva.Stage {
         const stage = new Konva.Stage({
@@ -175,7 +179,7 @@ export class Painter {
     }
 
     /**
-     * 插入新的绘图容器和 Konva 舞台
+     * 插入新的绘图容器和 Konva Stage
      * @param pageView - 当前 PDF 页面视图
      * @param pageNumber - 当前页码
      */
@@ -190,8 +194,8 @@ export class Painter {
             wrapper: painterWrapper,
             isActive: false
         })
-        this.reDrawAnnotation(pageNumber)
-        this.enablePainting()
+        this.reDrawAnnotation(pageNumber) // 重绘批注
+        this.enablePainting() // 启用绘画
     }
 
     /**
@@ -216,10 +220,10 @@ export class Painter {
      * @param mode - 模式类型 ('selection', 'painting', 'default')
      */
     private setMode(mode: 'selection' | 'painting' | 'default'): void {
-        const isPainting = mode === 'painting'
-        const isSelection = mode === 'selection'
-        this.webSelection[isSelection ? 'enable' : 'disable']()
-        document.body.classList.toggle(`${PAINTER_IS_PAINTING_STYLE}`, isPainting)
+        const isPainting = mode === 'painting' // 是否绘画模式
+        const isSelection = mode === 'selection' // 是否选择模式
+        this.webSelection[isSelection ? 'enable' : 'disable']() // 启用或禁用 WebSelection
+        document.body.classList.toggle(`${PAINTER_IS_PAINTING_STYLE}`, isPainting) // 添加或移除绘画模式样式
         const allAnnotationClasses = Object.values(AnnotationType)
             .filter(type => typeof type === 'number')
             .map(type => `${PAINTER_PAINTING_TYPE}_${type}`)
@@ -227,16 +231,28 @@ export class Painter {
         allAnnotationClasses.forEach(cls => document.body.classList.remove(cls))
         // 移出签名鼠标指针变量
         removeCssCustomProperty(CURSOR_CSS_PROPERTY)
+
         if (this.currentAnnotation) {
             document.body.classList.add(`${PAINTER_PAINTING_TYPE}_${this.currentAnnotation?.type}`)
         }
     }
 
+    /**
+     * 保存到存储
+     * @param shapeGroup - 形状组
+     * @param pdfjsAnnotationStorage - PDF.js 批注存储
+     * @param annotationContent - 批注内容
+     */
     private saveToStore(shapeGroup: IShapeGroup, pdfjsAnnotationStorage: IPdfjsAnnotationStorage, annotationContent?: IAnnotationContent) {
         this.store.save(shapeGroup, pdfjsAnnotationStorage, annotationContent)
     }
 
-    private findEditorForGroupId(groupId: string) {
+    /**
+     * 根据组 ID 查找编辑器
+     * @param groupId - 组 ID
+     * @returns 编辑器实例
+     */
+    private findEditorForGroupId(groupId: string): Editor {
         let editor: Editor = null
         this.editorStore.forEach(_editor => {
             if (_editor.shapeGroupStore?.has(groupId)) {
@@ -247,29 +263,35 @@ export class Painter {
         return editor
     }
 
+    /**
+     * 根据页码和编辑器类型查找编辑器
+     * @param pageNumber - 页码
+     * @param editorType - 编辑器类型
+     * @returns 编辑器实例
+     */
     private findEditor(pageNumber: number, editorType: AnnotationType): Editor {
         return this.editorStore.get(`${pageNumber}_${editorType}`)
     }
 
     /**
      * 启用特定类型的编辑器
-     * @param options - 包含 Konva 舞台, 页码 和 注释类型的对象
+     * @param options - 包含 Konva Stage、页码和批注类型的对象
      */
     private enableEditor({ konvaStage, pageNumber, annotation }: { konvaStage: Konva.Stage; pageNumber: number; annotation: IAnnotationType }): void {
-        const storeEditor = this.findEditor(pageNumber, annotation.type)
+        const storeEditor = this.findEditor(pageNumber, annotation.type) // 查找存储中的编辑器实例
         if (storeEditor) {
             if (storeEditor instanceof EditorSignature) {
-                storeEditor.activateWithSignature(konvaStage, annotation, this.tempDataTransfer)
+                storeEditor.activateWithSignature(konvaStage, annotation, this.tempDataTransfer) // 激活带有签名的编辑器
                 return
             }
             if (storeEditor instanceof EditorStamp) {
-                storeEditor.activateWithStamp(konvaStage, annotation, this.tempDataTransfer)
+                storeEditor.activateWithStamp(konvaStage, annotation, this.tempDataTransfer) // 激活带有图章的编辑器
                 return
             }
-            storeEditor.activate(konvaStage, annotation)
+            storeEditor.activate(konvaStage, annotation) // 激活编辑器
             return
         }
-        let editor: Editor | null = null
+        let editor: Editor | null = null // 初始化编辑器为空
         switch (annotation.type) {
             case AnnotationType.FREETEXT:
                 editor = new EditorFreeText({
@@ -332,7 +354,7 @@ export class Painter {
                             this.saveToStore(shapeGroup, pdfjsAnnotationStorage, annotationContent)
                             if (annotation.isOnce) {
                                 this.setDefaultMode()
-                                this.selector.selected(shapeGroup.id)
+                                this.selector.select(shapeGroup.id)
                             }
                         }
                     },
@@ -349,7 +371,7 @@ export class Painter {
                             this.saveToStore(shapeGroup, pdfjsAnnotationStorage, annotationContent)
                             if (annotation.isOnce) {
                                 this.setDefaultMode()
-                                this.selector.selected(shapeGroup.id)
+                                this.selector.select(shapeGroup.id)
                             }
                         }
                     },
@@ -357,80 +379,99 @@ export class Painter {
                 )
                 break
             case AnnotationType.SELECT:
-                this.selector.activate(pageNumber)
+                this.selector.activate(pageNumber) // 激活选择器
                 break
 
             default:
-                console.warn(`未实现的注释类型: ${annotation.type}`)
+                console.warn(`未实现的批注类型: ${annotation.type}`)
                 return
         }
 
         if (editor) {
-            this.editorStore.set(editor.id, editor)
+            this.editorStore.set(editor.id, editor) // 将编辑器实例存储到 editorStore
         }
     }
 
     /**
-     * 启用批注
+     * 启用绘画
      */
     private enablePainting(): void {
         this.konvaCanvasStore.forEach(({ konvaStage, pageNumber }) => {
+            // 遍历 KonvaCanvas 实例
             if (this.currentAnnotation) {
                 this.enableEditor({
                     konvaStage,
                     pageNumber,
-                    annotation: this.currentAnnotation
+                    annotation: this.currentAnnotation // 启用特定类型的编辑器
                 })
             }
         })
     }
 
-    private reDrawAnnotation(pageNumber: number) {
-        const konvaCanvasStore = this.konvaCanvasStore.get(pageNumber)
-        const annotationStores = this.store.getByPage(pageNumber)
+    /**
+     * 重新绘制批注
+     * @param pageNumber - 页码
+     */
+    private reDrawAnnotation(pageNumber: number): void {
+        const konvaCanvasStore = this.konvaCanvasStore.get(pageNumber) // 获取 KonvaCanvas 实例
+        const annotationStores = this.store.getByPage(pageNumber) // 获取指定页码的批注存储
         annotationStores.forEach(annotationStore => {
-            const storeEditor = this.findEditor(pageNumber, annotationStore.type)
+            const storeEditor = this.findEditor(pageNumber, annotationStore.type) // 查找编辑器实例
             if (storeEditor) {
-                storeEditor.addSerializedGroupToLayer(konvaCanvasStore.konvaStage, annotationStore.konvaString)
+                storeEditor.addSerializedGroupToLayer(konvaCanvasStore.konvaStage, annotationStore.konvaString) // 添加序列化组到图层
             }
         })
     }
 
-    private deleteAnnotation(id) {
+    /**
+     * 删除批注
+     * @param id - 批注 ID
+     */
+    private deleteAnnotation(id): void {
         const annotationStore = this.store.annotation(id)
+        const konvaCanvasStore = this.konvaCanvasStore.get(annotationStore.pageNumber) // 获取 KonvaCanvas 实例
         if (!annotationStore) {
             return
         }
         this.store.delete(id)
         const storeEditor = this.findEditor(annotationStore.pageNumber, annotationStore.type)
         if (storeEditor) {
-            storeEditor.deleteGroup(id)
+            storeEditor.deleteGroup(id, konvaCanvasStore.konvaStage)
         }
     }
 
     /**
-     * 关闭批注
+     * 关闭绘画
      */
     private disablePainting(): void {
-        this.setMode('default')
-        this.clearTempDataTransfer()
-        this.selector.clear()
+        this.setMode('default') // 设置默认模式
+        this.clearTempDataTransfer() // 清除临时数据传输
+        this.selector.clear() // 清除选择器
         console.log('Painting mode disabled')
     }
 
-    private saveTempDataTransfer(data: string) {
+    /**
+     * 保存临时数据传输
+     * @param data - 数据
+     * @returns 临时数据传输
+     */
+    private saveTempDataTransfer(data: string): string {
         this.tempDataTransfer = data
         return this.tempDataTransfer
     }
 
-    private clearTempDataTransfer() {
+    /**
+     * 清除临时数据传输
+     * @returns 临时数据传输
+     */
+    private clearTempDataTransfer(): string {
         this.tempDataTransfer = null
         return this.tempDataTransfer
     }
 
     /**
      * 初始化或更新 KonvaCanvas
-     * @param params - 包含当前 PDF 页面视图, 是否需要缩放和页码的对象
+     * @param params - 包含当前 PDF 页面视图、是否需要 CSS 转换和页码的对象
      */
     public initCanvas({ pageView, cssTransform, pageNumber }: { pageView: PDFPageView; cssTransform: boolean; pageNumber: number }): void {
         if (cssTransform) {
@@ -449,22 +490,25 @@ export class Painter {
     }
 
     /**
-     * 激活特定注释类型的方法
-     * @param annotation - 注释类型对象
+     * 激活特定批注类型
+     * @param annotation - 批注类型对象
+     * @param dataTransfer - 数据传输
      */
     public activate(annotation: IAnnotationType | null, dataTransfer: string | null): void {
         this.currentAnnotation = annotation
         this.disablePainting()
         this.saveTempDataTransfer(dataTransfer)
+
         if (!annotation) {
             return
         }
+
         console.log(`Painting mode active type: ${annotation.type} | pdfjs annotationStorage type: ${annotation.pdfjsType}`)
         switch (annotation.type) {
             case AnnotationType.HIGHLIGHT:
             case AnnotationType.STRIKEOUT:
             case AnnotationType.UNDERLINE:
-                this.setMode('selection')
+                this.setMode('selection') // 设置选择模式
                 break
 
             case AnnotationType.FREETEXT:
@@ -475,18 +519,21 @@ export class Painter {
             case AnnotationType.SIGNATURE:
             case AnnotationType.STAMP:
             case AnnotationType.SELECT:
-                this.setMode('painting')
+                this.setMode('painting') // 设置绘画模式
                 break
 
             default:
-                this.setMode('default')
+                this.setMode('default') // 设置默认模式
                 break
         }
 
         this.enablePainting()
     }
 
-    public resetPdfjsAnnotationStorage() {
+    /**
+     * 重置 PDF.js 批注存储
+     */
+    public resetPdfjsAnnotationStorage(): void {
         this.store.resetAnnotationStorage()
     }
 }

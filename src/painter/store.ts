@@ -8,6 +8,7 @@ const PDFJS_INTERNAL_EDITOR_PREFIX = 'pdfjs_internal_editor_'
 export class Store {
     private annotationStore: Map<string, IAnnotationStore> = new Map()
     private pdfViewerApplication: PDFViewerApplication
+
     constructor({ PDFViewerApplication }: { PDFViewerApplication: PDFViewerApplication }) {
         this.pdfViewerApplication = PDFViewerApplication
     }
@@ -31,7 +32,7 @@ export class Store {
             content: annotationContent,
             time: new Date().getTime()
         })
-        console.log(this.annotationStore)
+        console.log('%c [ annotationStore ]', 'font-size:13px; background:#6318bc; color:#a75cff;', this.annotationStore)
     }
 
     public update(id: string, updates: Partial<IAnnotationStore>) {
@@ -66,37 +67,28 @@ export class Store {
      * @param id - 要删除的注释的 ID。
      */
     public delete(id: string): void {
-        // 检查注释是否存在
         if (this.annotationStore.has(id)) {
-            // 从 annotationStore 中删除注释
             this.annotationStore.delete(id)
-
-            // 从 pdfjsAnnotationStorage 中删除与该注释关联的值
             this.pdfViewerApplication.pdfDocument.annotationStorage.remove(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}`)
-
-            console.log(`Annotation with id ${id} deleted.`)
         } else {
             console.warn(`Annotation with id ${id} not found.`)
         }
     }
 
+    /**
+     * 重置 pdfjs annotationStorage中的ImageBitmap
+     */
     public async resetAnnotationStorage(): Promise<void> {
-        // 获取 annotationStorage 对象
         const annotationStorage = this.pdfViewerApplication.pdfDocument.annotationStorage
-
-        // 遍历 annotationStorage 中所有的键
         for (const key in annotationStorage._storage) {
-            // 如果键是以 PDFJS_INTERNAL_EDITOR_PREFIX 开头的，则删除它
             if (key.startsWith(PDFJS_INTERNAL_EDITOR_PREFIX)) {
                 annotationStorage.remove(key)
             }
         }
-        // 使用兼容 ES5 的方式遍历 annotationStore
         this.annotationStore.forEach(async (annotation, id) => {
             if (annotation.content && annotation.content.image) {
                 // 如果存在 content.image，将其 base64 转换为 ImageBitmap
                 annotation.pdfjsAnnotationStorage.bitmap = await base64ToImageBitmap(annotation.content.image)
-                // 重新设置值
                 annotationStorage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${annotation.id}`, annotation.pdfjsAnnotationStorage)
             }
         })

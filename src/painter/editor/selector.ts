@@ -3,21 +3,25 @@ import { DefaultChooseSetting, IAnnotationStore } from '../../const/definitions'
 import { KonvaCanvas } from '../index'
 import { SELECTOR_HOVER_STYLE, SHAPE_GROUP_NAME } from '../const'
 
-// 定义选择器的选项接口
+/**
+ * 定义选择器的选项接口
+ */
 export interface ISelectorOptions {
-    konvaCanvasStore: Map<number, KonvaCanvas> // 存储各个页面的Konva画布实例
+    konvaCanvasStore: Map<number, KonvaCanvas> // 存储各个页面的 Konva 画布实例
     getAnnotationStore: (id: string) => IAnnotationStore // 获取注解存储的方法
-    onChange: (id: string, konvaGroupString: string, rawAnnotationStore: IAnnotationStore) => void
-    onDelete: (id: string) => void
+    onChange: (id: string, konvaGroupString: string, rawAnnotationStore: IAnnotationStore) => void // 注解变化时的回调
+    onDelete: (id: string) => void // 删除注解时的回调
 }
 
-// 定义选择器类
+/**
+ * 定义选择器类
+ */
 export class Selector {
     public readonly onChange: (id: string, konvaGroupString: string, rawAnnotationStore: IAnnotationStore) => void
     public readonly onDelete: (id: string) => void
     private transformerStore: Map<string, Konva.Transformer> = new Map() // 存储变换器实例
     private getAnnotationStore: (id: string) => IAnnotationStore // 获取注解存储的方法
-    private konvaCanvasStore: Map<number, KonvaCanvas> // 存储各个页面的Konva画布实例
+    private konvaCanvasStore: Map<number, KonvaCanvas> // 存储各个页面的 Konva 画布实例
 
     private _currentTransformerId: string | null = null // 当前激活的变换器ID
 
@@ -46,16 +50,16 @@ export class Selector {
     }
 
     /**
-     * 禁用给定Konva舞台上的默认事件。
-     * @param konvaStage - 要禁用事件的Konva舞台。
+     * 禁用给定 Konva Stage上的默认事件。
+     * @param konvaStage - 要禁用事件的 Konva Stage。
      */
     private disableStageEvents(konvaStage: Konva.Stage): void {
         konvaStage.off('click mousedown mousemove mouseup mouseenter mouseout')
     }
 
     /**
-     * 绑定Konva舞台上的全局点击事件。
-     * @param konvaStage - 要绑定事件的Konva舞台。
+     * 绑定 Konva Stage上的全局点击事件。
+     * @param konvaStage - 要绑定事件的 Konva Stage。
      */
     private bindStageEvents(konvaStage: Konva.Stage): void {
         konvaStage.on('click', e => {
@@ -65,24 +69,24 @@ export class Selector {
     }
 
     /**
-     * 获取Konva舞台的背景图层。
-     * @param konvaStage - 要获取背景图层的Konva舞台。
-     * @returns Konva舞台的背景图层。
+     * 获取 Konva Stage的背景图层。
+     * @param konvaStage - 要获取背景图层的 Konva Stage。
+     * @returns Konva Stage的背景图层。
      */
     private getBackgroundLayer(konvaStage: Konva.Stage): Konva.Layer {
         return konvaStage.getLayers()[0]
     }
 
     /**
-     * 获取给定Konva舞台上的所有形状组。
-     * @param konvaStage - 要获取形状组的Konva舞台。
+     * 获取给定 Konva Stage上的所有形状组。
+     * @param konvaStage - 要获取形状组的 Konva Stage。
      * @returns 形状组的数组。
      */
     private getPageShapeGroups(konvaStage: Konva.Stage): Konva.Group[] {
         return this.getBackgroundLayer(konvaStage).getChildren(node => node.name() === SHAPE_GROUP_NAME) as Konva.Group[]
     }
 
-    // 获取指定id的形状组
+    // 获取指定 id 的形状组
     private getGroupById(konvaStage: Konva.Stage, groupId: string): Konva.Group | null {
         const pageGroups = this.getPageShapeGroups(konvaStage)
         return pageGroups.find(group => group.id() === groupId) || null
@@ -95,7 +99,7 @@ export class Selector {
     /**
      * 启用给定组中的所有形状的交互功能。
      * @param groups - 要启用的形状组。
-     * @param konvaStage - 形状组所在的Konva舞台。
+     * @param konvaStage - 形状组所在的 Konva Stage。
      */
     private enableShapeGroups(groups: Konva.Group[], konvaStage: Konva.Stage): void {
         groups.forEach(group => {
@@ -125,7 +129,7 @@ export class Selector {
     /**
      * 为给定形状绑定点击、鼠标悬停和鼠标离开事件。
      * @param shape - 要绑定事件的形状。
-     * @param konvaStage - 形状所在的Konva舞台。
+     * @param konvaStage - 形状所在的 Konva Stage。
      */
     private bindShapeEvents(shape: Konva.Shape, konvaStage: Konva.Stage): void {
         shape.on('click', e => {
@@ -156,7 +160,7 @@ export class Selector {
     /**
      * 处理形状的点击事件。
      * @param shape - 被点击的形状。
-     * @param konvaStage - 形状所在的Konva舞台。
+     * @param konvaStage - 形状所在的 Konva Stage。
      */
     private handleShapeClick(shape: Konva.Shape, konvaStage: Konva.Stage): void {
         const group = shape.findAncestor(`.${SHAPE_GROUP_NAME}`) as Konva.Group
@@ -166,6 +170,11 @@ export class Selector {
         this.bindGlobalEvents() // 绑定全局事件
     }
 
+    /**
+     * 创建变形区域
+     * @param group
+     * @param konvaStage
+     */
     private createTransformer(group: Konva.Group, konvaStage: Konva.Stage) {
         const groupId = group.id()
         this.currentTransformerId = groupId
@@ -345,7 +354,11 @@ export class Selector {
         }
     }
 
-    public selected(id: string) {
+    /**
+     * 选择指定的形状组。
+     * @param id - 要选择的形状组的 ID。
+     */
+    public select(id: string): void {
         this.selectedId = id
     }
 }

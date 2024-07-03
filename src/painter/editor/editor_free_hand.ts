@@ -5,9 +5,16 @@ import { IEditorOptions, Editor } from './editor'
 import { AnnotationType, IAnnotationStore, IPdfjsAnnotationStorage, PdfjsAnnotationEditorType } from '../../const/definitions'
 import { getRGB } from '../../utils/utils'
 
+/**
+ * 自由手绘编辑器类，继承自基础编辑器类 Editor，用于在画布上绘制自由曲线。
+ */
 export class EditorFreeHand extends Editor {
     private line: Konva.Line | null // 当前正在绘制的自由曲线
 
+    /**
+     * 构造函数，初始化自由手绘编辑器。
+     * @param EditorOptions 编辑器选项接口
+     */
     constructor(EditorOptions: IEditorOptions) {
         super({ ...EditorOptions, editorType: AnnotationType.FREEHAND })
         this.line = null // 初始化当前曲线为null
@@ -24,7 +31,7 @@ export class EditorFreeHand extends Editor {
 
         Editor.TimerClear(this.pageNumber) // 清除当前页的计时器
         this.line = null // 重置当前曲线对象
-        this.isPainting = true
+        this.isPainting = true // 设置绘制状态为真
 
         if (!this.currentShapeGroup) {
             // 如果当前形状组不存在，则创建新的形状组并添加到背景层
@@ -32,15 +39,16 @@ export class EditorFreeHand extends Editor {
             this.getBgLayer().add(this.currentShapeGroup.konvaGroup)
         }
 
+        // 获取当前指针位置，并初始化线条对象
         const pos = this.konvaStage.getRelativePointerPosition()
         this.line = new Konva.Line({
-            stroke: this.currentAnnotation.style.color,
-            strokeWidth: this.currentAnnotation.style.strokeWidth,
-            opacity: this.currentAnnotation.style.opacity,
-            lineCap: 'round',
-            lineJoin: 'round',
-            hitStrokeWidth: 10,
-            visible: false,
+            stroke: this.currentAnnotation.style.color, // 设置线条颜色
+            strokeWidth: this.currentAnnotation.style.strokeWidth, // 设置线条宽度
+            opacity: this.currentAnnotation.style.opacity, // 设置线条透明度
+            lineCap: 'round', // 设置线条端点为圆形
+            lineJoin: 'round', // 设置线条连接处为圆形
+            hitStrokeWidth: 10, // 设置点击检测的宽度
+            visible: false, // 初始化为不可见
             globalCompositeOperation: 'source-over',
             points: [pos.x, pos.y, pos.x, pos.y] // 初始化起始点
         })
@@ -61,9 +69,10 @@ export class EditorFreeHand extends Editor {
         e.evt.preventDefault() // 阻止默认事件，如滚动页面
         this.line.show() // 显示当前绘制的曲线
 
+        // 获取当前指针位置并更新线条点集
         const pos = this.konvaStage.getRelativePointerPosition()
         const newPoints = this.line.points().concat([pos.x, pos.y])
-        this.line.points(newPoints) // 更新曲线的点集
+        this.line.points(newPoints)
     }
 
     /**
@@ -126,8 +135,15 @@ export class EditorFreeHand extends Editor {
         window.removeEventListener('mouseup', this.globalPointerUpHandler) // 移除全局鼠标释放事件监听器
     }
 
+    /**
+     * 刷新 Pdfjs 注释存储，用于更新或修正注释组。
+     * @param groupId 注释组 ID
+     * @param groupString 注释组的序列化字符串
+     * @param rawAnnotationStore 原始注释存储数据
+     * @returns 更新后的 Pdfjs 注释存储对象
+     */
     public async refreshPdfjsAnnotationStorage(groupId: string, groupString: string, rawAnnotationStore: IAnnotationStore) {
-        const ghostGroup = Konva.Node.create(groupString)
+        const ghostGroup = Konva.Node.create(groupString) // 通过序列化字符串创建临时组
         return this.calculateLinesForStorage({
             group: ghostGroup,
             annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
@@ -138,12 +154,15 @@ export class EditorFreeHand extends Editor {
         })
     }
 
+    /**
+     * 修正线条在组内的坐标。
+     * @param line Konva.Line 对象
+     * @param group Konva.Group 对象
+     * @returns 修正后的点集
+     */
     private fixLineCoordinateForGroup(line: Konva.Line, group: Konva.Group) {
-        // 获取组的全局变换矩阵
-        const groupTransform = group.getTransform()
-
-        // 获取线条的局部点集
-        const points = line.points()
+        const groupTransform = group.getTransform() // 获取组的全局变换矩阵
+        const points = line.points() // 获取线条的局部点集
         const transformedPoints: number[] = []
 
         // 遍历点集并应用组的变换
@@ -162,6 +181,7 @@ export class EditorFreeHand extends Editor {
 
     /**
      * 将当前绘制的曲线数据转换为 PDF.js 所需的注释存储数据格式。
+     * @param param0 参数对象
      * @returns 符合 PDF.js 注释存储数据格式的对象
      */
     private calculateLinesForStorage({
@@ -230,10 +250,10 @@ export class EditorFreeHand extends Editor {
 
     /**
      * 判断当前绘制的曲线是否太小。
-     * @returns 如果曲线点集长度小于 20 返回 true，否则返回 false
+     * @returns 如果曲线点集长度小于 5 返回 true，否则返回 false
      */
     private isTooSmall(): boolean {
-        return this.line.points().length < 5
+        return this.line.points().length < Editor.MinSize
     }
 
     protected mouseOutHandler() {}

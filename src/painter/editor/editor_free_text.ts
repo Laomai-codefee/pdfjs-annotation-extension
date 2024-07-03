@@ -6,7 +6,14 @@ import { AnnotationType, IAnnotationStore, IPdfjsAnnotationStorage, PdfjsAnnotat
 import { FREE_TEXT_TEXT_CLASS_NAME } from '../const'
 import { base64ToImageBitmap } from '../../utils/utils'
 
+/**
+ * EditorFreeText 是继承自 Editor 的自由文本编辑器类。
+ */
 export class EditorFreeText extends Editor {
+    /**
+     * 创建一个 EditorFreeText 实例。
+     * @param EditorOptions 初始化编辑器的选项
+     */
     constructor(EditorOptions: IEditorOptions) {
         super({ ...EditorOptions, editorType: AnnotationType.FREETEXT })
     }
@@ -16,6 +23,10 @@ export class EditorFreeText extends Editor {
     protected mouseDownHandler() {}
     protected mouseMoveHandler() {}
 
+    /**
+     * 处理鼠标抬起事件，创建输入区域。
+     * @param e Konva 事件对象
+     */
     protected mouseUpHandler(e: KonvaEventObject<PointerEvent>) {
         if (e.currentTarget !== this.konvaStage) {
             return
@@ -26,6 +37,10 @@ export class EditorFreeText extends Editor {
         this.createInputArea(e)
     }
 
+    /**
+     * 创建输入区域（textarea）并设置样式。
+     * @param e Konva 事件对象
+     */
     private createInputArea(e: KonvaEventObject<PointerEvent>) {
         const pos = this.konvaStage.getRelativePointerPosition()
         const { x: scaleX } = this.konvaStage.scale()
@@ -52,9 +67,14 @@ export class EditorFreeText extends Editor {
         this.addInputAreaEventListeners(inputArea, scaleX, pos)
     }
 
-    // 设置 textarea 的样式和初始配置
+    /**
+     * 设置 textarea 的样式和初始配置。
+     * @param inputArea textarea 元素
+     * @param evt 鼠标事件坐标
+     * @param scaleX X 轴缩放比例
+     */
     private setupInputAreaStyles(inputArea: HTMLTextAreaElement, evt: { x: number; y: number }, scaleX: number) {
-        inputArea.placeholder = '回车完成, ESC取消'
+        inputArea.placeholder = '开始输入...'
         inputArea.rows = 1
         inputArea.className = FREE_TEXT_TEXT_CLASS_NAME
 
@@ -67,7 +87,12 @@ export class EditorFreeText extends Editor {
         inputArea.style.color = this.currentAnnotation.style.color
     }
 
-    // 注册 textarea 的事件监听器
+    /**
+     * 注册 textarea 的事件监听器。
+     * @param inputArea textarea 元素
+     * @param scaleX X 轴缩放比例
+     * @param pos 相对位置坐标
+     */
     private addInputAreaEventListeners(inputArea: HTMLTextAreaElement, scaleX: number, pos: { x: number; y: number }) {
         // 动态调整 textarea 的高度以适应输入内容
         inputArea.addEventListener('input', e => this.adjustTextareaHeight(e))
@@ -86,7 +111,10 @@ export class EditorFreeText extends Editor {
         inputArea.addEventListener('keydown', e => this.handleInputAreaKeydown(e, scaleX))
     }
 
-    // 动态调整 textarea 的高度
+    /**
+     * 动态调整 textarea 的高度。
+     * @param event 输入事件对象
+     */
     private adjustTextareaHeight(event: Event) {
         const element = event.target as HTMLTextAreaElement
         element.style.height = 'auto' // 重置高度以重新计算
@@ -94,7 +122,11 @@ export class EditorFreeText extends Editor {
         element.style.height = `${scrollHeight}px` // 设置为内容的实际高度
     }
 
-    // 处理 textarea 的键盘事件
+    /**
+     * 处理 textarea 的键盘事件。
+     * @param e 键盘事件对象
+     * @param scaleX X 轴缩放比例
+     */
     private handleInputAreaKeydown(e: KeyboardEvent, scaleX: number) {
         const target = e.target as HTMLTextAreaElement
         const scrollHeight = target.scrollHeight
@@ -118,6 +150,12 @@ export class EditorFreeText extends Editor {
         }
     }
 
+    /**
+     * 处理输入完成后的操作。
+     * @param inputArea textarea 元素
+     * @param scaleX X 轴缩放比例
+     * @param pos 相对位置坐标
+     */
     private async inputDoneHandler(inputArea: HTMLTextAreaElement, scaleX: number, pos: { x: number; y: number }) {
         const value = inputArea.value.trim()
         const textWidth = inputArea.offsetWidth
@@ -139,7 +177,8 @@ export class EditorFreeText extends Editor {
         })
 
         this.currentShapeGroup.konvaGroup.add(text)
-        // 将 toDataURL 封装成 Promise
+
+        // 将 Text 节点转换为 Image
         const imageUrl = await new Promise<string>(resolve => {
             text.toDataURL({
                 callback: url => resolve(url)
@@ -159,9 +198,11 @@ export class EditorFreeText extends Editor {
                 height: height_rec,
                 base64: imageUrl
             })
+
             // 修正图像的坐标和尺寸
             const { x, y, width, height } = this.fixImageCoordinateForGroup(image, this.currentShapeGroup.konvaGroup)
             const id = this.currentShapeGroup.konvaGroup.id()
+
             // 计算并保存图像的存储信息
             const storage = await this.calculateImageForStorage({
                 x,
@@ -173,6 +214,7 @@ export class EditorFreeText extends Editor {
                 imageUrl,
                 id
             })
+
             // 标记当前形状组为完成状态
             this.setShapeGroupDone(id, storage, {
                 image: imageUrl
@@ -180,17 +222,30 @@ export class EditorFreeText extends Editor {
         })
     }
 
+    /**
+     * 移除输入区域（textarea）并删除对应的形状组。
+     * @param inputArea textarea 元素
+     */
     private removeInputArea(inputArea: HTMLTextAreaElement) {
         inputArea.remove()
         inputArea = null
         this.delShapeGroup(this.currentShapeGroup.id)
     }
 
-    public async refreshPdfjsAnnotationStorage(groupId: string, groupString: string, rawAnnotationStore: IAnnotationStore) {
+    /**
+     * 刷新 PDF.js 注解存储，返回计算后的存储信息。
+     * @param groupId 形状组的 ID
+     * @param groupString 序列化的组字符串
+     * @param rawAnnotationStore 原始注解存储对象
+     * @returns 返回注解的存储信息 IPdfjsAnnotationStorage 的 Promise
+     */
+    public async refreshPdfjsAnnotationStorage(groupId: string, groupString: string, rawAnnotationStore: IAnnotationStore): Promise<IPdfjsAnnotationStorage> {
         const ghostGroup = Konva.Node.create(groupString)
         const image = this.getGroupNodesByClassName(ghostGroup, 'Image')[0] as Konva.Image
 
         const { x, y, width, height } = this.fixImageCoordinateForGroup(image, ghostGroup)
+
+        // 计算并返回注解的存储信息
         const annotationStorage = await this.calculateImageForStorage({
             x,
             y,
@@ -201,9 +256,16 @@ export class EditorFreeText extends Editor {
             imageUrl: image.getAttr('base64'),
             id: groupId
         })
+
         return annotationStorage
     }
 
+    /**
+     * 修正图像在组中的坐标和尺寸，返回全局坐标和尺寸。
+     * @param image Konva.Image 对象
+     * @param group Konva.Group 对象
+     * @returns 返回修正后的坐标和尺寸 { x, y, width, height }
+     */
     private fixImageCoordinateForGroup(image: Konva.Image, group: Konva.Group) {
         const imageLocalRect = image.getClientRect({ relativeTo: group })
 
@@ -228,6 +290,11 @@ export class EditorFreeText extends Editor {
         }
     }
 
+    /**
+     * 计算图像的存储信息，并返回 IPdfjsAnnotationStorage 对象。
+     * @param param0 包含图像信息的参数对象
+     * @returns 返回 Promise<IPdfjsAnnotationStorage> 对象
+     */
     private async calculateImageForStorage({
         x,
         y,
@@ -248,10 +315,13 @@ export class EditorFreeText extends Editor {
         id: string
     }): Promise<IPdfjsAnnotationStorage> {
         const canvasHeight = this.konvaStage.size().height / this.konvaStage.scale().y
+
         // 计算矩形的右下角顶点坐标
         const rectBottomRightX: number = x + width
         const rectBottomRightY: number = y + height
         const rect: [number, number, number, number] = [x, canvasHeight - y, rectBottomRightX, canvasHeight - rectBottomRightY]
+
+        // 构造并返回注解的存储信息对象
         const annotationStorage: IPdfjsAnnotationStorage = {
             annotationType,
             isSvg: false,
@@ -261,18 +331,28 @@ export class EditorFreeText extends Editor {
             rect: rect,
             rotation: 0
         }
-        return Promise.resolve(annotationStorage)
+
+        return annotationStorage
     }
 
+    /**
+     * 将序列化的组字符串添加到 Konva 舞台的背景层中。
+     * @param konvaStage Konva 舞台对象
+     * @param konvaString 序列化的 Konva 字符串
+     */
     public addSerializedGroupToLayer(konvaStage: Konva.Stage, konvaString: string) {
         const ghostGroup = Konva.Node.create(konvaString)
         const oldImage = this.getGroupNodesByClassName(ghostGroup, 'Image')[0] as Konva.Image
         const imageUrl = oldImage.getAttr('base64')
+
+        // 使用 imageUrl 创建新的 Konva.Image
         Konva.Image.fromURL(imageUrl, async image => {
             image.setAttrs(oldImage.getAttrs())
             oldImage.destroy()
             ghostGroup.add(image)
         })
+
+        // 将组添加到背景层
         this.getBgLayer(konvaStage).add(ghostGroup)
     }
 }

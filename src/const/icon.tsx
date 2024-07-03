@@ -60,10 +60,7 @@ const RectangleSvg = () => (
 
 const EllipseSvg = () => (
     <svg height="1em" fill="currentColor" viewBox="0 0 512 512">
-        <path
-            fill="currentColor"
-            d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z"
-        ></path>
+        <path fill="currentColor" d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z"></path>
     </svg>
 )
 
@@ -147,5 +144,18 @@ const PaletteIcon = (props: Partial<CustomIconComponentProps>) => <Icon componen
 
 const FontSizeIcon = (props: Partial<CustomIconComponentProps>) => <Icon component={FontSizeSvg} {...props} />
 
-
-export { SelectIcon, HighlightIcon, StrikeoutIcon, UnderlineIcon, FreetextIcon, RectangleIcon, EllipseIcon, FreehandIcon, FreeHighlightIcon, SignatureIcon, StampIcon, PaletteIcon, FontSizeIcon }
+export {
+    SelectIcon,
+    HighlightIcon,
+    StrikeoutIcon,
+    UnderlineIcon,
+    FreetextIcon,
+    RectangleIcon,
+    EllipseIcon,
+    FreehandIcon,
+    FreeHighlightIcon,
+    SignatureIcon,
+    StampIcon,
+    PaletteIcon,
+    FontSizeIcon
+}

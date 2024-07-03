@@ -11,6 +11,10 @@ export class EditorFreeHighlight extends Editor {
         super({ ...EditorOptions, editorType: AnnotationType.FREE_HIGHLIGHT })
         this.line = null // 初始化当前曲线为 null
     }
+
+    protected mouseOutHandler() {}
+    protected mouseEnterHandler() {}
+
     /**
      * 处理鼠标或触摸指针按下事件，开始绘制自由曲线。
      * @param e Konva 事件对象
@@ -113,20 +117,6 @@ export class EditorFreeHighlight extends Editor {
         if (e.button !== 0) return // 只处理左键释放事件
         this.mouseUpHandler() // 调用指针释放处理方法
         window.removeEventListener('mouseup', this.globalPointerUpHandler) // 移除全局鼠标释放事件监听器
-    }
-
-    public async refreshPdfjsAnnotationStorage(groupId: string, groupString: string, rawAnnotationStore: IAnnotationStore) {
-        const ghostGroup = Konva.Node.create(groupString)
-        const line = this.getGroupNodesByClassName(ghostGroup, 'Line')[0] as Konva.Line
-        return this.calculateLinesForStorage({
-            group: ghostGroup,
-            line,
-            annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
-            color: rawAnnotationStore.pdfjsAnnotationStorage.color,
-            thickness: rawAnnotationStore.pdfjsAnnotationStorage.thickness,
-            opacity: rawAnnotationStore.pdfjsAnnotationStorage.opacity,
-            pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex
-        })
     }
 
     /**
@@ -285,6 +275,24 @@ export class EditorFreeHighlight extends Editor {
         return (this.line?.points().length || 0) < 5
     }
 
-    protected mouseOutHandler() {}
-    protected mouseEnterHandler() {}
+    /**
+     * 刷新 Pdfjs 注释存储，用于更新或修正注释组。
+     * @param groupId 注释组 ID
+     * @param groupString 注释组的序列化字符串
+     * @param rawAnnotationStore 原始注释存储数据
+     * @returns 更新后的 Pdfjs 注释存储对象
+     */
+    public async refreshPdfjsAnnotationStorage(groupId: string, groupString: string, rawAnnotationStore: IAnnotationStore) {
+        const ghostGroup = Konva.Node.create(groupString)
+        const line = this.getGroupNodesByClassName(ghostGroup, 'Line')[0] as Konva.Line
+        return this.calculateLinesForStorage({
+            group: ghostGroup,
+            line,
+            annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
+            color: rawAnnotationStore.pdfjsAnnotationStorage.color,
+            thickness: rawAnnotationStore.pdfjsAnnotationStorage.thickness,
+            opacity: rawAnnotationStore.pdfjsAnnotationStorage.opacity,
+            pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex
+        })
+    }
 }
