@@ -43,7 +43,7 @@ export class EditorFreeText extends Editor {
      */
     private createInputArea(e: KonvaEventObject<PointerEvent>) {
         const pos = this.konvaStage.getRelativePointerPosition()
-        const { x: scaleX } = this.konvaStage.scale()
+        const { y: scaleY } = this.konvaStage.scale()
 
         // 创建和配置 textarea 元素
         const inputArea = document.createElement('textarea')
@@ -53,7 +53,7 @@ export class EditorFreeText extends Editor {
                 x: e.evt.offsetX,
                 y: e.evt.offsetY
             },
-            scaleX
+            scaleY
         )
         this.konvaStage.container().append(inputArea)
 
@@ -64,16 +64,16 @@ export class EditorFreeText extends Editor {
         }, 100)
 
         // 注册事件监听器
-        this.addInputAreaEventListeners(inputArea, scaleX, pos)
+        this.addInputAreaEventListeners(inputArea, scaleY, pos)
     }
 
     /**
      * 设置 textarea 的样式和初始配置。
      * @param inputArea textarea 元素
      * @param evt 鼠标事件坐标
-     * @param scaleX X 轴缩放比例
+     * @param scaleY Y 轴缩放比例
      */
-    private setupInputAreaStyles(inputArea: HTMLTextAreaElement, evt: { x: number; y: number }, scaleX: number) {
+    private setupInputAreaStyles(inputArea: HTMLTextAreaElement, evt: { x: number; y: number }, scaleY: number) {
         inputArea.placeholder = '开始输入...'
         inputArea.rows = 1
         inputArea.className = FREE_TEXT_TEXT_CLASS_NAME
@@ -82,18 +82,18 @@ export class EditorFreeText extends Editor {
         inputArea.style.width = '200px'
         inputArea.style.left = `${evt.x}px`
         inputArea.style.top = `${evt.y}px`
-        inputArea.style.height = `${this.currentAnnotation.style.fontSize * scaleX + 6}px`
-        inputArea.style.fontSize = `${this.currentAnnotation.style.fontSize * scaleX}px`
+        inputArea.style.height = `${this.currentAnnotation.style.fontSize * scaleY + 6}px`
+        inputArea.style.fontSize = `${this.currentAnnotation.style.fontSize * scaleY}px`
         inputArea.style.color = this.currentAnnotation.style.color
     }
 
     /**
      * 注册 textarea 的事件监听器。
      * @param inputArea textarea 元素
-     * @param scaleX X 轴缩放比例
+     * @param scaleY Y 轴缩放比例
      * @param pos 相对位置坐标
      */
-    private addInputAreaEventListeners(inputArea: HTMLTextAreaElement, scaleX: number, pos: { x: number; y: number }) {
+    private addInputAreaEventListeners(inputArea: HTMLTextAreaElement, scaleY: number, pos: { x: number; y: number }) {
         // 动态调整 textarea 的高度以适应输入内容
         inputArea.addEventListener('input', e => this.adjustTextareaHeight(e))
 
@@ -103,12 +103,12 @@ export class EditorFreeText extends Editor {
             if (target.getAttribute('del') === 'true') {
                 this.removeInputArea(target)
             } else {
-                this.inputDoneHandler(target, scaleX, pos)
+                this.inputDoneHandler(target, scaleY, pos)
             }
         })
 
         // 处理键盘事件
-        inputArea.addEventListener('keydown', e => this.handleInputAreaKeydown(e, scaleX))
+        inputArea.addEventListener('keydown', e => this.handleInputAreaKeydown(e, scaleY))
     }
 
     /**
@@ -125,16 +125,16 @@ export class EditorFreeText extends Editor {
     /**
      * 处理 textarea 的键盘事件。
      * @param e 键盘事件对象
-     * @param scaleX X 轴缩放比例
+     * @param scaleY Y 轴缩放比例
      */
-    private handleInputAreaKeydown(e: KeyboardEvent, scaleX: number) {
+    private handleInputAreaKeydown(e: KeyboardEvent, scaleY: number) {
         const target = e.target as HTMLTextAreaElement
         const scrollHeight = target.scrollHeight
 
         if (e.key === 'Enter') {
             if (e.shiftKey) {
                 // 允许在按住 Shift 键的情况下换行
-                target.style.height = `${scrollHeight + this.currentAnnotation.style.fontSize * scaleX}px`
+                target.style.height = `${scrollHeight + this.currentAnnotation.style.fontSize * scaleY}px`
             } else {
                 e.preventDefault()
                 e.stopPropagation()
@@ -153,10 +153,10 @@ export class EditorFreeText extends Editor {
     /**
      * 处理输入完成后的操作。
      * @param inputArea textarea 元素
-     * @param scaleX X 轴缩放比例
+     * @param scaleY Y 轴缩放比例
      * @param pos 相对位置坐标
      */
-    private async inputDoneHandler(inputArea: HTMLTextAreaElement, scaleX: number, pos: { x: number; y: number }) {
+    private async inputDoneHandler(inputArea: HTMLTextAreaElement, scaleY: number, pos: { x: number; y: number }) {
         const value = inputArea.value.trim()
         const textWidth = inputArea.offsetWidth
         inputArea.remove()
@@ -166,13 +166,11 @@ export class EditorFreeText extends Editor {
             this.currentShapeGroup = null
             return
         }
-
         const text = new Konva.Text({
             x: pos.x,
             y: pos.y,
             text: value,
-            width: textWidth / scaleX,
-            fontSize: this.currentAnnotation.style.fontSize,
+            fontSize: this.currentAnnotation.style.fontSize / scaleY,
             fill: this.currentAnnotation.style.color
         })
 
