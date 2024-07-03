@@ -1,17 +1,4 @@
-// Font Awesome 图标导入
-import { faCircle, faSquare } from '@fortawesome/free-regular-svg-icons'
-import {
-    faArrowPointer,
-    faHighlighter,
-    faStrikethrough,
-    faT,
-    faUnderline,
-    faPencil,
-    faPaintbrush,
-    faSignature,
-    faStamp
-} from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { EllipseIcon, FreehandIcon, FreeHighlightIcon, FreetextIcon, HighlightIcon, RectangleIcon, SelectIcon, SignatureIcon, StampIcon, StrikeoutIcon, UnderlineIcon } from './icon'
 
 /**
  * 描述批注路径数据的接口
@@ -133,6 +120,8 @@ export const DefaultSettings = {
     COLOR: DefaultColors[0],
     FONT_SIZE: DefaultFontSize[0],
     HIGHLIGHT_COLOR: DefaultColors[1],
+    STRIKEOUT_COLOR: DefaultColors[0],
+    UNDERLINE_COLOR: DefaultColors[6],
     STROKE_WIDTH: 2,
     OPACITY: 1,
     MAX_CURSOR_SIZE: 96 // 鼠标指针图片最大宽度/高度
@@ -181,7 +170,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         pdfjsType: PdfjsAnnotationEditorType.NONE,
         isOnce: false,
         readonly: true,
-        icon: <FontAwesomeIcon icon={faArrowPointer} />
+        icon: <SelectIcon />
     },
     {
         name: '高亮',
@@ -189,7 +178,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         pdfjsType: PdfjsAnnotationEditorType.HIGHLIGHT,
         isOnce: false,
         readonly: true,
-        icon: <FontAwesomeIcon icon={faHighlighter} />,
+        icon: <HighlightIcon />,
         style: {
             color: DefaultSettings.HIGHLIGHT_COLOR,
             opacity: 0.5
@@ -201,9 +190,9 @@ export const annotationDefinitions: IAnnotationType[] = [
         pdfjsType: PdfjsAnnotationEditorType.HIGHLIGHT,
         isOnce: false,
         readonly: true,
-        icon: <FontAwesomeIcon icon={faStrikethrough} />,
+        icon: <StrikeoutIcon />,
         style: {
-            color: DefaultSettings.COLOR,
+            color: DefaultSettings.STRIKEOUT_COLOR,
             opacity: DefaultSettings.OPACITY
         }
     },
@@ -213,9 +202,9 @@ export const annotationDefinitions: IAnnotationType[] = [
         pdfjsType: PdfjsAnnotationEditorType.HIGHLIGHT,
         isOnce: false,
         readonly: true,
-        icon: <FontAwesomeIcon icon={faUnderline} />,
+        icon: <UnderlineIcon />,
         style: {
-            color: DefaultSettings.COLOR,
+            color: DefaultSettings.UNDERLINE_COLOR,
             opacity: DefaultSettings.OPACITY
         }
     },
@@ -225,7 +214,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         pdfjsType: PdfjsAnnotationEditorType.STAMP,
         isOnce: true,
         readonly: false,
-        icon: <FontAwesomeIcon icon={faT} />,
+        icon: <FreetextIcon />,
         style: {
             color: DefaultSettings.COLOR,
             fontSize: DefaultSettings.FONT_SIZE,
@@ -238,7 +227,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         pdfjsType: PdfjsAnnotationEditorType.INK,
         isOnce: false,
         readonly: false,
-        icon: <FontAwesomeIcon icon={faSquare} />,
+        icon: <RectangleIcon />,
         style: {
             color: DefaultSettings.COLOR,
             strokeWidth: DefaultSettings.STROKE_WIDTH,
@@ -251,7 +240,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         pdfjsType: PdfjsAnnotationEditorType.INK,
         isOnce: false,
         readonly: false,
-        icon: <FontAwesomeIcon icon={faCircle} />,
+        icon: <EllipseIcon />,
         style: {
             color: DefaultSettings.COLOR,
             strokeWidth: DefaultSettings.STROKE_WIDTH,
@@ -264,7 +253,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         pdfjsType: PdfjsAnnotationEditorType.INK,
         isOnce: false,
         readonly: false,
-        icon: <FontAwesomeIcon icon={faPencil} />,
+        icon: <FreehandIcon />,
         style: {
             color: DefaultSettings.COLOR,
             strokeWidth: DefaultSettings.STROKE_WIDTH
@@ -276,7 +265,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         pdfjsType: PdfjsAnnotationEditorType.INK,
         isOnce: false,
         readonly: false,
-        icon: <FontAwesomeIcon icon={faPaintbrush} />,
+        icon: <FreeHighlightIcon />,
         style: {
             color: DefaultSettings.COLOR,
             strokeWidth: 10,
@@ -289,7 +278,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         pdfjsType: PdfjsAnnotationEditorType.STAMP,
         isOnce: true,
         readonly: false,
-        icon: <FontAwesomeIcon icon={faSignature} />,
+        icon: <SignatureIcon />,
         style: {
             strokeWidth: 3,
             opacity: 1
@@ -301,6 +290,6 @@ export const annotationDefinitions: IAnnotationType[] = [
         pdfjsType: PdfjsAnnotationEditorType.STAMP,
         isOnce: true,
         readonly: false,
-        icon: <FontAwesomeIcon icon={faStamp} />
+        icon: <StampIcon />
     }
 ]

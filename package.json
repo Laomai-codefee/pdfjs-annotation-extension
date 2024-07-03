@@ -54,10 +54,6 @@
   },
   "target": "web",
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^6.5.2",
-    "@fortawesome/free-regular-svg-icons": "^6.5.2",
-    "@fortawesome/free-solid-svg-icons": "^6.5.2",
-    "@fortawesome/react-fontawesome": "^0.2.2",
     "antd": "^5.15.3",
     "konva": "^9.3.6",
     "react": "^18.2.0",

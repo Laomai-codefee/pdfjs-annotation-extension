@@ -1,7 +1,7 @@
 import './index.scss' // 导入画笔样式文件
 import Konva from 'konva'
 import { EventBus, PageViewport, PDFPageView, PDFViewerApplication } from 'pdfjs'
-import { AnnotationType, IAnnotationContent, IAnnotationType, IPdfjsAnnotationStorage } from '../types/definitions'
+import { AnnotationType, IAnnotationContent, IAnnotationType, IPdfjsAnnotationStorage } from '../const/definitions'
 import { WebSelection } from './webSelection'
 import { Editor, IShapeGroup } from './editor/editor'
 import { EditorRectangle } from './editor/editor_rectangle'
@@ -36,7 +36,7 @@ export class Painter {
     private store: Store
     private selector: Selector
     private tempDataTransfer: string | null
-    public readonly onActivateOnce: () => void
+    public readonly setDefaultMode: () => void
 
     /**
      * 构造函数，初始化 PDFViewerApplication, EventBus, 和 WebSelection
@@ -45,15 +45,15 @@ export class Painter {
     constructor({
         PDFViewerApplication,
         PDFJS_EventBus,
-        onActivateOnce
+        setDefaultMode
     }: {
         PDFViewerApplication: PDFViewerApplication
         PDFJS_EventBus: EventBus
-        onActivateOnce: () => void
+        setDefaultMode: () => void
     }) {
         this.pdfViewerApplication = PDFViewerApplication
         this.pdfjsEventBus = PDFJS_EventBus
-        this.onActivateOnce = onActivateOnce
+        this.setDefaultMode = setDefaultMode
         this.store = new Store({ PDFViewerApplication })
         this.selector = new Selector({
             konvaCanvasStore: this.konvaCanvasStore,
@@ -78,20 +78,41 @@ export class Painter {
                 const canvas = this.konvaCanvasStore.get(pageNumber)
                 if (canvas) {
                     const { konvaStage, wrapper } = canvas
-                    const editor = new EditorHighLight({
-                        konvaStage,
-                        pageNumber,
-                        annotation: this.currentAnnotation,
-                        onAdd: (shapeGroup, pdfjsAnnotationStorage, annotationContent) => {
-                            this.saveToStore(shapeGroup, pdfjsAnnotationStorage, annotationContent)
+                    const editor = new EditorHighLight(
+                        {
+                            konvaStage,
+                            pageNumber,
+                            annotation: this.currentAnnotation,
+                            onAdd: (shapeGroup, pdfjsAnnotationStorage, annotationContent) => {
+                                this.saveToStore(shapeGroup, pdfjsAnnotationStorage, annotationContent)
+                            }
                         },
-                        
-                    }, this.currentAnnotation.type)
+                        this.currentAnnotation.type
+                    )
                     this.editorStore.set(editor.id, editor)
                     editor.convertTextSelection(elements, wrapper)
                 }
             }
         })
+        this.bindGlobalEvents()
+    }
+
+    /**
+     * 绑定全局事件。
+     */
+    private bindGlobalEvents(): void {
+        window.addEventListener('keyup', this.globalKeyUpHandler)
+    }
+
+    /**
+     * 全局键盘抬起事件处理器。
+     * @param e - 键盘事件。
+     */
+    private globalKeyUpHandler = (e: KeyboardEvent): void => {
+        if (e.code === 'Escape' && (this.currentAnnotation.type === AnnotationType.SIGNATURE || this.currentAnnotation.type === AnnotationType.STAMP)) {
+            removeCssCustomProperty(CURSOR_CSS_PROPERTY)
+            this.setDefaultMode()
+        }
     }
 
     /**
@@ -255,8 +276,8 @@ export class Painter {
                     konvaStage,
                     pageNumber,
                     annotation,
-                    onAdd: (shapeGroup, pdfjsAnnotationStorage) => {
-                        this.saveToStore(shapeGroup, pdfjsAnnotationStorage)
+                    onAdd: (shapeGroup, pdfjsAnnotationStorage, annotationContent) => {
+                        this.saveToStore(shapeGroup, pdfjsAnnotationStorage, annotationContent)
                     }
                 })
                 break
@@ -307,10 +328,10 @@ export class Painter {
                         konvaStage,
                         pageNumber,
                         annotation,
-                        onAdd: (shapeGroup, pdfjsAnnotationStorage) => {
-                            this.saveToStore(shapeGroup, pdfjsAnnotationStorage)
+                        onAdd: (shapeGroup, pdfjsAnnotationStorage, annotationContent) => {
+                            this.saveToStore(shapeGroup, pdfjsAnnotationStorage, annotationContent)
                             if (annotation.isOnce) {
-                                this.onActivateOnce()
+                                this.setDefaultMode()
                                 this.selector.selected(shapeGroup.id)
                             }
                         }
@@ -324,10 +345,10 @@ export class Painter {
                         konvaStage,
                         pageNumber,
                         annotation,
-                        onAdd: (shapeGroup, pdfjsAnnotationStorage) => {
-                            this.saveToStore(shapeGroup, pdfjsAnnotationStorage)
+                        onAdd: (shapeGroup, pdfjsAnnotationStorage, annotationContent) => {
+                            this.saveToStore(shapeGroup, pdfjsAnnotationStorage, annotationContent)
                             if (annotation.isOnce) {
-                                this.onActivateOnce()
+                                this.setDefaultMode()
                                 this.selector.selected(shapeGroup.id)
                             }
                         }
@@ -463,5 +484,9 @@ export class Painter {
         }
 
         this.enablePainting()
+    }
+
+    public resetPdfjsAnnotationStorage() {
+        this.store.resetAnnotationStorage()
     }
 }

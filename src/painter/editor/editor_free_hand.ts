@@ -2,7 +2,7 @@ import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 
 import { IEditorOptions, Editor } from './editor'
-import { AnnotationType, IAnnotationStore, IPdfjsAnnotationStorage, PdfjsAnnotationEditorType } from '../../types/definitions'
+import { AnnotationType, IAnnotationStore, IPdfjsAnnotationStorage, PdfjsAnnotationEditorType } from '../../const/definitions'
 import { getRGB } from '../../utils/utils'
 
 export class EditorFreeHand extends Editor {

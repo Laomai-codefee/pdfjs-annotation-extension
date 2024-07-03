@@ -1,2 +1,3 @@
-dist
+examples
+examples/**/*/
 node_modules/**/*

@@ -1,11 +1,10 @@
 import './index.scss'
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
-import { annotationDefinitions, AnnotationType, DefaultColors, DefaultFontSize, DefaultSettings, IAnnotationType } from '../../types/definitions'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPalette, faTextHeight } from '@fortawesome/free-solid-svg-icons'
+import { annotationDefinitions, AnnotationType, DefaultColors, DefaultFontSize, DefaultSettings, IAnnotationType } from '../../const/definitions'
 import { ColorPicker, Dropdown } from 'antd'
 import { SignatureTool } from './signature'
 import { StampTool } from './stamp'
+import { FontSizeIcon, PaletteIcon } from '../../const/icon'
 
 interface CustomToolbarProps {
     onChange: (annotation: IAnnotationType | null, dataTransfer: string | null) => void
@@ -124,7 +123,7 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
                 >
                     <li className={isColorDisabled ? 'disabled' : ''}>
                         <div className="icon">
-                            <FontAwesomeIcon icon={faPalette} style={{ color: currentAnnotation?.style?.color }} />
+                            <PaletteIcon style={{ color: currentAnnotation?.style?.color }} />
                         </div>
                         <div className="name">颜色</div>
                     </li>
@@ -132,7 +131,7 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
                 <Dropdown menu={{ items: fontSizeMenuItems }} trigger={['click']}>
                     <li className={isFontSizeDisabled ? 'disabled' : ''}>
                         <div className="icon">
-                            <FontAwesomeIcon icon={faTextHeight} />
+                            <FontSizeIcon />
                         </div>
                         <div className="name">字号</div>
                     </li>

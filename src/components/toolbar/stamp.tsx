@@ -1,4 +1,4 @@
-import { IAnnotationType } from '../../types/definitions' // 导入自定义注释类型
+import { IAnnotationType } from '../../const/definitions' // 导入自定义注释类型
 import { formatFileSize } from '../../utils/utils' // 导入文件大小格式化工具
 import './index.scss' // 导入组件的样式
 import React from 'react' // 导入 React

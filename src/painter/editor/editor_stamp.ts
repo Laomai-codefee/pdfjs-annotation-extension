@@ -2,7 +2,7 @@ import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 
 import { IEditorOptions, Editor } from './editor'
-import { AnnotationType, DefaultSettings, IAnnotationStore, IAnnotationType, IPdfjsAnnotationStorage, PdfjsAnnotationEditorType } from '../../types/definitions'
+import { AnnotationType, DefaultSettings, IAnnotationStore, IAnnotationType, IPdfjsAnnotationStorage, PdfjsAnnotationEditorType } from '../../const/definitions'
 import { base64ToImageBitmap, resizeImage, setCssCustomProperty } from '../../utils/utils'
 import { CURSOR_CSS_PROPERTY } from '../const'
 
@@ -27,6 +27,16 @@ export class EditorStamp extends Editor {
             const { width, height } = image.getClientRect()
             const { newWidth, newHeight } = resizeImage(width, height, DefaultSettings.MAX_CURSOR_SIZE)
             const crosshair = { x: newWidth / 2, y: newHeight / 2 }
+
+            const border = new Konva.Rect({
+                x: 0,
+                y: 0,
+                width: newWidth,
+                height: newHeight,
+                stroke: 'red',
+                strokeWidth: 2
+            })
+
             const horizontalLine = new Konva.Line({
                 points: [0, crosshair.y, newWidth, crosshair.y],
                 stroke: 'red',
@@ -55,7 +65,7 @@ export class EditorStamp extends Editor {
                 height: newHeight,
                 visible: true
             })
-            cursorGroup.add(image, horizontalLine, verticalLine, point)
+            cursorGroup.add(image, horizontalLine, verticalLine, point, border)
             const cursorImg = cursorGroup.toDataURL()
             cursorGroup.destroy()
             setCssCustomProperty(CURSOR_CSS_PROPERTY, `url(${cursorImg}) ${crosshair.x} ${crosshair.y}, default`)
@@ -96,7 +106,10 @@ export class EditorStamp extends Editor {
                     pageIndex: this.pageNumber - 1,
                     stampUrl: this.stampUrl,
                     id
-                })
+                }),
+                {
+                    image: this.stampUrl
+                }
             )
             this.stampImage = null
         })

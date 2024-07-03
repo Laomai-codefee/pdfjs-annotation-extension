@@ -1,5 +1,5 @@
 import { Button, Modal, Popover } from 'antd' // 导入 antd 组件
-import { DefaultSignatureSetting, IAnnotationType } from '../../types/definitions' // 导入自定义类型和默认设置
+import { DefaultSignatureSetting, IAnnotationType } from '../../const/definitions' // 导入自定义类型和默认设置
 import './index.scss' // 导入样式
 import React, { useEffect, useRef, useState, useCallback } from 'react' // 导入 React 和相关 Hooks
 import Konva from 'konva' // 导入 Konva 库

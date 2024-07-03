@@ -1,5 +1,5 @@
 import Konva from 'konva'
-import { AnnotationType, IAnnotationContent, IAnnotationStore, IAnnotationType, IPdfjsAnnotationStorage } from '../../types/definitions'
+import { AnnotationType, IAnnotationContent, IAnnotationStore, IAnnotationType, IPdfjsAnnotationStorage } from '../../const/definitions'
 import { KonvaEventObject } from 'konva/lib/Node'
 import { generateUUID } from '../../utils/utils'
 import { SHAPE_GROUP_NAME } from '../const'

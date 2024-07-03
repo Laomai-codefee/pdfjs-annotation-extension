@@ -2,7 +2,7 @@ import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 
 import { IEditorOptions, Editor } from './editor'
-import { AnnotationType, IAnnotationStore, IPdfjsAnnotationStorage, PdfjsAnnotationEditorType } from '../../types/definitions'
+import { AnnotationType, IAnnotationStore, IPdfjsAnnotationStorage, PdfjsAnnotationEditorType } from '../../const/definitions'
 import { FREE_TEXT_TEXT_CLASS_NAME } from '../const'
 import { base64ToImageBitmap } from '../../utils/utils'
 
@@ -174,7 +174,9 @@ export class EditorFreeText extends Editor {
                 id
             })
             // 标记当前形状组为完成状态
-            this.setShapeGroupDone(id, storage)
+            this.setShapeGroupDone(id, storage, {
+                image: imageUrl
+            })
         })
     }
 

@@ -25,3 +25,8 @@ node_modules/
 # Output
 dist/
 *.log
+
+# stats
+stats.json
+
+yarn.lock

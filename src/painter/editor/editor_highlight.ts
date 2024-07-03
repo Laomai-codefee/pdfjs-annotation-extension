@@ -1,6 +1,6 @@
 import Konva from 'konva'
 import { IEditorOptions, Editor } from './editor'
-import { AnnotationType, IPdfjsAnnotationStorage } from '../../types/definitions'
+import { AnnotationType, IPdfjsAnnotationStorage } from '../../const/definitions'
 import { getRGB } from '../../utils/utils'
 
 export class EditorHighLight extends Editor {

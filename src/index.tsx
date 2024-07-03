@@ -4,7 +4,7 @@ import { CustomToolbarRef, CustomToolbar } from './components/toolbar' // 导入
 import { EventBus, PDFPageView, PDFViewerApplication } from 'pdfjs' // 导入 PDF.js 相关组件和类型
 import { createRef } from 'react' // 导入 React 的 createRef 方法
 import { Painter } from './painter' // 导入画笔类
-import { annotationDefinitions } from './types/definitions'
+import { annotationDefinitions } from './const/definitions'
 
 class PdfjsAnnotationExtension {
     PDFJS_PDFViewerApplication: PDFViewerApplication // PDF.js 的 PDFViewerApplication 对象
@@ -28,7 +28,7 @@ class PdfjsAnnotationExtension {
         this.painter = new Painter({
             PDFViewerApplication: this.PDFJS_PDFViewerApplication,
             PDFJS_EventBus: this.PDFJS_EventBus,
-            onActivateOnce: () => {
+            setDefaultMode: () => {
                 this.customToolbarRef.current.activeAnnotation(annotationDefinitions[0])
             }
         })
@@ -66,10 +66,18 @@ class PdfjsAnnotationExtension {
         )
     }
 
+    private hidePdfjsEditorModeButtons() {
+        const editorModeButtons = document.querySelector('#editorModeButtons') as HTMLDivElement
+        const editorModeSeparator = document.querySelector('#editorModeSeparator') as HTMLDivElement
+        editorModeButtons.style.display = 'none'
+        editorModeSeparator.style.display = 'none'
+    }
+
     /**
      * @description 绑定 PDF.js 事件
      */
     private bindPdfjsEvent() {
+        this.hidePdfjsEditorModeButtons()
         // 监听 PDF.js 页面渲染完成事件
         this.PDFJS_EventBus._on(
             'pagerendered',
@@ -80,6 +88,14 @@ class PdfjsAnnotationExtension {
         // 监听PDF.js documentloaded 事件，完成后绑定WebSelection， 在id="viewer"元素上绑定
         this.PDFJS_EventBus._on('documentloaded', () => {
             this.painter.initWebSelection(this.$PDFJS_viewerContainer)
+        })
+
+        // 重置 Pdfjs AnnotationStorage 解决有嵌入图片打印、下载会ImageBitmap报错的问题
+        this.PDFJS_EventBus._on('beforeprint', () => {
+            this.painter.resetPdfjsAnnotationStorage()
+        })
+        this.PDFJS_EventBus._on('download', () => {
+            this.painter.resetPdfjsAnnotationStorage()
         })
     }
 }

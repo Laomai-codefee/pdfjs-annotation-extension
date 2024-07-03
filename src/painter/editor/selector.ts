@@ -1,5 +1,5 @@
 import Konva from 'konva'
-import { DefaultChooseSetting, IAnnotationStore } from '../../types/definitions'
+import { DefaultChooseSetting, IAnnotationStore } from '../../const/definitions'
 import { KonvaCanvas } from '../index'
 import { SELECTOR_HOVER_STYLE, SHAPE_GROUP_NAME } from '../const'
 

@@ -1,4 +1,5 @@
-import { IAnnotationContent, IAnnotationStore, IPdfjsAnnotationStorage } from '../types/definitions'
+import { IAnnotationContent, IAnnotationStore, IPdfjsAnnotationStorage } from '../const/definitions'
+import { base64ToImageBitmap } from '../utils/utils'
 import { IShapeGroup } from './editor/editor'
 import { PDFViewerApplication } from 'pdfjs'
 
@@ -30,6 +31,7 @@ export class Store {
             content: annotationContent,
             time: new Date().getTime()
         })
+        console.log(this.annotationStore)
     }
 
     public update(id: string, updates: Partial<IAnnotationStore>) {
@@ -76,5 +78,27 @@ export class Store {
         } else {
             console.warn(`Annotation with id ${id} not found.`)
         }
+    }
+
+    public async resetAnnotationStorage(): Promise<void> {
+        // 获取 annotationStorage 对象
+        const annotationStorage = this.pdfViewerApplication.pdfDocument.annotationStorage
+
+        // 遍历 annotationStorage 中所有的键
+        for (const key in annotationStorage._storage) {
+            // 如果键是以 PDFJS_INTERNAL_EDITOR_PREFIX 开头的，则删除它
+            if (key.startsWith(PDFJS_INTERNAL_EDITOR_PREFIX)) {
+                annotationStorage.remove(key)
+            }
+        }
+        // 使用兼容 ES5 的方式遍历 annotationStore
+        this.annotationStore.forEach(async (annotation, id) => {
+            if (annotation.content && annotation.content.image) {
+                // 如果存在 content.image，将其 base64 转换为 ImageBitmap
+                annotation.pdfjsAnnotationStorage.bitmap = await base64ToImageBitmap(annotation.content.image)
+                // 重新设置值
+                annotationStorage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${annotation.id}`, annotation.pdfjsAnnotationStorage)
+            }
+        })
     }
 }
