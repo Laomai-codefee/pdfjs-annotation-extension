@@ -97,7 +97,7 @@ export class EditorFreeHand extends Editor {
                         annotationType: this.currentAnnotation.pdfjsType,
                         color: getRGB(this.currentAnnotation.style.color),
                         thickness: this.currentAnnotation.style.strokeWidth || 2,
-                        opacity: this.currentAnnotation.style.opacity,
+                        opacity: this.currentAnnotation.style.opacity || 1,
                         pageIndex: this.pageNumber - 1
                     })
                 )
@@ -115,7 +115,7 @@ export class EditorFreeHand extends Editor {
                     annotationType: this.currentAnnotation.pdfjsType,
                     color: getRGB(this.currentAnnotation.style.color),
                     thickness: this.currentAnnotation.style.strokeWidth || 2,
-                    opacity: this.currentAnnotation.style.opacity,
+                    opacity: this.currentAnnotation.style.opacity || 1,
                     pageIndex: this.pageNumber - 1
                 })
             )
