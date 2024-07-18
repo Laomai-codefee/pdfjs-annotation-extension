@@ -331,7 +331,8 @@ export const annotationDefinitions: IAnnotationType[] = [
         icon: <FreehandIcon />,
         style: {
             color: DefaultSettings.COLOR, // 默认自由绘制颜色
-            strokeWidth: DefaultSettings.STROKE_WIDTH // 默认线条宽度
+            strokeWidth: DefaultSettings.STROKE_WIDTH, // 默认线条宽度
+            opacity: DefaultSettings.OPACITY // 默认透明度
         }
     },
     {
