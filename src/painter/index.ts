@@ -64,9 +64,13 @@ export class Painter {
             onChange: async (id, groupString, rawAnnotationStore) => {
                 const editor = this.findEditorForGroupId(id)
                 if (editor) {
+                    const {annotationStorage , batchPdfjsAnnotationStorage}  = await editor.refreshPdfjsAnnotationStorage(id, groupString, rawAnnotationStore)
                     this.store.update(id, {
                         konvaString: groupString,
-                        pdfjsAnnotationStorage: await editor.refreshPdfjsAnnotationStorage(id, groupString, rawAnnotationStore)
+                        pdfjsAnnotationStorage: annotationStorage,
+                        ...(batchPdfjsAnnotationStorage && batchPdfjsAnnotationStorage.length > 0 && {
+                            content: { batchPdfjsAnnotationStorage }
+                        })
                     })
                 }
             },
@@ -82,6 +86,7 @@ export class Painter {
                     const { konvaStage, wrapper } = canvas
                     const editor = new EditorHighLight(
                         {
+                            pdfViewerApplication: this.pdfViewerApplication,
                             konvaStage,
                             pageNumber,
                             annotation: this.currentAnnotation,
@@ -295,6 +300,7 @@ export class Painter {
         switch (annotation.type) {
             case AnnotationType.FREETEXT:
                 editor = new EditorFreeText({
+                    pdfViewerApplication: this.pdfViewerApplication,
                     konvaStage,
                     pageNumber,
                     annotation,
@@ -305,6 +311,7 @@ export class Painter {
                 break
             case AnnotationType.RECTANGLE:
                 editor = new EditorRectangle({
+                    pdfViewerApplication: this.pdfViewerApplication,
                     konvaStage,
                     pageNumber,
                     annotation,
@@ -316,6 +323,7 @@ export class Painter {
 
             case AnnotationType.ELLIPSE:
                 editor = new EditorEllipse({
+                    pdfViewerApplication: this.pdfViewerApplication,
                     konvaStage,
                     pageNumber,
                     annotation,
@@ -326,6 +334,7 @@ export class Painter {
                 break
             case AnnotationType.FREEHAND:
                 editor = new EditorFreeHand({
+                    pdfViewerApplication: this.pdfViewerApplication,
                     konvaStage,
                     pageNumber,
                     annotation,
@@ -336,6 +345,7 @@ export class Painter {
                 break
             case AnnotationType.FREE_HIGHLIGHT:
                 editor = new EditorFreeHighlight({
+                    pdfViewerApplication: this.pdfViewerApplication,
                     konvaStage,
                     pageNumber,
                     annotation,
@@ -347,6 +357,7 @@ export class Painter {
             case AnnotationType.SIGNATURE:
                 editor = new EditorSignature(
                     {
+                        pdfViewerApplication: this.pdfViewerApplication,
                         konvaStage,
                         pageNumber,
                         annotation,
@@ -364,6 +375,7 @@ export class Painter {
             case AnnotationType.STAMP:
                 editor = new EditorStamp(
                     {
+                        pdfViewerApplication: this.pdfViewerApplication,
                         konvaStage,
                         pageNumber,
                         annotation,

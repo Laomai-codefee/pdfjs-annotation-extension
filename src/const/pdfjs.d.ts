@@ -11,6 +11,7 @@ declare module 'pdfjs' {
         page: number
         eventBus: EventBus
         pdfViewer: PDFPageView
+        pagesCount: number
         [key: string]: any // 其他未知属性的类型定义
     }
     /**

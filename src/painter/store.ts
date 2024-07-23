@@ -13,16 +13,24 @@ export class Store {
         this.pdfViewerApplication = PDFViewerApplication
     }
 
+    /**
+     * 获取指定 ID 的注释
+     * @param id - 注释的 ID
+     * @returns 注释对象，如果存在则返回，否则返回 undefined
+     */
     get annotation() {
-        return (id: string) => {
-            return this.annotationStore.get(id)
-        }
+        return (id: string) => this.annotationStore.get(id)
     }
 
+    /**
+     * 保存注释到本地存储和 PDF.js
+     * @param shapeGroup - 形状组对象
+     * @param pdfjsAnnotationStorage - PDF.js 注释存储对象
+     * @param annotationContent - 注释内容对象（可选）
+     */
     public save(shapeGroup: IShapeGroup, pdfjsAnnotationStorage: IPdfjsAnnotationStorage, annotationContent?: IAnnotationContent) {
         const id = shapeGroup.id
-        this.pdfViewerApplication.pdfDocument.annotationStorage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}`, pdfjsAnnotationStorage)
-        this.annotationStore.set(id, {
+        const store = {
             id,
             pageNumber: shapeGroup.pageNumber,
             konvaString: shapeGroup.konvaGroup.toJSON(),
@@ -30,11 +38,28 @@ export class Store {
             readonly: shapeGroup.annotation.readonly,
             pdfjsAnnotationStorage,
             content: annotationContent,
-            time: new Date().getTime()
-        })
+            time: Date.now()
+        }
+
+        this.annotationStore.set(id, store)
+
+        const storage = this.pdfViewerApplication.pdfDocument.annotationStorage
+        if (annotationContent?.batchPdfjsAnnotationStorage?.length) {
+            annotationContent.batchPdfjsAnnotationStorage.forEach(store => {
+                storage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}-${store.pageIndex}`, store)
+            })
+        } else {
+            storage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}`, pdfjsAnnotationStorage)
+        }
+
         console.log('%c [ annotationStore ]', 'font-size:13px; background:#6318bc; color:#a75cff;', this.annotationStore)
     }
 
+    /**
+     * 更新指定 ID 的注释
+     * @param id - 注释的 ID
+     * @param updates - 更新的部分注释数据
+     */
     public update(id: string, updates: Partial<IAnnotationStore>) {
         if (this.annotationStore.has(id)) {
             const existingAnnotation = this.annotationStore.get(id)
@@ -42,55 +67,86 @@ export class Store {
                 const updatedAnnotation = {
                     ...existingAnnotation,
                     ...updates,
-                    time: new Date().getTime()
+                    time: Date.now()
                 }
                 this.annotationStore.set(id, updatedAnnotation)
-                this.pdfViewerApplication.pdfDocument.annotationStorage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}`, updates.pdfjsAnnotationStorage)
+
+                const storage = this.pdfViewerApplication.pdfDocument.annotationStorage
+                if (updates.content?.batchPdfjsAnnotationStorage?.length) {
+                    updates.content.batchPdfjsAnnotationStorage.forEach(store => {
+                        storage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}-${store.pageIndex}`, store)
+                    })
+                } else {
+                    storage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}`, updates.pdfjsAnnotationStorage)
+                }
             }
         } else {
             console.warn(`Annotation with id ${id} not found.`)
         }
     }
 
+    /**
+     * 根据页面号获取注释
+     * @param pageNumber - 页码
+     * @returns 指定页面的注释列表
+     */
     public getByPage(pageNumber: number): IAnnotationStore[] {
-        const annotations: IAnnotationStore[] = []
-        this.annotationStore.forEach(annotation => {
-            if (annotation.pageNumber === pageNumber) {
-                annotations.push(annotation)
-            }
-        })
-        return annotations
+        // 将 Map 转换为数组，并使用 filter 方法
+        return Array.from(this.annotationStore.values()).filter(annotation => annotation.pageNumber === pageNumber)
     }
 
     /**
-     * 删除指定 ID 的注释。
-     * @param id - 要删除的注释的 ID。
+     * 删除指定 ID 的注释
+     * @param id - 要删除的注释的 ID
      */
     public delete(id: string): void {
         if (this.annotationStore.has(id)) {
+            const batchPdfjsAnnotationStorage = this.annotationStore.get(id)?.content?.batchPdfjsAnnotationStorage
             this.annotationStore.delete(id)
-            this.pdfViewerApplication.pdfDocument.annotationStorage.remove(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}`)
+
+            const storage = this.pdfViewerApplication.pdfDocument.annotationStorage
+            storage.remove(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}`)
+            if (batchPdfjsAnnotationStorage?.length) {
+                batchPdfjsAnnotationStorage.forEach(store => {
+                    storage.remove(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}-${store.pageIndex}`)
+                })
+            }
         } else {
             console.warn(`Annotation with id ${id} not found.`)
         }
     }
 
     /**
-     * 重置 pdfjs annotationStorage中的ImageBitmap
+     * 重置 PDF.js 注释存储中的 ImageBitmap
+     * 将存储中的 Base64 图片转换为 ImageBitmap 并更新存储
      */
     public async resetAnnotationStorage(): Promise<void> {
         const annotationStorage = this.pdfViewerApplication.pdfDocument.annotationStorage
+
+        // 删除内部编辑器的所有注释
         for (const key in annotationStorage._storage) {
             if (key.startsWith(PDFJS_INTERNAL_EDITOR_PREFIX)) {
                 annotationStorage.remove(key)
             }
         }
-        this.annotationStore.forEach(async (annotation, id) => {
-            if (annotation.content && annotation.content.image) {
-                // 如果存在 content.image，将其 base64 转换为 ImageBitmap
-                annotation.pdfjsAnnotationStorage.bitmap = await base64ToImageBitmap(annotation.content.image)
-                annotationStorage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${annotation.id}`, annotation.pdfjsAnnotationStorage)
+
+        // 更新存储中的 ImageBitmap
+        const entries = Array.from(this.annotationStore.entries())
+        for (const [id, annotation] of entries) {
+            if (annotation.content?.image) {
+                const batchPdfjsAnnotationStorage = annotation.content.batchPdfjsAnnotationStorage
+                const bitmap = await base64ToImageBitmap(annotation.content.image)
+
+                if (batchPdfjsAnnotationStorage?.length) {
+                    for (const store of batchPdfjsAnnotationStorage) {
+                        store.bitmap = bitmap
+                        annotationStorage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}-${store.pageIndex}`, store)
+                    }
+                } else {
+                    annotation.pdfjsAnnotationStorage.bitmap = bitmap
+                    annotationStorage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}`, annotation.pdfjsAnnotationStorage)
+                }
             }
-        })
+        }
     }
 }

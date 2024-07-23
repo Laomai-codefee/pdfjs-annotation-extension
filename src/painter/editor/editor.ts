@@ -3,11 +3,13 @@ import { AnnotationType, IAnnotationContent, IAnnotationStore, IAnnotationType, 
 import { KonvaEventObject } from 'konva/lib/Node'
 import { generateUUID } from '../../utils/utils'
 import { SHAPE_GROUP_NAME } from '../const'
+import { PDFViewerApplication } from 'pdfjs'
 
 /**
  * IEditorOptions 接口定义了编辑器的初始化选项。
  */
 export interface IEditorOptions {
+    pdfViewerApplication: PDFViewerApplication
     konvaStage: Konva.Stage // Konva Stage对象
     pageNumber: number // 页面编号
     annotation: IAnnotationType | null // 当前注解对象，可以为 null
@@ -35,6 +37,7 @@ export interface IShapeGroup {
  * Editor 是一个抽象类，定义了编辑器的基本行为和属性。
  */
 export abstract class Editor {
+    protected pdfViewerApplication: PDFViewerApplication
     public readonly id: string // 编辑器实例的唯一标识符
     public readonly onAdd: (shapeGroup: IShapeGroup, pdfjsAnnotationStorage: IPdfjsAnnotationStorage, annotationContent?: IAnnotationContent) => void // 添加形状组的回调函数
     protected konvaStage: Konva.Stage // Konva Stage对象
@@ -50,7 +53,8 @@ export abstract class Editor {
      * Editor 类的构造函数。
      * @param options 初始化编辑器的选项
      */
-    constructor({ konvaStage, pageNumber, annotation, onAdd, editorType }: IEditorOptions & { editorType: AnnotationType }) {
+    constructor({ konvaStage, pageNumber, annotation, onAdd, editorType, pdfViewerApplication }: IEditorOptions & { editorType: AnnotationType }) {
+        this.pdfViewerApplication = pdfViewerApplication
         this.id = `${pageNumber}_${editorType}` // 构造唯一标识符
         this.konvaStage = konvaStage // 初始化 Konva Stage对象
         this.pageNumber = pageNumber // 初始化页面编号
@@ -226,7 +230,7 @@ export abstract class Editor {
      * @param rawAnnotationStore 原始注解存储对象
      * @returns 返回更新后的 PDF.js 注解存储对象的 Promise
      */
-    public abstract refreshPdfjsAnnotationStorage(groupId: string, groupString: string, rawAnnotationStore: IAnnotationStore): Promise<IPdfjsAnnotationStorage>
+    public abstract refreshPdfjsAnnotationStorage(groupId: string, groupString: string, rawAnnotationStore: IAnnotationStore): Promise<{annotationStorage :IPdfjsAnnotationStorage, batchPdfjsAnnotationStorage?: IPdfjsAnnotationStorage[]}>
 
     /**
      * 处理鼠标按下事件的抽象方法，子类需实现具体逻辑。

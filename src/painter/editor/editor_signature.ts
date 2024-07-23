@@ -144,7 +144,11 @@ export class EditorSignature extends Editor {
      * @param rawAnnotationStore 原始注解存储对象
      * @returns 返回更新后的 PDF.js 注解存储对象的 Promise
      */
-    public async refreshPdfjsAnnotationStorage(groupId: string, groupString: string, rawAnnotationStore: IAnnotationStore): Promise<IPdfjsAnnotationStorage> {
+    public async refreshPdfjsAnnotationStorage(
+        groupId: string,
+        groupString: string,
+        rawAnnotationStore: IAnnotationStore
+    ): Promise<{ annotationStorage: IPdfjsAnnotationStorage; batchPdfjsAnnotationStorage?: IPdfjsAnnotationStorage[] }> {
         const ghostGroup = Konva.Node.create(groupString)
         const image = this.getGroupNodesByClassName(ghostGroup, 'Image')[0] as Konva.Image
         const { x, y, width, height } = this.fixImageCoordinateForGroup(image, ghostGroup)
@@ -160,7 +164,7 @@ export class EditorSignature extends Editor {
             signatureUrl: image.getAttr('base64'),
             id: groupId
         })
-        return annotationStorage
+        return { annotationStorage }
     }
 
     /**

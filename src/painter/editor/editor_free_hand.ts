@@ -144,14 +144,16 @@ export class EditorFreeHand extends Editor {
      */
     public async refreshPdfjsAnnotationStorage(groupId: string, groupString: string, rawAnnotationStore: IAnnotationStore) {
         const ghostGroup = Konva.Node.create(groupString) // 通过序列化字符串创建临时组
-        return this.calculateLinesForStorage({
-            group: ghostGroup,
-            annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
-            color: rawAnnotationStore.pdfjsAnnotationStorage.color,
-            thickness: rawAnnotationStore.pdfjsAnnotationStorage.thickness,
-            opacity: rawAnnotationStore.pdfjsAnnotationStorage.opacity,
-            pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex
-        })
+        return {
+            annotationStorage: this.calculateLinesForStorage({
+                group: ghostGroup,
+                annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
+                color: rawAnnotationStore.pdfjsAnnotationStorage.color,
+                thickness: rawAnnotationStore.pdfjsAnnotationStorage.thickness,
+                opacity: rawAnnotationStore.pdfjsAnnotationStorage.opacity,
+                pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex
+            })
+        }
     }
 
     /**

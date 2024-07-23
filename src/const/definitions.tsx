@@ -221,6 +221,7 @@ export interface IAnnotationStyle {
 export interface IAnnotationContent {
     text?: string // 批注的文本内容
     image?: string // 批注的图像内容
+    batchPdfjsAnnotationStorage?: IPdfjsAnnotationStorage[] //批量应用对应的 pdfjs store
 }
 
 // 批注存储接口

@@ -148,18 +148,20 @@ export class EditorEllipse extends Editor {
         const ghostGroup = Konva.Node.create(groupString) // 通过序列化字符串创建临时组
         const ellipse = this.getGroupNodesByClassName(ghostGroup, 'Ellipse')[0] as Konva.Ellipse // 获取椭圆对象
         const { x, y, radiusX, radiusY } = this.fixShapeCoordinateForGroup(ellipse, ghostGroup) // 修正椭圆坐标
-
-        return this.calculateEllipseForStorage({
-            x,
-            y,
-            radiusX,
-            radiusY,
-            annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
-            color: rawAnnotationStore.pdfjsAnnotationStorage.color,
-            thickness: rawAnnotationStore.pdfjsAnnotationStorage.thickness,
-            opacity: rawAnnotationStore.pdfjsAnnotationStorage.opacity,
-            pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex
-        })
+        return {
+            annotationStorage: this.calculateEllipseForStorage({
+                x,
+                y,
+                radiusX,
+                radiusY,
+                annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
+                color: rawAnnotationStore.pdfjsAnnotationStorage.color,
+                thickness: rawAnnotationStore.pdfjsAnnotationStorage.thickness,
+                opacity: rawAnnotationStore.pdfjsAnnotationStorage.opacity,
+                pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex
+            })
+        }
+        
     }
 
     /**

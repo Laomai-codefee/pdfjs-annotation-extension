@@ -1,10 +1,83 @@
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
-
+import { Input, Modal } from 'antd'
 import { IEditorOptions, Editor } from './editor'
 import { AnnotationType, DefaultSettings, IAnnotationStore, IAnnotationType, IPdfjsAnnotationStorage, PdfjsAnnotationEditorType } from '../../const/definitions'
-import { base64ToImageBitmap, resizeImage, setCssCustomProperty } from '../../utils/utils'
+import { base64ToImageBitmap, parsePageRanges, resizeImage, setCssCustomProperty } from '../../utils/utils'
 import { CURSOR_CSS_PROPERTY } from '../const'
+import type { InputRef } from 'antd/es/input'
+import React from 'react'
+
+/**
+ * 批量设置盖章位置
+ * @returns {Promise<{ parsedPages: number[], originalInput: string }>}
+ */
+async function setBatchStampPageNumbers(): Promise<{ parsedPages: number[]; originalInput: string }> {
+    return new Promise(resolve => {
+        const placeholder = '格式: 1,1-2,3-4'
+        let inputValue = '' // 临时变量来存储输入值
+        let status: '' | 'error' | 'warning' = 'error' // 初始状态设置为错误，确保初始时提交按钮禁用
+        let parsedPages: number[] = [] // 用于存储解析后的页码数组
+        let modal: any
+        const inputRef = React.createRef<InputRef>() // 使用 React.createRef 以确保类型正确
+
+        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+            inputValue = e.target.value // 更新输入值
+            try {
+                parsedPages = parsePageRanges(inputValue)
+                if (parsedPages.length > 0) {
+                    status = '' // 清除错误状态
+                } else {
+                    status = 'error'
+                }
+            } catch (error) {
+                status = 'error'
+                parsedPages = [] // 清空解析结果
+            }
+            // 强制重新渲染 Modal
+            modal.update({
+                content: (
+                    <div>
+                        <div> 应用范围：{status === 'error' && placeholder}</div>
+                        <Input ref={inputRef} status={status} placeholder={placeholder} onChange={handleChange} />
+                    </div>
+                ),
+                okButtonProps: {
+                    disabled: status === 'error'
+                }
+            })
+        }
+
+        modal = Modal.confirm({
+            title: '批量设置',
+            content: (
+                <div>
+                    <div> 应用范围：</div>
+                    <Input ref={inputRef} status={status} placeholder={placeholder} onChange={handleChange} />
+                </div>
+            ),
+            zIndex: 999999,
+            okText: '确定',
+            cancelText: '取消',
+            okButtonProps: {
+                disabled: status === 'error'
+            },
+            onOk: () => {
+                resolve({ parsedPages, originalInput: inputValue }) // 解析 Promise 并返回输入值和解析后的页码数组
+            },
+            onCancel: () => {
+                resolve({ parsedPages: [], originalInput: '' }) // 如果用户取消，则解析 Promise 并返回空数组和空字符串
+            }
+        })
+
+        // 使用 setTimeout 确保在 Modal 完全渲染后设置焦点
+        setTimeout(() => {
+            if (inputRef.current) {
+                inputRef.current.focus()
+            }
+        }, 100)
+    })
+}
 
 /**
  * EditorStamp 是继承自 Editor 的签章编辑器类。
@@ -114,9 +187,40 @@ export class EditorStamp extends Editor {
             })
             this.currentShapeGroup.konvaGroup.add(this.stampImage)
 
+            const { parsedPages, originalInput } = await setBatchStampPageNumbers()
+
+            if (parsedPages.length > 0) {
+                const text = new Konva.Text({
+                    x: pos.x - crosshair.x,
+                    y: pos.y - crosshair.y,
+                    text: `应用范围：${originalInput}`,
+                    fontSize: 12,
+                    fill: 'red'
+                })
+                this.currentShapeGroup.konvaGroup.add(text)
+            }
+
             // 调整图片坐标并更新 PDF.js 注解存储
             const { x, y, width, height } = this.fixImageCoordinateForGroup(this.stampImage, this.currentShapeGroup.konvaGroup)
             const id = this.currentShapeGroup.konvaGroup.id()
+
+            const batchPdfjsAnnotationStorage: IPdfjsAnnotationStorage[] = []
+            for (const pageNumber of parsedPages) {
+                if (pageNumber <= this.pdfViewerApplication.pagesCount) {
+                    const batchStore = await this.calculateImageForStorage({
+                        x,
+                        y,
+                        width,
+                        height,
+                        annotationType: this.currentAnnotation.pdfjsType,
+                        pageIndex: pageNumber - 1,
+                        stampUrl: this.stampUrl,
+                        id: `${id}-${pageNumber - 1}`
+                    })
+                    batchPdfjsAnnotationStorage.push(batchStore)
+                }
+            }
+
             this.setShapeGroupDone(
                 id,
                 await this.calculateImageForStorage({
@@ -130,9 +234,12 @@ export class EditorStamp extends Editor {
                     id
                 }),
                 {
-                    image: this.stampUrl
+                    image: this.stampUrl,
+                    text: originalInput || '',
+                    batchPdfjsAnnotationStorage: batchPdfjsAnnotationStorage
                 }
             )
+
             this.stampImage = null
         })
     }
@@ -144,10 +251,15 @@ export class EditorStamp extends Editor {
      * @param rawAnnotationStore 原始注解存储对象
      * @returns 返回更新后的 PDF.js 注解存储对象的 Promise
      */
-    public async refreshPdfjsAnnotationStorage(groupId: string, groupString: string, rawAnnotationStore: IAnnotationStore): Promise<IPdfjsAnnotationStorage> {
+    public async refreshPdfjsAnnotationStorage(
+        groupId: string,
+        groupString: string,
+        rawAnnotationStore: IAnnotationStore
+    ): Promise<{ annotationStorage: IPdfjsAnnotationStorage; batchPdfjsAnnotationStorage?: IPdfjsAnnotationStorage[] }> {
         const ghostGroup = Konva.Node.create(groupString)
         const image = this.getGroupNodesByClassName(ghostGroup, 'Image')[0] as Konva.Image
         const { x, y, width, height } = this.fixImageCoordinateForGroup(image, ghostGroup)
+        const stampUrl = image.getAttr('base64')
 
         // 计算并返回更新后的 PDF.js 注解存储对象
         const annotationStorage = await this.calculateImageForStorage({
@@ -157,10 +269,31 @@ export class EditorStamp extends Editor {
             height,
             annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
             pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex,
-            stampUrl: image.getAttr('base64'),
+            stampUrl: stampUrl,
             id: groupId
         })
-        return annotationStorage
+
+        // 处理批量 PDF.js 注解存储
+        const batchPdfjsAnnotationStorage: IPdfjsAnnotationStorage[] = []
+        const batchStores = rawAnnotationStore.content?.batchPdfjsAnnotationStorage
+
+        if (batchStores?.length > 0) {
+            for (const store of batchStores) {
+                const newStore = await this.calculateImageForStorage({
+                    x,
+                    y,
+                    width,
+                    height,
+                    annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
+                    pageIndex: store.pageIndex,
+                    stampUrl: stampUrl,
+                    id: `${groupId}-${store.pageIndex}`
+                })
+                batchPdfjsAnnotationStorage.push(newStore)
+            }
+        }
+
+        return { annotationStorage, batchPdfjsAnnotationStorage }
     }
 
     /**
@@ -259,12 +392,15 @@ export class EditorStamp extends Editor {
         const ghostGroup = Konva.Node.create(konvaString)
         const oldImage = this.getGroupNodesByClassName(ghostGroup, 'Image')[0] as Konva.Image
         const imageUrl = oldImage.getAttr('base64')
-
+        const oldText = this.getGroupNodesByClassName(ghostGroup, 'Text')[0] as Konva.Text
         // 从 URL 加载签章图片并替换旧图片
         Konva.Image.fromURL(imageUrl, async image => {
             image.setAttrs(oldImage.getAttrs())
             oldImage.destroy()
             ghostGroup.add(image)
+            if (oldText) {
+                oldText.moveToTop()
+            }
         })
 
         // 将恢复后的组添加到背景图层

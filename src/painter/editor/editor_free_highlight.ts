@@ -285,14 +285,16 @@ export class EditorFreeHighlight extends Editor {
     public async refreshPdfjsAnnotationStorage(groupId: string, groupString: string, rawAnnotationStore: IAnnotationStore) {
         const ghostGroup = Konva.Node.create(groupString)
         const line = this.getGroupNodesByClassName(ghostGroup, 'Line')[0] as Konva.Line
-        return this.calculateLinesForStorage({
-            group: ghostGroup,
-            line,
-            annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
-            color: rawAnnotationStore.pdfjsAnnotationStorage.color,
-            thickness: rawAnnotationStore.pdfjsAnnotationStorage.thickness,
-            opacity: rawAnnotationStore.pdfjsAnnotationStorage.opacity,
-            pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex
-        })
+        return {
+            annotationStorage: this.calculateLinesForStorage({
+                group: ghostGroup,
+                line,
+                annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
+                color: rawAnnotationStore.pdfjsAnnotationStorage.color,
+                thickness: rawAnnotationStore.pdfjsAnnotationStorage.thickness,
+                opacity: rawAnnotationStore.pdfjsAnnotationStorage.opacity,
+                pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex
+            })
+        }
     }
 }

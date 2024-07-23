@@ -237,7 +237,7 @@ export class EditorFreeText extends Editor {
      * @param rawAnnotationStore 原始注解存储对象
      * @returns 返回注解的存储信息 IPdfjsAnnotationStorage 的 Promise
      */
-    public async refreshPdfjsAnnotationStorage(groupId: string, groupString: string, rawAnnotationStore: IAnnotationStore): Promise<IPdfjsAnnotationStorage> {
+    public async refreshPdfjsAnnotationStorage(groupId: string, groupString: string, rawAnnotationStore: IAnnotationStore): Promise<{annotationStorage :IPdfjsAnnotationStorage, batchPdfjsAnnotationStorage?: IPdfjsAnnotationStorage[]}> {
         const ghostGroup = Konva.Node.create(groupString)
         const image = this.getGroupNodesByClassName(ghostGroup, 'Image')[0] as Konva.Image
 
@@ -255,7 +255,7 @@ export class EditorFreeText extends Editor {
             id: groupId
         })
 
-        return annotationStorage
+        return { annotationStorage }
     }
 
     /**

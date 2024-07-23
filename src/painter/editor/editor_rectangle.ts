@@ -124,21 +124,27 @@ export class EditorRectangle extends Editor {
      * @param rawAnnotationStore 原始注解存储对象
      * @returns 返回更新后的 PDF.js 注解存储对象的 Promise
      */
-    public async refreshPdfjsAnnotationStorage(groupId: string, groupString: string, rawAnnotationStore: IAnnotationStore): Promise<IPdfjsAnnotationStorage> {
+    public async refreshPdfjsAnnotationStorage(
+        groupId: string,
+        groupString: string,
+        rawAnnotationStore: IAnnotationStore
+    ): Promise<{ annotationStorage: IPdfjsAnnotationStorage; batchPdfjsAnnotationStorage?: IPdfjsAnnotationStorage[] }> {
         const ghostGroup = Konva.Node.create(groupString) // 根据序列化的组字符串创建 Konva 节点
         const rect = this.getGroupNodesByClassName(ghostGroup, 'Rect')[0] as Konva.Rect // 获取组中的矩形对象
         const { x, y, width, height } = this.fixShapeCoordinateForGroup(rect, ghostGroup) // 调整矩形在组中的坐标
-        return this.calculateRectForStorage({
-            x,
-            y,
-            width,
-            height,
-            annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
-            color: rawAnnotationStore.pdfjsAnnotationStorage.color,
-            thickness: rawAnnotationStore.pdfjsAnnotationStorage.thickness,
-            opacity: rawAnnotationStore.pdfjsAnnotationStorage.opacity,
-            pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex
-        }) // 计算并返回更新后的 PDF.js 注解存储对象
+        return {
+            annotationStorage: this.calculateRectForStorage({
+                x,
+                y,
+                width,
+                height,
+                annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
+                color: rawAnnotationStore.pdfjsAnnotationStorage.color,
+                thickness: rawAnnotationStore.pdfjsAnnotationStorage.thickness,
+                opacity: rawAnnotationStore.pdfjsAnnotationStorage.opacity,
+                pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex
+            }) // 计算并返回更新后的 PDF.js 注解存储对象
+        }
     }
 
     /**
