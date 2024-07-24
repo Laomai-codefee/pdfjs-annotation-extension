@@ -1,10 +1,10 @@
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 
-import { IEditorOptions, Editor } from './editor'
 import { AnnotationType, DefaultSettings, IAnnotationStore, IAnnotationType, IPdfjsAnnotationStorage, PdfjsAnnotationEditorType } from '../../const/definitions'
 import { base64ToImageBitmap, resizeImage, setCssCustomProperty } from '../../utils/utils'
 import { CURSOR_CSS_PROPERTY } from '../const'
+import { Editor, IEditorOptions } from './editor'
 
 /**
  * EditorSignature 是继承自 Editor 的签名编辑器类。

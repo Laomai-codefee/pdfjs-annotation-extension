@@ -1,7 +1,8 @@
 import Konva from 'konva'
-import { IEditorOptions, Editor } from './editor'
+
 import { AnnotationType, IPdfjsAnnotationStorage } from '../../const/definitions'
 import { getRGB } from '../../utils/utils'
+import { Editor, IEditorOptions } from './editor'
 
 /**
  * EditorHighLight 是继承自 Editor 的高亮编辑器类。
@@ -152,7 +153,7 @@ export class EditorHighLight extends Editor {
      * @param groupString 序列化的组字符串
      * @returns 返回空 Promise
      */
-    public async refreshPdfjsAnnotationStorage(groupId: string, groupString: string): Promise<null> {
+    public async refreshPdfjsAnnotationStorage(): Promise<null> {
         return null
     }
 

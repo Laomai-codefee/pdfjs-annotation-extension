@@ -1,9 +1,10 @@
 import Konva from 'konva'
-import { AnnotationType, IAnnotationContent, IAnnotationStore, IAnnotationType, IPdfjsAnnotationStorage } from '../../const/definitions'
 import { KonvaEventObject } from 'konva/lib/Node'
+import { PDFViewerApplication } from 'pdfjs'
+
+import { AnnotationType, IAnnotationContent, IAnnotationStore, IAnnotationType, IPdfjsAnnotationStorage } from '../../const/definitions'
 import { generateUUID } from '../../utils/utils'
 import { SHAPE_GROUP_NAME } from '../const'
-import { PDFViewerApplication } from 'pdfjs'
 
 /**
  * IEditorOptions 接口定义了编辑器的初始化选项。
@@ -230,7 +231,11 @@ export abstract class Editor {
      * @param rawAnnotationStore 原始注解存储对象
      * @returns 返回更新后的 PDF.js 注解存储对象的 Promise
      */
-    public abstract refreshPdfjsAnnotationStorage(groupId: string, groupString: string, rawAnnotationStore: IAnnotationStore): Promise<{annotationStorage :IPdfjsAnnotationStorage, batchPdfjsAnnotationStorage?: IPdfjsAnnotationStorage[]}>
+    public abstract refreshPdfjsAnnotationStorage(
+        groupId: string,
+        groupString: string,
+        rawAnnotationStore: IAnnotationStore
+    ): Promise<{ annotationStorage: IPdfjsAnnotationStorage; batchPdfjsAnnotationStorage?: IPdfjsAnnotationStorage[] }>
 
     /**
      * 处理鼠标按下事件的抽象方法，子类需实现具体逻辑。

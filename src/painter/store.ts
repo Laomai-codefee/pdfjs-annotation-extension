@@ -1,7 +1,8 @@
+import { PDFViewerApplication } from 'pdfjs'
+
 import { IAnnotationContent, IAnnotationStore, IPdfjsAnnotationStorage } from '../const/definitions'
 import { base64ToImageBitmap } from '../utils/utils'
 import { IShapeGroup } from './editor/editor'
-import { PDFViewerApplication } from 'pdfjs'
 
 const PDFJS_INTERNAL_EDITOR_PREFIX = 'pdfjs_internal_editor_'
 

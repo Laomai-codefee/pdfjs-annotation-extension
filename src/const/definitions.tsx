@@ -162,7 +162,7 @@ export enum AnnotationType {
 
 // 配置默认颜色
 // 提供一组默认的颜色选项
-export const DefaultColors = ['#FF0000', '#FFBE00', '#CC0000', , '#FFFF00', '#83D33C', '#00B445', '#00B2F4', '#0071C4', '#001F63', '#7828A4']
+export const DefaultColors = ['#FF0000', '#FFBE00', '#CC0000', '#FFFF00', '#83D33C', '#00B445', '#00B2F4', '#0071C4', '#001F63', '#7828A4']
 
 // 配置默认字体大小
 // 提供一组默认的字体大小选项

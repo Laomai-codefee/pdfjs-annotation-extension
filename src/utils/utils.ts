@@ -170,47 +170,48 @@ function resizeImage(width: number, height: number, max: number): { newWidth: nu
  * @returns {Array<number> | null} - 格式化后的页码数组，或在输入无效时返回 null
  */
 function parsePageRanges(input: string): number[] | null {
-    const pages = new Set<number>();
-    const rangeRegex = /^(\d+)(?:-(\d+))?$/;
+    const pages = new Set<number>()
+    const rangeRegex = /^(\d+)(?:-(\d+))?$/
 
     // 分割输入字符串
-    const parts = input.split(',');
+    const parts = input.split(',')
 
-    for (let part of parts) {
-        const match = part.match(rangeRegex);
+    for (const part of parts) {
+        const match = part.match(rangeRegex)
 
         if (match) {
-            const start = parseInt(match[1], 10);
-            const end = match[2] ? parseInt(match[2], 10) : start;
+            const start = parseInt(match[1], 10)
+            const end = match[2] ? parseInt(match[2], 10) : start
 
             // 如果范围无效（例如2-1），则返回 null
             if (start > end) {
-                return null;
+                return null
             }
 
             for (let i = start; i <= end; i++) {
-                if (i !== 0) { // 去掉 0
-                    pages.add(i);
+                if (i !== 0) {
+                    // 去掉 0
+                    pages.add(i)
                 }
             }
         } else {
-            return null;
+            return null
         }
     }
 
     // 返回排序后的页码数组
-    return Array.from(pages).sort((a, b) => a - b);
+    return Array.from(pages).sort((a, b) => a - b)
 }
 
 export {
-    getRGB,
-    isElementInDOM,
-    generateUUID,
-    getRandomBytes,
-    setCssCustomProperty,
-    removeCssCustomProperty,
     base64ToImageBitmap,
     formatFileSize,
+    generateUUID,
+    getRandomBytes,
+    getRGB,
+    isElementInDOM,
+    parsePageRanges,
+    removeCssCustomProperty,
     resizeImage,
-    parsePageRanges
+    setCssCustomProperty
 }

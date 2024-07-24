@@ -1,7 +1,9 @@
+import './index.scss' // 导入组件的样式
+
+import React from 'react' // 导入 React
+
 import { IAnnotationType } from '../../const/definitions' // 导入自定义注释类型
 import { formatFileSize } from '../../utils/utils' // 导入文件大小格式化工具
-import './index.scss' // 导入组件的样式
-import React from 'react' // 导入 React
 
 // 定义组件的 props 类型
 interface StampToolProps {
@@ -39,8 +41,8 @@ const StampTool: React.FC<StampToolProps> = props => {
 
     return (
         <div className="StampTool">
-            <input title='' type="file" accept=".png,.jpg" onChange={onInputFileChange} /> 
-            <div className="icon">{props.annotation.icon}</div> 
+            <input title="" type="file" accept=".png,.jpg" onChange={onInputFileChange} />
+            <div className="icon">{props.annotation.icon}</div>
             <div className="name">{props.annotation.name}</div>
         </div>
     )

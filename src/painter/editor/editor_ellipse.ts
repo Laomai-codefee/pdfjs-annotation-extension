@@ -1,9 +1,9 @@
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 
-import { IEditorOptions, Editor } from './editor'
 import { AnnotationType, IAnnotationStore, IPdfjsAnnotationStorage, PdfjsAnnotationEditorType } from '../../const/definitions'
 import { getRGB } from '../../utils/utils'
+import { Editor, IEditorOptions } from './editor'
 
 /**
  * 椭圆编辑器类，继承自基础编辑器类 Editor，用于在画布上绘制椭圆。
@@ -161,7 +161,6 @@ export class EditorEllipse extends Editor {
                 pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex
             })
         }
-        
     }
 
     /**
@@ -211,7 +210,7 @@ export class EditorEllipse extends Editor {
         radiusX: number
         radiusY: number
         annotationType: PdfjsAnnotationEditorType
-        color: any
+        color: number[]
         thickness: number
         opacity: number
         pageIndex: number

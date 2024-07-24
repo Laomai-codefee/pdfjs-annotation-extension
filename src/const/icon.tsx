@@ -1,6 +1,6 @@
-import React from 'react'
 import Icon from '@ant-design/icons'
 import type { GetProps } from 'antd'
+import React from 'react'
 
 type CustomIconComponentProps = GetProps<typeof Icon>
 
@@ -145,17 +145,17 @@ const PaletteIcon = (props: Partial<CustomIconComponentProps>) => <Icon componen
 const FontSizeIcon = (props: Partial<CustomIconComponentProps>) => <Icon component={FontSizeSvg} {...props} />
 
 export {
-    SelectIcon,
-    HighlightIcon,
-    StrikeoutIcon,
-    UnderlineIcon,
-    FreetextIcon,
-    RectangleIcon,
     EllipseIcon,
+    FontSizeIcon,
     FreehandIcon,
     FreeHighlightIcon,
+    FreetextIcon,
+    HighlightIcon,
+    PaletteIcon,
+    RectangleIcon,
+    SelectIcon,
     SignatureIcon,
     StampIcon,
-    PaletteIcon,
-    FontSizeIcon
+    StrikeoutIcon,
+    UnderlineIcon
 }

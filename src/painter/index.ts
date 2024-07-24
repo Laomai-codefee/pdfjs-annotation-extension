@@ -1,21 +1,23 @@
 import './index.scss' // 导入画笔样式文件
+
 import Konva from 'konva'
 import { EventBus, PageViewport, PDFPageView, PDFViewerApplication } from 'pdfjs'
+
 import { AnnotationType, IAnnotationContent, IAnnotationType, IPdfjsAnnotationStorage } from '../const/definitions'
-import { WebSelection } from './webSelection'
-import { Editor, IShapeGroup } from './editor/editor'
-import { EditorRectangle } from './editor/editor_rectangle'
-import { Store } from './store'
 import { isElementInDOM, removeCssCustomProperty } from '../utils/utils'
-import { EditorHighLight } from './editor/editor_highlight'
+import { CURSOR_CSS_PROPERTY, PAINTER_IS_PAINTING_STYLE, PAINTER_PAINTING_TYPE, PAINTER_WRAPPER_PREFIX } from './const'
+import { Editor, IShapeGroup } from './editor/editor'
 import { EditorEllipse } from './editor/editor_ellipse'
 import { EditorFreeHand } from './editor/editor_free_hand'
 import { EditorFreeHighlight } from './editor/editor_free_highlight'
+import { EditorFreeText } from './editor/editor_free_text'
+import { EditorHighLight } from './editor/editor_highlight'
+import { EditorRectangle } from './editor/editor_rectangle'
 import { EditorSignature } from './editor/editor_signature'
 import { EditorStamp } from './editor/editor_stamp'
 import { Selector } from './editor/selector'
-import { CURSOR_CSS_PROPERTY, PAINTER_IS_PAINTING_STYLE, PAINTER_PAINTING_TYPE, PAINTER_WRAPPER_PREFIX } from './const'
-import { EditorFreeText } from './editor/editor_free_text'
+import { Store } from './store'
+import { WebSelection } from './webSelection'
 
 // KonvaCanvas 接口定义
 export interface KonvaCanvas {
@@ -61,16 +63,16 @@ export class Painter {
             getAnnotationStore: (id: string) => {
                 return this.store.annotation(id)
             },
+            // eslint-disable-next-line prettier/prettier
             onChange: async (id, groupString, rawAnnotationStore) => {
                 const editor = this.findEditorForGroupId(id)
                 if (editor) {
-                    const {annotationStorage , batchPdfjsAnnotationStorage}  = await editor.refreshPdfjsAnnotationStorage(id, groupString, rawAnnotationStore)
+                    const { annotationStorage, batchPdfjsAnnotationStorage } = await editor.refreshPdfjsAnnotationStorage(id, groupString, rawAnnotationStore)
                     this.store.update(id, {
                         konvaString: groupString,
                         pdfjsAnnotationStorage: annotationStorage,
-                        ...(batchPdfjsAnnotationStorage && batchPdfjsAnnotationStorage.length > 0 && {
-                            content: { batchPdfjsAnnotationStorage }
-                        })
+                        // eslint-disable-line prettier/prettier
+                        ...(batchPdfjsAnnotationStorage && batchPdfjsAnnotationStorage.length > 0 && { content: { batchPdfjsAnnotationStorage } })
                     })
                 }
             },

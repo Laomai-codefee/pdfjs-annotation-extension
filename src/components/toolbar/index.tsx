@@ -1,10 +1,12 @@
 import './index.scss'
-import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
-import { annotationDefinitions, AnnotationType, DefaultColors, DefaultFontSize, DefaultSettings, IAnnotationType } from '../../const/definitions'
+
 import { ColorPicker, Dropdown } from 'antd'
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
+
+import { annotationDefinitions, AnnotationType, DefaultColors, DefaultFontSize, DefaultSettings, IAnnotationType } from '../../const/definitions'
+import { FontSizeIcon, PaletteIcon } from '../../const/icon'
 import { SignatureTool } from './signature'
 import { StampTool } from './stamp'
-import { FontSizeIcon, PaletteIcon } from '../../const/icon'
 
 interface CustomToolbarProps {
     onChange: (annotation: IAnnotationType | null, dataTransfer: string | null) => void
@@ -82,7 +84,7 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
     useEffect(() => {
         // 调用 onChange 并传递当前的 annotation 和 dataTransfer
         props.onChange(currentAnnotation, dataTransfer)
-    }, [currentAnnotation, dataTransfer])
+    }, [currentAnnotation, dataTransfer, props])
 
     const handleColorChange = (color: string) => {
         if (!currentAnnotation) return

@@ -1,12 +1,13 @@
+import { Input, Modal } from 'antd'
+import type { InputRef } from 'antd/es/input'
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
-import { Input, Modal } from 'antd'
-import { IEditorOptions, Editor } from './editor'
+import React from 'react'
+
 import { AnnotationType, DefaultSettings, IAnnotationStore, IAnnotationType, IPdfjsAnnotationStorage, PdfjsAnnotationEditorType } from '../../const/definitions'
 import { base64ToImageBitmap, parsePageRanges, resizeImage, setCssCustomProperty } from '../../utils/utils'
 import { CURSOR_CSS_PROPERTY } from '../const'
-import type { InputRef } from 'antd/es/input'
-import React from 'react'
+import { Editor, IEditorOptions } from './editor'
 
 /**
  * 批量设置盖章位置
@@ -18,6 +19,7 @@ async function setBatchStampPageNumbers(): Promise<{ parsedPages: number[]; orig
         let inputValue = '' // 临时变量来存储输入值
         let status: '' | 'error' | 'warning' = 'error' // 初始状态设置为错误，确保初始时提交按钮禁用
         let parsedPages: number[] = [] // 用于存储解析后的页码数组
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, prefer-const
         let modal: any
         const inputRef = React.createRef<InputRef>() // 使用 React.createRef 以确保类型正确
 

@@ -1,10 +1,12 @@
 import './scss/app.scss'
-import { createRoot } from 'react-dom/client'
-import { CustomToolbarRef, CustomToolbar } from './components/toolbar'
+
 import { EventBus, PDFPageView, PDFViewerApplication } from 'pdfjs'
 import { createRef } from 'react'
-import { Painter } from './painter'
+import { createRoot } from 'react-dom/client'
+
+import { CustomToolbar, CustomToolbarRef } from './components/toolbar'
 import { annotationDefinitions } from './const/definitions'
+import { Painter } from './painter'
 
 class PdfjsAnnotationExtension {
     PDFJS_PDFViewerApplication: PDFViewerApplication // PDF.js 的 PDFViewerApplication 对象
@@ -17,6 +19,7 @@ class PdfjsAnnotationExtension {
 
     constructor() {
         // 初始化 PDF.js 对象和相关属性
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.PDFJS_PDFViewerApplication = (window as any).PDFViewerApplication
         this.PDFJS_EventBus = this.PDFJS_PDFViewerApplication.eventBus
         this.$PDFJS_sidebarContainer = this.PDFJS_PDFViewerApplication.appConfig.sidebar.sidebarContainer
@@ -40,7 +43,7 @@ class PdfjsAnnotationExtension {
      * @description 初始化 PdfjsAnnotationExtension 类
      */
     private init(): void {
-        this.addCustomStyle() 
+        this.addCustomStyle()
         this.bindPdfjsEvents()
         this.renderToolbar()
     }
@@ -56,7 +59,7 @@ class PdfjsAnnotationExtension {
      * @description 渲染自定义工具栏
      */
     private renderToolbar(): void {
-        const toolbar = document.createElement('div') 
+        const toolbar = document.createElement('div')
         this.$PDFJS_toolbar_container.insertAdjacentElement('afterend', toolbar)
         createRoot(toolbar).render(
             <CustomToolbar

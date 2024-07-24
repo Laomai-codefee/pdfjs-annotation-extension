@@ -1,10 +1,10 @@
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 
-import { IEditorOptions, Editor } from './editor'
 import { AnnotationType, IAnnotationStore, IPdfjsAnnotationStorage, PdfjsAnnotationEditorType } from '../../const/definitions'
-import { FREE_TEXT_TEXT_CLASS_NAME } from '../const'
 import { base64ToImageBitmap } from '../../utils/utils'
+import { FREE_TEXT_TEXT_CLASS_NAME } from '../const'
+import { Editor, IEditorOptions } from './editor'
 
 /**
  * EditorFreeText 是继承自 Editor 的自由文本编辑器类。
@@ -158,7 +158,6 @@ export class EditorFreeText extends Editor {
      */
     private async inputDoneHandler(inputArea: HTMLTextAreaElement, scaleY: number, pos: { x: number; y: number }) {
         const value = inputArea.value.trim()
-        const textWidth = inputArea.offsetWidth
         inputArea.remove()
 
         if (value === '') {
@@ -237,7 +236,11 @@ export class EditorFreeText extends Editor {
      * @param rawAnnotationStore 原始注解存储对象
      * @returns 返回注解的存储信息 IPdfjsAnnotationStorage 的 Promise
      */
-    public async refreshPdfjsAnnotationStorage(groupId: string, groupString: string, rawAnnotationStore: IAnnotationStore): Promise<{annotationStorage :IPdfjsAnnotationStorage, batchPdfjsAnnotationStorage?: IPdfjsAnnotationStorage[]}> {
+    public async refreshPdfjsAnnotationStorage(
+        groupId: string,
+        groupString: string,
+        rawAnnotationStore: IAnnotationStore
+    ): Promise<{ annotationStorage: IPdfjsAnnotationStorage; batchPdfjsAnnotationStorage?: IPdfjsAnnotationStorage[] }> {
         const ghostGroup = Konva.Node.create(groupString)
         const image = this.getGroupNodesByClassName(ghostGroup, 'Image')[0] as Konva.Image
 

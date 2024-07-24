@@ -23,7 +23,7 @@ export class WebSelection {
      * @param root 要应用高亮器的根元素
      */
     public create(root: HTMLDivElement) {
-        if(this.highlighterObj) return
+        if (this.highlighterObj) return
         this.highlighterObj = new Highlighter({
             $root: root,
             wrapTag: 'mark'
@@ -39,11 +39,11 @@ export class WebSelection {
                 return span.closest('.page').getAttribute('data-page-number')
             })
 
-            for (let pageNumber in pageSelection) {
+            for (const pageNumber in pageSelection) {
                 this.onSelect(parseInt(pageNumber), pageSelection[pageNumber])
             }
 
-            this.highlighterObj.removeAll();
+            this.highlighterObj.removeAll()
         })
     }
 

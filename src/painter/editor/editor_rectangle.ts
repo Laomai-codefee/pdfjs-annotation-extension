@@ -1,9 +1,9 @@
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 
-import { IEditorOptions, Editor } from './editor'
 import { AnnotationType, IAnnotationStore, IPdfjsAnnotationStorage, PdfjsAnnotationEditorType } from '../../const/definitions'
 import { getRGB } from '../../utils/utils'
+import { Editor, IEditorOptions } from './editor'
 
 /**
  * EditorRectangle 是继承自 Editor 的矩形编辑器类。
@@ -195,7 +195,7 @@ export class EditorRectangle extends Editor {
         width: number
         height: number
         annotationType: PdfjsAnnotationEditorType
-        color: any
+        color: number[]
         thickness: number
         opacity: number
         pageIndex: number

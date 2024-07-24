@@ -1,9 +1,9 @@
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 
-import { IEditorOptions, Editor } from './editor'
 import { AnnotationType, IAnnotationStore, IPdfjsAnnotationStorage, PdfjsAnnotationEditorType } from '../../const/definitions'
 import { getRGB } from '../../utils/utils'
+import { Editor, IEditorOptions } from './editor'
 
 /**
  * 自由手绘编辑器类，继承自基础编辑器类 Editor，用于在画布上绘制自由曲线。
@@ -89,7 +89,7 @@ export class EditorFreeHand extends Editor {
         if (this.isTooSmall()) {
             // 如果曲线太小，则销毁曲线对象并延时保存形状组状态
             this.line.destroy()
-            Editor.TimerStart(this.pageNumber, _pageNumber => {
+            Editor.TimerStart(this.pageNumber, () => {
                 this.setShapeGroupDone(
                     group.id(),
                     this.calculateLinesForStorage({
@@ -107,7 +107,7 @@ export class EditorFreeHand extends Editor {
         }
 
         // 否则，延时保存形状组状态
-        Editor.TimerStart(this.pageNumber, _pageNumber => {
+        Editor.TimerStart(this.pageNumber, () => {
             this.setShapeGroupDone(
                 group.id(),
                 this.calculateLinesForStorage({
@@ -196,7 +196,7 @@ export class EditorFreeHand extends Editor {
     }: {
         group: Konva.Group
         annotationType: PdfjsAnnotationEditorType
-        color: any
+        color: number[]
         thickness: number
         opacity: number
         pageIndex: number
