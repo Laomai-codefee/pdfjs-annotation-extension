@@ -166,7 +166,7 @@ export const DefaultColors = ['#FF0000', '#FFBE00', '#CC0000', '#FFFF00', '#83D3
 
 // 配置默认字体大小
 // 提供一组默认的字体大小选项
-export const DefaultFontSize = [14, 16, 18, 20, 22, 24]
+export const DefaultFontSize = [12, 14, 16, 18, 20, 22, 24]
 
 // 配置默认的签名设置
 export const DefaultSignatureSetting = {

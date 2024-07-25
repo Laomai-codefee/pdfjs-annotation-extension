@@ -43,7 +43,7 @@ export class EditorFreeText extends Editor {
      */
     private createInputArea(e: KonvaEventObject<PointerEvent>) {
         const pos = this.konvaStage.getRelativePointerPosition()
-        const { y: scaleY } = this.konvaStage.scale()
+        const { x, y } = this.konvaStage.scale()
 
         // 创建和配置 textarea 元素
         const inputArea = document.createElement('textarea')
@@ -53,7 +53,7 @@ export class EditorFreeText extends Editor {
                 x: e.evt.offsetX,
                 y: e.evt.offsetY
             },
-            scaleY
+            y
         )
         this.konvaStage.container().append(inputArea)
 
@@ -64,7 +64,7 @@ export class EditorFreeText extends Editor {
         }, 100)
 
         // 注册事件监听器
-        this.addInputAreaEventListeners(inputArea, scaleY, pos)
+        this.addInputAreaEventListeners(inputArea, { x, y }, pos)
     }
 
     /**
@@ -93,7 +93,7 @@ export class EditorFreeText extends Editor {
      * @param scaleY Y 轴缩放比例
      * @param pos 相对位置坐标
      */
-    private addInputAreaEventListeners(inputArea: HTMLTextAreaElement, scaleY: number, pos: { x: number; y: number }) {
+    private addInputAreaEventListeners(inputArea: HTMLTextAreaElement, scale: { x: number; y: number }, pos: { x: number; y: number }) {
         // 动态调整 textarea 的高度以适应输入内容
         inputArea.addEventListener('input', e => this.adjustTextareaHeight(e))
 
@@ -103,12 +103,12 @@ export class EditorFreeText extends Editor {
             if (target.getAttribute('del') === 'true') {
                 this.removeInputArea(target)
             } else {
-                this.inputDoneHandler(target, scaleY, pos)
+                this.inputDoneHandler(target, scale, pos)
             }
         })
 
         // 处理键盘事件
-        inputArea.addEventListener('keydown', e => this.handleInputAreaKeydown(e, scaleY))
+        inputArea.addEventListener('keydown', e => this.handleInputAreaKeydown(e, scale.y))
     }
 
     /**
@@ -156,7 +156,7 @@ export class EditorFreeText extends Editor {
      * @param scaleY Y 轴缩放比例
      * @param pos 相对位置坐标
      */
-    private async inputDoneHandler(inputArea: HTMLTextAreaElement, scaleY: number, pos: { x: number; y: number }) {
+    private async inputDoneHandler(inputArea: HTMLTextAreaElement, scale: { x: number; y: number }, pos: { x: number; y: number }) {
         const value = inputArea.value.trim()
         inputArea.remove()
 
@@ -167,10 +167,11 @@ export class EditorFreeText extends Editor {
         }
         const text = new Konva.Text({
             x: pos.x,
-            y: pos.y,
+            y: pos.y + 2,
             text: value,
-            fontSize: this.currentAnnotation.style.fontSize / scaleY,
-            fill: this.currentAnnotation.style.color
+            fontSize: this.currentAnnotation.style.fontSize,
+            fill: this.currentAnnotation.style.color,
+            padding: 2
         })
 
         this.currentShapeGroup.konvaGroup.add(text)
@@ -184,15 +185,15 @@ export class EditorFreeText extends Editor {
 
         // 使用生成的 imageUrl 创建 Konva.Image
         Konva.Image.fromURL(imageUrl, async image => {
+            const { width: width_rec, height: height_rec } = text.getClientRect()
             // 删除之前的文本节点
             this.getGroupNodesByClassName(this.currentShapeGroup.konvaGroup, 'Text')[0]?.destroy()
             this.currentShapeGroup.konvaGroup.add(image)
-            const { width: width_rec, height: height_rec } = image.getClientRect()
             image.setAttrs({
                 x: pos.x,
                 y: pos.y,
-                width: width_rec,
-                height: height_rec,
+                width: width_rec / scale.x,
+                height: height_rec / scale.y,
                 base64: imageUrl
             })
 
