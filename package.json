@@ -54,6 +54,7 @@
   },
   "target": "web",
   "dependencies": {
+    "@floating-ui/dom": "^1.6.10",
     "antd": "^5.15.3",
     "konva": "^9.3.6",
     "react": "^18.2.0",

@@ -39,6 +39,7 @@ export class Painter {
     private selector: Selector // 选择器实例
     private tempDataTransfer: string | null // 临时数据传输
     public readonly setDefaultMode: () => void // 设置默认模式的函数引用
+    public readonly onWebSelectionSelected: (range: Range) => void
 
     /**
      * 构造函数，初始化 PDFViewerApplication, EventBus, 和 WebSelection
@@ -47,15 +48,18 @@ export class Painter {
     constructor({
         PDFViewerApplication,
         PDFJS_EventBus,
-        setDefaultMode
+        setDefaultMode,
+        onWebSelectionSelected
     }: {
         PDFViewerApplication: PDFViewerApplication
         PDFJS_EventBus: EventBus
         setDefaultMode: () => void
+        onWebSelectionSelected: (range: Range) => void
     }) {
         this.pdfViewerApplication = PDFViewerApplication // 初始化 PDFViewerApplication
         this.pdfjsEventBus = PDFJS_EventBus // 初始化 PDF.js EventBus
         this.setDefaultMode = setDefaultMode // 设置默认模式的函数
+        this.onWebSelectionSelected = onWebSelectionSelected
         this.store = new Store({ PDFViewerApplication }) // 初始化存储实例
         this.selector = new Selector({
             // 初始化选择器实例
@@ -82,25 +86,50 @@ export class Painter {
         })
         this.webSelection = new WebSelection({
             // 初始化 WebSelection 实例
-            onSelect: (pageNumber, elements) => {
-                const canvas = this.konvaCanvasStore.get(pageNumber)
-                if (canvas) {
-                    const { konvaStage, wrapper } = canvas
-                    const editor = new EditorHighLight(
-                        {
-                            pdfViewerApplication: this.pdfViewerApplication,
-                            konvaStage,
-                            pageNumber,
-                            annotation: this.currentAnnotation,
-                            onAdd: (shapeGroup, pdfjsAnnotationStorage, annotationContent) => {
-                                this.saveToStore(shapeGroup, pdfjsAnnotationStorage, annotationContent)
-                            }
-                        },
-                        this.currentAnnotation.type
-                    )
-                    this.editorStore.set(editor.id, editor)
-                    editor.convertTextSelection(elements, wrapper)
-                }
+            onSelect: range => {
+                this.onWebSelectionSelected(range)
+                // const canvas = this.konvaCanvasStore.get(pageNumber)
+                // if (canvas) {
+                //     const { konvaStage, wrapper } = canvas
+                //     const editor = new EditorHighLight(
+                //         {
+                //             pdfViewerApplication: this.pdfViewerApplication,
+                //             konvaStage,
+                //             pageNumber,
+                //             annotation: this.currentAnnotation,
+                //             onAdd: (shapeGroup, pdfjsAnnotationStorage, annotationContent) => {
+                //                 this.saveToStore(shapeGroup, pdfjsAnnotationStorage, annotationContent)
+                //             }
+                //         },
+                //         this.currentAnnotation.type
+                //     )
+                //     this.editorStore.set(editor.id, editor)
+                //     editor.convertTextSelection(elements, wrapper)
+                // }
+            },
+            onHighlight: selection => {
+                Object.keys(selection).forEach(key => {
+                    const pageNumber = Number(key)
+                    const elements = selection[key]
+                    const canvas = this.konvaCanvasStore.get(pageNumber)
+                    if (canvas) {
+                        const { konvaStage, wrapper } = canvas
+                        const editor = new EditorHighLight(
+                            {
+                                pdfViewerApplication: this.pdfViewerApplication,
+                                konvaStage,
+                                pageNumber,
+                                annotation: this.currentAnnotation,
+                                onAdd: (shapeGroup, pdfjsAnnotationStorage, annotationContent) => {
+                                    this.saveToStore(shapeGroup, pdfjsAnnotationStorage, annotationContent)
+                                }
+                            },
+                            this.currentAnnotation.type
+                        )
+                        this.editorStore.set(editor.id, editor)
+                        editor.convertTextSelection(elements, wrapper)
+                    }
+                })
             }
         })
         this.bindGlobalEvents() // 绑定全局事件
@@ -501,6 +530,7 @@ export class Painter {
      */
     public initWebSelection(rootElement: HTMLDivElement): void {
         this.webSelection.create(rootElement)
+        this.webSelection.enable()
     }
 
     /**
@@ -549,5 +579,15 @@ export class Painter {
      */
     public resetPdfjsAnnotationStorage(): void {
         this.store.resetAnnotationStorage()
+    }
+
+    /**
+     * @description 根据 range 加亮
+     * @param range 
+     * @param annotation 
+     */
+    public highlight(range: Range, annotation: IAnnotationType) {
+        this.currentAnnotation = annotation
+        this.webSelection.highlight(range)
     }
 }

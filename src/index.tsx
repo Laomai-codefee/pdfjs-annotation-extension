@@ -4,6 +4,7 @@ import { EventBus, PDFPageView, PDFViewerApplication } from 'pdfjs'
 import { createRef } from 'react'
 import { createRoot } from 'react-dom/client'
 
+import { CustomPopbar, CustomPopbarRef } from './components/popbar'
 import { CustomToolbar, CustomToolbarRef } from './components/toolbar'
 import { annotationDefinitions } from './const/definitions'
 import { Painter } from './painter'
@@ -15,6 +16,7 @@ class PdfjsAnnotationExtension {
     $PDFJS_toolbar_container: HTMLDivElement // PDF.js 工具栏容器
     $PDFJS_viewerContainer: HTMLDivElement // PDF.js 页面视图容器
     customToolbarRef: React.RefObject<CustomToolbarRef> // 自定义工具栏的引用
+    customPopbarRef: React.RefObject<CustomPopbarRef>
     painter: Painter // 画笔实例
 
     constructor() {
@@ -27,12 +29,16 @@ class PdfjsAnnotationExtension {
         this.$PDFJS_viewerContainer = this.PDFJS_PDFViewerApplication.appConfig.viewerContainer
         // 使用 createRef 方法创建 React 引用
         this.customToolbarRef = createRef<CustomToolbarRef>()
+        this.customPopbarRef = createRef<CustomPopbarRef>()
         // 创建画笔实例
         this.painter = new Painter({
             PDFViewerApplication: this.PDFJS_PDFViewerApplication,
             PDFJS_EventBus: this.PDFJS_EventBus,
             setDefaultMode: () => {
                 this.customToolbarRef.current.activeAnnotation(annotationDefinitions[0])
+            },
+            onWebSelectionSelected: range => {
+                this.customPopbarRef.current.open(range)
             }
         })
         // 初始化操作
@@ -46,6 +52,7 @@ class PdfjsAnnotationExtension {
         this.addCustomStyle()
         this.bindPdfjsEvents()
         this.renderToolbar()
+        this.renderPopBar()
     }
 
     /**
@@ -66,6 +73,22 @@ class PdfjsAnnotationExtension {
                 ref={this.customToolbarRef}
                 onChange={(currentAnnotation, dataTransfer) => {
                     this.painter.activate(currentAnnotation, dataTransfer)
+                }}
+            />
+        )
+    }
+
+    /**
+     * @description 渲染自定义弹出工具条
+     */
+    private renderPopBar(): void {
+        const popbar = document.createElement('div')
+        this.$PDFJS_viewerContainer.insertAdjacentElement('afterend', popbar)
+        createRoot(popbar).render(
+            <CustomPopbar
+                ref={this.customPopbarRef}
+                onChange={(currentAnnotation, range) => {
+                    this.painter.highlight(range, currentAnnotation)
                 }}
             />
         )
@@ -94,7 +117,7 @@ class PdfjsAnnotationExtension {
             }
         )
         // 监听文档加载完成事件
-        this.PDFJS_EventBus._on('documentloaded', () => {
+        this.PDFJS_EventBus._on('documentloaded', (event) => {
             this.painter.initWebSelection(this.$PDFJS_viewerContainer)
         })
         // 重置 Pdfjs AnnotationStorage 解决有嵌入图片打印、下载会ImageBitmap报错的问题
@@ -103,6 +126,9 @@ class PdfjsAnnotationExtension {
         })
         this.PDFJS_EventBus._on('download', () => {
             this.painter.resetPdfjsAnnotationStorage()
+        })
+        this.PDFJS_EventBus._on('updateviewarea', () => {
+            // this.customPopbarRef.current.close()
         })
     }
 }

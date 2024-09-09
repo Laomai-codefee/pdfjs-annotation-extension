@@ -4,7 +4,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-
+    overflow-x: auto;
     .buttons {
         display: flex;
         padding: 0;
@@ -12,7 +12,6 @@
         list-style: none;
         gap: 3px;
         user-select: none;
-
         li {
             align-items: center;
             height: 100%;
@@ -181,5 +180,23 @@
         left: 0;
         z-index: 1;
         opacity: 0;
+    }
+}
+
+@media all and (max-width: 780px) {
+    .CustomToolbar {
+        .buttons {
+            .name {
+                display: none;
+            }
+        }
+    }
+}
+@media all and (max-width: 690px) {
+    .CustomToolbar {
+        justify-content: flex-start;
+        .buttons {
+            margin-left: 10px;
+        }
     }
 }

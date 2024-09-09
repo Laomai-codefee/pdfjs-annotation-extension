@@ -1,0 +1,46 @@
+.CustomPopbar {
+    width: max-content;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: var(--toolbar-bg-color);
+    border: 1px solid var(--toolbar-border-color);
+    border-radius: 5px;
+    .buttons {
+        display: flex;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        gap: 3px;
+        user-select: none;
+        li {
+            align-items: center;
+            height: 100%;
+            text-align: center;
+            border: 1px solid transparent;
+            color: var(--main-color);
+            transition: background-color 0.3s;
+            .icon {
+                font-size: 14px;
+                padding: 5px 10px 0 10px;
+                border-bottom: 1px solid transparent;
+                opacity: 0.8;
+            }
+            .name {
+                font-size: 14px;
+                padding: 1px 10px 2px 10px;
+            }
+            &:hover {
+                background-color: var(--button-hover-color);
+            }
+        }
+    }
+}
+
+.CustomPopbar.show{
+    z-index: 999;
+    display: block;
+}
+.CustomPopbar.hide{
+    display: none;
+}

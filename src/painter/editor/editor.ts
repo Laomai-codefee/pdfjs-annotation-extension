@@ -80,6 +80,10 @@ export abstract class Editor {
      * 启用编辑模式，监听 Konva Stage的鼠标事件。
      */
     protected enableEditMode() {
+        document.addEventListener('contextmenu', function (e) {
+            e.preventDefault() // 禁用默认的上下文菜单
+        })
+
         this.konvaStage.on('mousedown', e => {
             if (e.evt.button === 0) {
                 this.mouseDownHandler(e) // 处理鼠标按下事件
@@ -100,6 +104,17 @@ export abstract class Editor {
         })
         this.konvaStage.on('mouseout', e => {
             this.mouseOutHandler(e) // 处理鼠标离开事件
+        })
+
+        this.konvaStage.on('touchstart', e => {
+            if (e.evt.touches.length === 1) {
+                this.mouseDownHandler(e)
+            }
+        })
+        this.konvaStage.on('touchmove', e => {
+            if (e.evt.touches.length === 1) {
+                this.mouseMoveHandler(e)
+            }
         })
     }
 
