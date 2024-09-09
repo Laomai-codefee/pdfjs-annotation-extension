@@ -89,7 +89,7 @@ export class EditorSignature extends Editor {
      * 处理鼠标按下事件的方法，创建新的形状组并添加签名图片。
      * @param e Konva 事件对象
      */
-    protected mouseDownHandler(e: KonvaEventObject<PointerEvent>) {
+    protected mouseDownHandler(e: KonvaEventObject<MouseEvent | TouchEvent>) {
         if (e.currentTarget !== this.konvaStage) {
             return // 如果事件不是在舞台上发生的，则直接返回
         }
@@ -276,6 +276,4 @@ export class EditorSignature extends Editor {
     // 下面是未实现的抽象方法的空实现
     protected mouseMoveHandler() {}
     protected mouseUpHandler() {}
-    protected mouseOutHandler() {}
-    protected mouseEnterHandler() {}
 }

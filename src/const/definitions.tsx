@@ -285,19 +285,6 @@ export const annotationDefinitions: IAnnotationType[] = [
         }
     },
     {
-        name: '文字',
-        type: AnnotationType.FREETEXT,
-        pdfjsType: PdfjsAnnotationEditorType.STAMP,
-        isOnce: true,
-        readonly: false,
-        icon: <FreetextIcon />,
-        style: {
-            color: DefaultSettings.COLOR, // 默认文字颜色
-            fontSize: DefaultSettings.FONT_SIZE, // 默认字体大小
-            opacity: DefaultSettings.OPACITY // 默认透明度
-        }
-    },
-    {
         name: '矩形',
         type: AnnotationType.RECTANGLE,
         pdfjsType: PdfjsAnnotationEditorType.INK,
@@ -347,6 +334,19 @@ export const annotationDefinitions: IAnnotationType[] = [
             color: DefaultSettings.COLOR, // 默认自由高亮颜色
             strokeWidth: 10, // 默认线条宽度
             opacity: 0.5 // 默认透明度
+        }
+    },
+    {
+        name: '文字',
+        type: AnnotationType.FREETEXT,
+        pdfjsType: PdfjsAnnotationEditorType.STAMP,
+        isOnce: true,
+        readonly: false,
+        icon: <FreetextIcon />,
+        style: {
+            color: DefaultSettings.COLOR, // 默认文字颜色
+            fontSize: DefaultSettings.FONT_SIZE, // 默认字体大小
+            opacity: DefaultSettings.OPACITY // 默认透明度
         }
     },
     {

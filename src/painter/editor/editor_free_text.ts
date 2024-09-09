@@ -18,8 +18,6 @@ export class EditorFreeText extends Editor {
         super({ ...EditorOptions, editorType: AnnotationType.FREETEXT })
     }
 
-    protected mouseOutHandler() {}
-    protected mouseEnterHandler() {}
     protected mouseDownHandler() {}
     protected mouseMoveHandler() {}
 

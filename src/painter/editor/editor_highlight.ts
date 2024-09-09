@@ -228,13 +228,4 @@ export class EditorHighLight extends Editor {
      */
     protected mouseUpHandler() {}
 
-    /**
-     * 处理鼠标移出事件，目前未实现具体逻辑。
-     */
-    protected mouseOutHandler() {}
-
-    /**
-     * 处理鼠标移入事件，目前未实现具体逻辑。
-     */
-    protected mouseEnterHandler() {}
 }

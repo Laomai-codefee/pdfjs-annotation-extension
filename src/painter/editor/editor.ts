@@ -80,9 +80,9 @@ export abstract class Editor {
      * 启用编辑模式，监听 Konva Stage的鼠标事件。
      */
     protected enableEditMode() {
-        document.addEventListener('contextmenu', function (e) {
-            e.preventDefault() // 禁用默认的上下文菜单
-        })
+        // document.addEventListener('contextmenu', function (e) {
+        //     e.preventDefault() // 禁用默认的上下文菜单
+        // })
 
         this.konvaStage.on('mousedown', e => {
             if (e.evt.button === 0) {
@@ -97,15 +97,8 @@ export abstract class Editor {
                 this.mouseUpHandler(e) // 处理鼠标松开事件
             }
         })
-        this.konvaStage.on('mouseenter', e => {
-            if (e.evt.button === 0) {
-                this.mouseEnterHandler(e) // 处理鼠标进入事件
-            }
-        })
-        this.konvaStage.on('mouseout', e => {
-            this.mouseOutHandler(e) // 处理鼠标离开事件
-        })
 
+        // Mobile Touch Events
         this.konvaStage.on('touchstart', e => {
             if (e.evt.touches.length === 1) {
                 this.mouseDownHandler(e)
@@ -115,6 +108,9 @@ export abstract class Editor {
             if (e.evt.touches.length === 1) {
                 this.mouseMoveHandler(e)
             }
+        })
+        this.konvaStage.on('touchend', e => {
+            this.mouseUpHandler(e)
         })
     }
 
@@ -127,8 +123,9 @@ export abstract class Editor {
         this.konvaStage.off('mousedown')
         this.konvaStage.off('mousemove')
         this.konvaStage.off('mouseup')
-        this.konvaStage.off('mouseenter')
-        this.konvaStage.off('mouseout')
+        this.konvaStage.off('touchstart')
+        this.konvaStage.off('touchmove')
+        this.konvaStage.off('touchend')
     }
 
     /**
@@ -257,35 +254,21 @@ export abstract class Editor {
      * @param e Konva 事件对象
      * @protected
      */
-    protected abstract mouseDownHandler(e: KonvaEventObject<MouseEvent>): void
+    protected abstract mouseDownHandler(e: KonvaEventObject<MouseEvent | TouchEvent>): void
 
     /**
      * 处理鼠标移动事件的抽象方法，子类需实现具体逻辑。
      * @param e Konva 事件对象
      * @protected
      */
-    protected abstract mouseMoveHandler(e: KonvaEventObject<MouseEvent>): void
+    protected abstract mouseMoveHandler(e: KonvaEventObject<MouseEvent | TouchEvent>): void
 
     /**
      * 处理鼠标松开事件的抽象方法，子类需实现具体逻辑。
      * @param e Konva 事件对象
      * @protected
      */
-    protected abstract mouseUpHandler(e: KonvaEventObject<MouseEvent>): void
-
-    /**
-     * 处理鼠标离开事件的抽象方法，子类需实现具体逻辑。
-     * @param e Konva 事件对象
-     * @protected
-     */
-    protected abstract mouseOutHandler(e: KonvaEventObject<MouseEvent>): void
-
-    /**
-     * 处理鼠标进入事件的抽象方法，子类需实现具体逻辑。
-     * @param e Konva 事件对象
-     * @protected
-     */
-    protected abstract mouseEnterHandler(e: KonvaEventObject<MouseEvent>): void
+    protected abstract mouseUpHandler(e: KonvaEventObject<MouseEvent | TouchEvent>): void
 
     /**
      * 激活编辑器，重新设置 Konva Stage和当前注解对象，并启用编辑模式。

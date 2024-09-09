@@ -26,7 +26,7 @@ export class EditorRectangle extends Editor {
      * 处理鼠标按下事件的方法，创建新的矩形对象并添加到舞台。
      * @param e Konva 事件对象
      */
-    protected mouseDownHandler(e: KonvaEventObject<PointerEvent>) {
+    protected mouseDownHandler(e: KonvaEventObject<MouseEvent | TouchEvent>) {
         if (e.currentTarget !== this.konvaStage) {
             return
         }
@@ -54,7 +54,7 @@ export class EditorRectangle extends Editor {
      * 处理鼠标移动事件的方法，实时更新绘制的矩形对象的大小和位置。
      * @param e Konva 事件对象
      */
-    protected mouseMoveHandler(e: KonvaEventObject<PointerEvent>) {
+    protected mouseMoveHandler(e: KonvaEventObject<MouseEvent | TouchEvent>) {
         if (!this.isPainting) {
             return
         }
@@ -247,13 +247,4 @@ export class EditorRectangle extends Editor {
         return Math.max(width, height) < Editor.MinSize // 判断宽度和高度的最大值是否小于最小允许大小
     }
 
-    /**
-     * 空方法，处理鼠标移出事件。
-     */
-    protected mouseOutHandler() {}
-
-    /**
-     * 空方法，处理鼠标移入事件。
-     */
-    protected mouseEnterHandler() {}
 }

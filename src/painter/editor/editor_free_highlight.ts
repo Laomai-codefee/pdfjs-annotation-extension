@@ -13,14 +13,11 @@ export class EditorFreeHighlight extends Editor {
         this.line = null // 初始化当前曲线为 null
     }
 
-    protected mouseOutHandler() {}
-    protected mouseEnterHandler() {}
-
     /**
      * 处理鼠标或触摸指针按下事件，开始绘制自由曲线。
      * @param e Konva 事件对象
      */
-    protected mouseDownHandler(e: KonvaEventObject<PointerEvent>): void {
+    protected mouseDownHandler(e: KonvaEventObject<MouseEvent | TouchEvent>): void {
         if (e.currentTarget !== this.konvaStage) {
             return
         }
@@ -53,7 +50,7 @@ export class EditorFreeHighlight extends Editor {
      * 处理鼠标或触摸指针移动事件，绘制自由曲线。
      * @param e Konva 事件对象
      */
-    protected mouseMoveHandler(e: KonvaEventObject<PointerEvent>): void {
+    protected mouseMoveHandler(e: KonvaEventObject<MouseEvent | TouchEvent>): void {
         if (!this.isPainting) {
             return
         }

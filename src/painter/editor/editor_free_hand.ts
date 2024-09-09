@@ -24,7 +24,7 @@ export class EditorFreeHand extends Editor {
      * 处理鼠标或触摸指针按下事件，开始绘制自由曲线。
      * @param e Konva 事件对象
      */
-    protected mouseDownHandler(e: KonvaEventObject<PointerEvent>) {
+    protected mouseDownHandler(e: KonvaEventObject<MouseEvent | TouchEvent>) {
         if (e.currentTarget !== this.konvaStage) {
             return
         }
@@ -61,7 +61,7 @@ export class EditorFreeHand extends Editor {
      * 处理鼠标或触摸指针移动事件，绘制自由曲线。
      * @param e Konva 事件对象
      */
-    protected mouseMoveHandler(e: KonvaEventObject<PointerEvent>) {
+    protected mouseMoveHandler(e: KonvaEventObject<MouseEvent | TouchEvent>) {
         if (!this.isPainting) {
             return
         }
@@ -257,7 +257,4 @@ export class EditorFreeHand extends Editor {
     private isTooSmall(): boolean {
         return this.line.points().length < Editor.MinSize
     }
-
-    protected mouseOutHandler() {}
-    protected mouseEnterHandler() {}
 }
