@@ -6,6 +6,7 @@
     background-color: var(--toolbar-bg-color);
     border: 1px solid var(--toolbar-border-color);
     border-radius: 5px;
+    font:message-box;
     .buttons {
         display: flex;
         padding: 0;
@@ -19,7 +20,7 @@
             text-align: center;
             border: 1px solid transparent;
             color: var(--main-color);
-            transition: background-color 0.3s;
+            cursor: default;
             .icon {
                 font-size: 14px;
                 padding: 5px 10px 0 10px;

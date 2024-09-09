@@ -3,7 +3,7 @@ import './index.scss'
 import { ColorPicker, Dropdown } from 'antd'
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 
-import { annotationDefinitions, AnnotationType, DefaultColors, DefaultFontSize, DefaultSettings, IAnnotationType } from '../../const/definitions'
+import { annotationDefinitions, AnnotationType, DefaultColors, DefaultFontSize, DefaultSettings, IAnnotationType, PdfjsAnnotationEditorType } from '../../const/definitions'
 import { FontSizeIcon, PaletteIcon } from '../../const/icon'
 import { SignatureTool } from './signature'
 import { StampTool } from './stamp'
@@ -21,7 +21,7 @@ export interface CustomToolbarRef {
  */
 const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function CustomToolbar(props, ref) {
     const [currentAnnotation, setCurrentAnnotation] = useState<IAnnotationType | null>(null)
-    const [annotations, setAnnotations] = useState<IAnnotationType[]>(annotationDefinitions)
+    const [annotations, setAnnotations] = useState<IAnnotationType[]>(annotationDefinitions.filter(item => item.pdfjsType !== PdfjsAnnotationEditorType.HIGHLIGHT))
     const [dataTransfer, setDataTransfer] = useState<string | null>(null)
 
     useImperativeHandle(ref, () => ({

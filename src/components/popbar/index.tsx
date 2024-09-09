@@ -20,7 +20,6 @@ export interface CustomPopbarRef {
  */
 const CustomPopbar = forwardRef<CustomPopbarRef, CustomPopbarProps>(function CustomPopbar(props, ref) {
     const [show, setShow] = useState(false)
-    const [currentAnnotation, setCurrentAnnotation] = useState<IAnnotationType | null>(null)
     const [annotations] = useState<IAnnotationType[]>(annotationDefinitions.filter(item => item.pdfjsType === PdfjsAnnotationEditorType.HIGHLIGHT))
 
     const [currentRange, setCurrentRange] = useState<Range | null>(null)
@@ -83,7 +82,6 @@ const CustomPopbar = forwardRef<CustomPopbarRef, CustomPopbarProps>(function Cus
 
     const handleAnnotationClick = (annotation: IAnnotationType | null) => {
         setShow(false)
-        setCurrentAnnotation(annotation)
         props.onChange(annotation, currentRange)
     }
 

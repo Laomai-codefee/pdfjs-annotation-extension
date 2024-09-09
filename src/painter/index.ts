@@ -88,24 +88,6 @@ export class Painter {
             // 初始化 WebSelection 实例
             onSelect: range => {
                 this.onWebSelectionSelected(range)
-                // const canvas = this.konvaCanvasStore.get(pageNumber)
-                // if (canvas) {
-                //     const { konvaStage, wrapper } = canvas
-                //     const editor = new EditorHighLight(
-                //         {
-                //             pdfViewerApplication: this.pdfViewerApplication,
-                //             konvaStage,
-                //             pageNumber,
-                //             annotation: this.currentAnnotation,
-                //             onAdd: (shapeGroup, pdfjsAnnotationStorage, annotationContent) => {
-                //                 this.saveToStore(shapeGroup, pdfjsAnnotationStorage, annotationContent)
-                //             }
-                //         },
-                //         this.currentAnnotation.type
-                //     )
-                //     this.editorStore.set(editor.id, editor)
-                //     editor.convertTextSelection(elements, wrapper)
-                // }
             },
             onHighlight: selection => {
                 Object.keys(selection).forEach(key => {
@@ -252,13 +234,11 @@ export class Painter {
     }
 
     /**
-     * 设置当前模式 (选择模式、绘画模式、默认模式)
-     * @param mode - 模式类型 ('selection', 'painting', 'default')
+     * 设置当前模式 (绘画模式、默认模式)
+     * @param mode - 模式类型 ('painting', 'default')
      */
-    private setMode(mode: 'selection' | 'painting' | 'default'): void {
+    private setMode(mode: 'painting' | 'default'): void {
         const isPainting = mode === 'painting' // 是否绘画模式
-        const isSelection = mode === 'selection' // 是否选择模式
-        this.webSelection[isSelection ? 'enable' : 'disable']() // 启用或禁用 WebSelection
         document.body.classList.toggle(`${PAINTER_IS_PAINTING_STYLE}`, isPainting) // 添加或移除绘画模式样式
         const allAnnotationClasses = Object.values(AnnotationType)
             .filter(type => typeof type === 'number')
@@ -530,7 +510,6 @@ export class Painter {
      */
     public initWebSelection(rootElement: HTMLDivElement): void {
         this.webSelection.create(rootElement)
-        this.webSelection.enable()
     }
 
     /**
@@ -549,12 +528,6 @@ export class Painter {
 
         console.log(`Painting mode active type: ${annotation.type} | pdfjs annotationStorage type: ${annotation.pdfjsType}`)
         switch (annotation.type) {
-            case AnnotationType.HIGHLIGHT:
-            case AnnotationType.STRIKEOUT:
-            case AnnotationType.UNDERLINE:
-                this.setMode('selection') // 设置选择模式
-                break
-
             case AnnotationType.FREETEXT:
             case AnnotationType.RECTANGLE:
             case AnnotationType.ELLIPSE:
@@ -583,8 +556,8 @@ export class Painter {
 
     /**
      * @description 根据 range 加亮
-     * @param range 
-     * @param annotation 
+     * @param range
+     * @param annotation
      */
     public highlight(range: Range, annotation: IAnnotationType) {
         this.currentAnnotation = annotation
