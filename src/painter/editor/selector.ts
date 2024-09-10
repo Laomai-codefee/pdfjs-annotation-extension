@@ -55,7 +55,7 @@ export class Selector {
      * @param konvaStage - 要禁用事件的 Konva Stage。
      */
     private disableStageEvents(konvaStage: Konva.Stage): void {
-        konvaStage.off('click mousedown mousemove mouseup mouseenter mouseout')
+        konvaStage.off('click mousedown mousemove mouseup touchstart touchmove touchend')
     }
 
     /**
@@ -63,7 +63,7 @@ export class Selector {
      * @param konvaStage - 要绑定事件的 Konva Stage。
      */
     private bindStageEvents(konvaStage: Konva.Stage): void {
-        konvaStage.on('click', e => {
+        konvaStage.on('click tap', e => {
             if (e.target !== konvaStage) return
             this.clearTransformers()
         })
@@ -133,7 +133,7 @@ export class Selector {
      * @param konvaStage - 形状所在的 Konva Stage。
      */
     private bindShapeEvents(shape: Konva.Shape, konvaStage: Konva.Stage): void {
-        shape.on('click', e => {
+        shape.on('pointerclick', e => {
             if (e.evt.button === 0) {
                 this.handleShapeClick(shape, konvaStage)
             }
@@ -155,7 +155,7 @@ export class Selector {
      * @param shape - 要移除事件的形状。
      */
     private removeShapeEvents(shape: Konva.Shape): void {
-        shape.off('click mouseover mouseout')
+        shape.off('pointerclick mouseover mouseout')
     }
 
     /**

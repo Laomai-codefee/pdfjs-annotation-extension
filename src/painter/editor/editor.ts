@@ -85,6 +85,7 @@ export abstract class Editor {
         // })
 
         this.konvaStage.on('mousedown', e => {
+            console.log('mousedown')
             if (e.evt.button === 0) {
                 this.mouseDownHandler(e) // 处理鼠标按下事件
             }
@@ -100,6 +101,7 @@ export abstract class Editor {
 
         // Mobile Touch Events
         this.konvaStage.on('touchstart', e => {
+            console.log("touchstart")
             if (e.evt.touches.length === 1) {
                 this.mouseDownHandler(e)
             }
