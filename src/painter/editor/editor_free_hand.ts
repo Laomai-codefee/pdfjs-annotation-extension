@@ -47,7 +47,7 @@ export class EditorFreeHand extends Editor {
             opacity: this.currentAnnotation.style.opacity, // 设置线条透明度
             lineCap: 'round', // 设置线条端点为圆形
             lineJoin: 'round', // 设置线条连接处为圆形
-            hitStrokeWidth: 10, // 设置点击检测的宽度
+            hitStrokeWidth: 20, // 设置点击检测的宽度
             visible: false, // 初始化为不可见
             globalCompositeOperation: 'source-over',
             points: [pos.x, pos.y, pos.x, pos.y] // 初始化起始点

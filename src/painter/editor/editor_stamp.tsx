@@ -156,6 +156,7 @@ export class EditorStamp extends Editor {
             // 将组转换为数据 URL，并设置 CSS 自定义属性
             const cursorImg = cursorGroup.toDataURL()
             cursorGroup.destroy()
+
             setCssCustomProperty(CURSOR_CSS_PROPERTY, `url(${cursorImg}) ${crosshair.x} ${crosshair.y}, default`)
         })
     }
@@ -410,6 +411,6 @@ export class EditorStamp extends Editor {
     }
 
     // 以下是未实现的抽象方法的空实现
-    protected mouseMoveHandler() {}
-    protected mouseUpHandler() {}
+    protected mouseMoveHandler() { }
+    protected mouseUpHandler() { }
 }

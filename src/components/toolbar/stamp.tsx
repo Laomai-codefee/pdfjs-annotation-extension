@@ -2,7 +2,7 @@ import './index.scss' // 导入组件的样式
 
 import React from 'react' // 导入 React
 
-import { IAnnotationType } from '../../const/definitions' // 导入自定义注释类型
+import { DefaultStampSetting, IAnnotationType } from '../../const/definitions' // 导入自定义注释类型
 import { formatFileSize } from '../../utils/utils' // 导入文件大小格式化工具
 
 // 定义组件的 props 类型
@@ -12,7 +12,7 @@ interface StampToolProps {
 }
 
 const StampTool: React.FC<StampToolProps> = props => {
-    const maxSize: number = 1024 * 1024 // 最大文件大小为 1MB
+    const maxSize: number = DefaultStampSetting.MAX_SIZE
 
     // 文件输入变化的事件处理函数
     const onInputFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {

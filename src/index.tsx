@@ -105,6 +105,20 @@ class PdfjsAnnotationExtension {
     }
 
     /**
+     * @description 隐藏绘图层
+     */
+    private hidePainter() {
+        document.body.classList.add('PdfjsAnnotationExtension_scalechanging')
+    }
+
+    /**
+     * @description 显示绘图层
+     */
+    private showPainter() {
+        document.body.classList.remove('PdfjsAnnotationExtension_scalechanging')
+    }
+
+    /**
      * @description 绑定 PDF.js 相关事件
      */
     private bindPdfjsEvents(): void {
@@ -113,9 +127,14 @@ class PdfjsAnnotationExtension {
         this.PDFJS_EventBus._on(
             'pagerendered',
             async ({ source, cssTransform, pageNumber }: { source: PDFPageView; cssTransform: boolean; pageNumber: number }) => {
+                this.showPainter()
                 this.painter.initCanvas({ pageView: source, cssTransform, pageNumber })
             }
         )
+        // 缩放页面时隐藏绘图层
+        this.PDFJS_EventBus._on('scalechanging', () => {
+            this.hidePainter()
+        })
         // 监听文档加载完成事件
         this.PDFJS_EventBus._on('documentloaded', (event) => {
             this.painter.initWebSelection(this.$PDFJS_viewerContainer)
@@ -126,9 +145,6 @@ class PdfjsAnnotationExtension {
         })
         this.PDFJS_EventBus._on('download', () => {
             this.painter.resetPdfjsAnnotationStorage()
-        })
-        this.PDFJS_EventBus._on('updateviewarea', () => {
-            // this.customPopbarRef.current.close()
         })
     }
 }

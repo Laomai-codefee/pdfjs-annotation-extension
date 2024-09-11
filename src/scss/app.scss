@@ -11,4 +11,12 @@
     #toolbarContainer {
         height: 107px;
     }
+    .ant-message{
+        z-index: 9999999;
+    }
+}
+.PdfjsAnnotationExtension_scalechanging{
+    .PdfjsAnnotationExtension_painter_wrapper{
+        display: none;
+    }
 }

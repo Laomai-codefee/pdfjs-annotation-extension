@@ -171,8 +171,12 @@ export const DefaultFontSize = [12, 14, 16, 18, 20, 22, 24]
 // 配置默认的签名设置
 export const DefaultSignatureSetting = {
     COLORS: ['#000000', '#FF0000'], // 签名的默认颜色选项
-    WIDTH: 128 * 3, // 签名框的宽度
-    HEIGHT: 128 // 签名框的高度
+    WIDTH: 366, // 签名框的宽度
+    HEIGHT: 200 // 签名框的高度
+}
+
+export const DefaultStampSetting = {
+    MAX_SIZE: 1024 * 1024 * 1024 // 最大文件大小为 10MB
 }
 
 // 配置默认的选择设置

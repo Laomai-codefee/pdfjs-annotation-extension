@@ -1,8 +1,6 @@
 import './index.scss'
-
-import { ColorPicker, Dropdown } from 'antd'
+import { ColorPicker, Dropdown, message } from 'antd'
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
-
 import { annotationDefinitions, AnnotationType, DefaultColors, DefaultFontSize, DefaultSettings, IAnnotationType, PdfjsAnnotationEditorType } from '../../const/definitions'
 import { FontSizeIcon, PaletteIcon } from '../../const/icon'
 import { SignatureTool } from './signature'
@@ -41,6 +39,15 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
         }
     }
 
+    const handleAdd = (signatureDataUrl, annotation) => {
+        message.open({
+            type: 'info',
+            content: '请选择放置位置',
+        })
+        setDataTransfer(signatureDataUrl)
+        setCurrentAnnotation(annotation)
+    }
+
     const buttons = annotations.map((annotation, index) => {
         const isSelected = annotation.type === selectedType
 
@@ -48,23 +55,18 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
             className: isSelected ? 'selected' : ''
         }
 
-        const handleAdd = signatureDataUrl => {
-            setDataTransfer(signatureDataUrl)
-            setCurrentAnnotation(annotation)
-        }
-
         switch (annotation.type) {
             case AnnotationType.STAMP:
                 return (
                     <li key={index} {...commonProps}>
-                        <StampTool annotation={annotation} onAdd={handleAdd} />
+                        <StampTool annotation={annotation} onAdd={(signatureDataUrl) => handleAdd(signatureDataUrl, annotation)} />
                     </li>
                 )
 
             case AnnotationType.SIGNATURE:
                 return (
                     <li key={index} {...commonProps}>
-                        <SignatureTool annotation={annotation} onAdd={handleAdd} />
+                        <SignatureTool annotation={annotation} onAdd={(signatureDataUrl) => handleAdd(signatureDataUrl, annotation)} />
                     </li>
                 )
 
@@ -94,7 +96,6 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
         setCurrentAnnotation(updatedAnnotation)
     }
 
-    // 处理字体大小变化
     const handleFontSizeChange = (size: number) => {
         if (!currentAnnotation) return
         const updatedAnnotation = { ...currentAnnotation, style: { ...currentAnnotation.style, fontSize: size } }
@@ -103,7 +104,6 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
         setCurrentAnnotation(updatedAnnotation)
     }
 
-    // 构建字体大小的菜单项
     const fontSizeMenuItems = DefaultFontSize.map(size => ({
         key: size.toString(),
         label: size,
