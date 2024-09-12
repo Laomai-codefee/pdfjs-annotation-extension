@@ -161,30 +161,37 @@ export class EditorFreeText extends Editor {
      * @param pos 相对位置坐标
      */
     private async inputDoneHandler(inputValue: string, scale: { x: number; y: number }, pos: { x: number; y: number }, color: string, fontSize: number) {
-        const value = inputValue.trim()
+        const value = inputValue.trim();
         if (value === '') {
-            this.delShapeGroup(this.currentShapeGroup.id)
-            this.currentShapeGroup = null
-            return
+            this.delShapeGroup(this.currentShapeGroup.id);
+            this.currentShapeGroup = null;
+            return;
         }
+        const tempText = new Konva.Text({
+            text: value,
+            fontSize: fontSize,
+            padding: 2
+        });
+        const textWidth = tempText.width();
+        const maxWidth = 300;
+        const finalWidth = textWidth > maxWidth ? maxWidth : textWidth;
         const text = new Konva.Text({
             x: pos.x,
             y: pos.y + 2,
             text: value,
+            width: finalWidth,
             fontSize: fontSize,
             fill: color,
-            padding: 2
-        })
-
+            padding: 2,
+            wrap: textWidth > maxWidth ? 'word' : 'none'
+        });
         this.currentShapeGroup.konvaGroup.add(text)
-
         // 将 Text 节点转换为 Image
         const imageUrl = await new Promise<string>(resolve => {
             text.toDataURL({
                 callback: url => resolve(url)
             })
         })
-
         // 使用生成的 imageUrl 创建 Konva.Image
         Konva.Image.fromURL(imageUrl, async image => {
             const { width: width_rec, height: height_rec } = text.getClientRect()
