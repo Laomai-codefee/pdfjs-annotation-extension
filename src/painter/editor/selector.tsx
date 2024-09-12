@@ -204,7 +204,7 @@ export class Selector {
             rotateEnabled: false,
             borderStrokeWidth: DefaultChooseSetting.STROKEWIDTH,
             borderStroke: DefaultChooseSetting.COLOR,
-            anchorFill: '#fff',
+            anchorFill: DefaultChooseSetting.COLOR,
             anchorStroke: DefaultChooseSetting.COLOR,
             anchorCornerRadius: 5,
             anchorStrokeWidth: 2,

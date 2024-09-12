@@ -162,7 +162,7 @@ export enum AnnotationType {
 
 // 配置默认颜色
 // 提供一组默认的颜色选项
-export const DefaultColors = ['#ff0000', '#ffbe00', '#cc0000', '#ffff00', '#83d33c', '#00b445', '#00b2f4', '#0071c4', '#001f63', '#7828a4']
+export const DefaultColors = ['#ff0000', '#ffbe00', '#ffff00', '#83d33c', '#00b445', '#00b2f4', '#0071c4', '#001f63', '#7828a4']
 
 // 配置默认字体大小
 // 提供一组默认的字体大小选项
@@ -182,8 +182,8 @@ export const DefaultStampSetting = {
 // 配置默认的选择设置
 // 提供默认的选择工具的颜色和线条宽度
 export const DefaultChooseSetting = {
-    COLOR: '#0071c4', // 选择工具的颜色
-    STROKEWIDTH: 2 // 选择工具的线条宽度
+    COLOR: '#000', // 选择工具的颜色
+    STROKEWIDTH: 1 // 选择工具的线条宽度
 }
 
 // 默认配置对象
@@ -191,7 +191,7 @@ export const DefaultChooseSetting = {
 export const DefaultSettings = {
     COLOR: DefaultColors[0], // 默认颜色
     FONT_SIZE: DefaultFontSize[0], // 默认字体大小
-    HIGHLIGHT_COLOR: DefaultColors[1], // 默认高亮颜色
+    HIGHLIGHT_COLOR: DefaultColors[2], // 默认高亮颜色
     STRIKEOUT_COLOR: DefaultColors[0], // 默认删除线颜色
     UNDERLINE_COLOR: DefaultColors[6], // 默认下划线颜色
     STROKE_WIDTH: 2, // 默认线条宽度

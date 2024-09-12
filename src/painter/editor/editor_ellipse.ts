@@ -45,6 +45,8 @@ export class EditorEllipse extends Editor {
             radiusY: 0,
             x: pos.x,
             y: pos.y,
+            // do not scale strokes
+            strokeScaleEnabled: false,
             visible: false, // 初始状态为不可见
             stroke: this.currentAnnotation.style.color, // 设置椭圆边框颜色
             strokeWidth: this.currentAnnotation.style.strokeWidth, // 设置椭圆边框宽度
@@ -250,5 +252,4 @@ export class EditorEllipse extends Editor {
         const { width, height } = this.ellipse.size()
         return Math.max(width, height) < Editor.MinSize
     }
-
 }

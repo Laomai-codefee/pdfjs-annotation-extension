@@ -42,6 +42,8 @@ export class EditorFreeHand extends Editor {
         // 获取当前指针位置，并初始化线条对象
         const pos = this.konvaStage.getRelativePointerPosition()
         this.line = new Konva.Line({
+            // do not scale strokes
+            strokeScaleEnabled: false,
             stroke: this.currentAnnotation.style.color, // 设置线条颜色
             strokeWidth: this.currentAnnotation.style.strokeWidth, // 设置线条宽度
             opacity: this.currentAnnotation.style.opacity, // 设置线条透明度

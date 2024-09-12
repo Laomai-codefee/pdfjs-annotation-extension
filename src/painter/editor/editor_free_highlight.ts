@@ -31,6 +31,8 @@ export class EditorFreeHighlight extends Editor {
         const pos = this.konvaStage.getRelativePointerPosition()
 
         this.line = new Konva.Line({
+            // do not scale strokes
+            strokeScaleEnabled: false,
             stroke: this.currentAnnotation.style.color,
             strokeWidth: this.currentAnnotation.style.strokeWidth,
             opacity: this.currentAnnotation.style.opacity,

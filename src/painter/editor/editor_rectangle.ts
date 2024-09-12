@@ -41,6 +41,8 @@ export class EditorRectangle extends Editor {
             y: pos.y,
             width: 0,
             height: 0,
+            // do not scale strokes
+            strokeScaleEnabled: false,
             visible: false,
             stroke: this.currentAnnotation.style.color,
             strokeWidth: this.currentAnnotation.style.strokeWidth || 2,
@@ -246,5 +248,4 @@ export class EditorRectangle extends Editor {
         const { width, height } = this.rect.size() // 获取矩形的宽度和高度
         return Math.max(width, height) < Editor.MinSize // 判断宽度和高度的最大值是否小于最小允许大小
     }
-
 }
