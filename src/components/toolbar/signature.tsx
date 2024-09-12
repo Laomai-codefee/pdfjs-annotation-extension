@@ -3,6 +3,9 @@ import './index.scss' // 导入样式
 import { Button, Modal, Popover } from 'antd' // 导入 antd 组件
 import Konva from 'konva' // 导入 Konva 库
 import React, { useCallback, useEffect, useRef, useState } from 'react' // 导入 React 和相关 Hooks
+import {
+    PlusCircleOutlined
+} from '@ant-design/icons';
 
 import { DefaultSignatureSetting, IAnnotationType } from '../../const/definitions' // 导入自定义类型和默认设置
 
@@ -175,7 +178,7 @@ const SignatureTool: React.FC<SignatureToolProps> = props => {
                             })}
                         </ul>
                         <div className="SignaturePop-Toolbar">
-                            <Button block onClick={openModal}>
+                            <Button block type="link" onClick={openModal} icon={<PlusCircleOutlined />}>
                                 创建签名
                             </Button>
                         </div>
