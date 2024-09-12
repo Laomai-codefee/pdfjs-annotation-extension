@@ -74,6 +74,9 @@ class PdfjsAnnotationExtension {
                 onChange={(currentAnnotation, dataTransfer) => {
                     this.painter.activate(currentAnnotation, dataTransfer)
                 }}
+                onSave={() => {
+                    this.savePdf()
+                }}
             />
         )
     }
@@ -98,11 +101,29 @@ class PdfjsAnnotationExtension {
      * @description 隐藏 PDF.js 编辑模式按钮
      */
     private hidePdfjsEditorModeButtons(): void {
-        const editorModeButtons = document.querySelector('#editorModeButtons') as HTMLDivElement
-        const editorModeSeparator = document.querySelector('#editorModeSeparator') as HTMLDivElement
-        editorModeButtons.style.display = 'none'
-        editorModeSeparator.style.display = 'none'
+        // 查找所有需要隐藏的元素
+        const elementsToHide: HTMLElement[] = [
+            document.querySelector('#editorModeButtons') as HTMLDivElement,
+            document.querySelector('#editorModeSeparator') as HTMLDivElement,
+            document.querySelector('#pageRotateCw') as HTMLButtonElement,
+            document.querySelector('#pageRotateCcw') as HTMLButtonElement,
+            document.querySelector('#download') as HTMLButtonElement
+        ];
+
+        // 处理紧邻 pageRotateCcw 的下一个兄弟元素
+        const pageRotateCcw = elementsToHide[3]; // 第四个元素是 #pageRotateCcw
+        const nextDiv = pageRotateCcw?.nextElementSibling as HTMLElement;
+        if (nextDiv) {
+            nextDiv.style.display = 'none';
+        }
+        // 隐藏所有找到的元素
+        elementsToHide.forEach((element) => {
+            if (element) {
+                element.style.display = 'none';
+            }
+        });
     }
+
 
     /**
      * @description 隐藏绘图层
@@ -146,6 +167,21 @@ class PdfjsAnnotationExtension {
         this.PDFJS_EventBus._on('download', () => {
             this.painter.resetPdfjsAnnotationStorage()
         })
+    }
+
+    private async savePdf() {
+        // 下载到本地
+        this.PDFJS_EventBus.dispatch("download")
+
+        // 保存到远程地址
+        // const data = await this.PDFJS_PDFViewerApplication?.pdfDocument?.saveDocument()
+        // const blob = new Blob([data], { type: 'application/pdf' })
+        // const formData = new FormData()
+        // formData.append('file', blob, '未命名.pdf')
+        // fetch('save.action', {
+        //     method: 'POST',
+        //     body: formData
+        // })
     }
 }
 

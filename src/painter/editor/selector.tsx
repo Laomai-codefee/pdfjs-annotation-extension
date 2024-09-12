@@ -141,7 +141,6 @@ export class Selector {
                 type: 'warn',
                 destroyOnClose: true,
                 centered: true,
-                zIndex: 9999,
                 okText: '是',
                 cancelText: '否',
                 onOk: () => {

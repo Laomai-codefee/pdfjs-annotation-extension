@@ -35,9 +35,6 @@
                 padding: 1px 10px 2px 10px;
             }
 
-            &:hover {
-                background-color: var(--button-hover-color);
-            }
         }
 
         li.selected {
@@ -55,8 +52,9 @@
     }
 
     .splitToolbarButtonSeparator {
-        height: 51px;
-        margin: 0 10px;
+        height: 30px;
+        margin: 0 5px;
+        min-width: 1px;
     }
 }
 
@@ -169,7 +167,6 @@
 
 .StampTool {
     position: relative;
-
     input {
         position: absolute;
         width: 100%;
@@ -195,6 +192,20 @@
         justify-content: flex-start;
         .buttons {
             margin-left: 10px;
+            padding-right: 10px;
         }
+    }
+}
+
+@media (hover: hover) {
+    /* 只在支持 hover 的设备上保留 :hover 效果 */
+    .CustomToolbar .buttons li:hover {
+        background-color: var(--button-hover-color);
+    }
+}
+@media (hover: none) {
+    /* 在不支持 hover 的设备上，例如触屏设备，禁用 :hover 效果 */
+    .CustomToolbar .buttons li:active {
+        background-color: var(--button-hover-color); /* 使用 active 替代 */
     }
 }

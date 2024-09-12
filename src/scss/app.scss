@@ -1,4 +1,7 @@
 .PdfjsAnnotationExtension {
+    .toolbar{
+        z-index: 99;
+    }
     .textLayer {
         z-index: 9 !important;
     }

@@ -187,7 +187,6 @@ const SignatureTool: React.FC<SignatureToolProps> = props => {
                 trigger="click"
                 open={isPopoverOpen}
                 onOpenChange={handleOpenChange}
-                zIndex={9999}
                 placement="bottom"
                 arrow={false}
             >
@@ -202,7 +201,6 @@ const SignatureTool: React.FC<SignatureToolProps> = props => {
                 onOk={handleOk}
                 onCancel={handleCancel}
                 destroyOnClose={true}
-                zIndex={99999}
                 okText="确定"
                 cancelText="取消"
                 afterOpenChange={afterOpen}

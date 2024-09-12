@@ -190,7 +190,7 @@ export const DefaultChooseSetting = {
 // 提供一组默认的批注设置
 export const DefaultSettings = {
     COLOR: DefaultColors[0], // 默认颜色
-    FONT_SIZE: DefaultFontSize[0], // 默认字体大小
+    FONT_SIZE: DefaultFontSize[2], // 默认字体大小
     HIGHLIGHT_COLOR: DefaultColors[2], // 默认高亮颜色
     STRIKEOUT_COLOR: DefaultColors[0], // 默认删除线颜色
     UNDERLINE_COLOR: DefaultColors[6], // 默认下划线颜色

@@ -2,12 +2,13 @@ import './index.scss'
 import { ColorPicker, message } from 'antd'
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 import { annotationDefinitions, AnnotationType, DefaultColors, DefaultSettings, IAnnotationType, PdfjsAnnotationEditorType } from '../../const/definitions'
-import { PaletteIcon } from '../../const/icon'
+import { PaletteIcon, SaveIcon } from '../../const/icon'
 import { SignatureTool } from './signature'
 import { StampTool } from './stamp'
 
 interface CustomToolbarProps {
     onChange: (annotation: IAnnotationType | null, dataTransfer: string | null) => void
+    onSave:() => void
 }
 
 export interface CustomToolbarRef {
@@ -81,7 +82,6 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
     })
 
     const isColorDisabled = !currentAnnotation?.style?.color
-    const isFontSizeDisabled = !currentAnnotation?.style?.fontSize
 
     useEffect(() => {
         // 调用 onChange 并传递当前的 annotation 和 dataTransfer
@@ -102,6 +102,7 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
             <div className="splitToolbarButtonSeparator"></div>
             <ul className="buttons">
                 <ColorPicker
+                    arrow={false}
                     disabledAlpha
                     value={currentAnnotation?.style?.color || DefaultSettings.COLOR}
                     disabled={isColorDisabled}
@@ -116,6 +117,14 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
                         <div className="name">颜色</div>
                     </li>
                 </ColorPicker>
+                <li onClick={()=> {
+                    props.onSave()
+                }}>
+                    <div className="icon">
+                        <SaveIcon />
+                    </div>
+                    <div className="name">保存</div>
+                </li>
             </ul>
         </div>
     )

@@ -101,7 +101,6 @@ async function setInputText(color: string, fontSize: number): Promise<{ inputVal
                 </div>
             ),
             destroyOnClose: true,
-            zIndex: 9999,
             okText: '确定',
             cancelText: '取消',
             okButtonProps: {

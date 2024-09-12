@@ -59,7 +59,6 @@ async function setBatchStampPageNumbers(): Promise<{ parsedPages: number[]; inpu
                     <Input ref={inputRef} status={status} placeholder={placeholder} onChange={handleChange} />
                 </div>
             ),
-            zIndex: 999999,
             okText: '确定',
             cancelText: '取消',
             okButtonProps: {
