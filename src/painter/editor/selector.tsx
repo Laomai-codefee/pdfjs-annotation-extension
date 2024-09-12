@@ -3,6 +3,7 @@ import Konva from 'konva'
 import { DefaultChooseSetting, IAnnotationStore } from '../../const/definitions'
 import { SELECTOR_HOVER_STYLE, SHAPE_GROUP_NAME } from '../const'
 import { KonvaCanvas } from '../index'
+import { Modal } from 'antd'
 
 /**
  * 定义选择器的选项接口
@@ -133,6 +134,23 @@ export class Selector {
      * @param konvaStage - 形状所在的 Konva Stage。
      */
     private bindShapeEvents(shape: Konva.Shape, konvaStage: Konva.Stage): void {
+
+        shape.on('pointerdblclick', () => {
+            Modal.confirm({
+                title: `是否删除`,
+                type: 'warn',
+                destroyOnClose: true,
+                centered: true,
+                zIndex: 9999,
+                okText: '是',
+                cancelText: '否',
+                onOk: () => {
+                    this.onDelete(this.currentTransformerId)
+                    this.clearTransformers()
+                }
+            })
+        })
+
         shape.on('pointerclick', e => {
             if (e.evt.button === 0) {
                 this.handleShapeClick(shape, konvaStage)
@@ -155,7 +173,7 @@ export class Selector {
      * @param shape - 要移除事件的形状。
      */
     private removeShapeEvents(shape: Konva.Shape): void {
-        shape.off('pointerclick mouseover mouseout')
+        shape.off('pointerclick mouseover mouseout pointerdblclick')
     }
 
     /**
