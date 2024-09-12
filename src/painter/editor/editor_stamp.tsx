@@ -11,9 +11,9 @@ import { Editor, IEditorOptions } from './editor'
 
 /**
  * 批量设置盖章位置
- * @returns {Promise<{ parsedPages: number[], originalInput: string }>}
+ * @returns {Promise<{ parsedPages: number[], inputValue: string }>}
  */
-async function setBatchStampPageNumbers(): Promise<{ parsedPages: number[]; originalInput: string }> {
+async function setBatchStampPageNumbers(): Promise<{ parsedPages: number[]; inputValue: string }> {
     return new Promise(resolve => {
         const placeholder = '格式: 1,1-2,3-4'
         let inputValue = '' // 临时变量来存储输入值
@@ -51,7 +51,8 @@ async function setBatchStampPageNumbers(): Promise<{ parsedPages: number[]; orig
         }
 
         modal = Modal.confirm({
-            title: '批量设置',
+            title: '批量设置盖章位置',
+            icon: null,
             content: (
                 <div>
                     <div> 应用范围：</div>
@@ -65,10 +66,10 @@ async function setBatchStampPageNumbers(): Promise<{ parsedPages: number[]; orig
                 disabled: status === 'error'
             },
             onOk: () => {
-                resolve({ parsedPages, originalInput: inputValue }) // 解析 Promise 并返回输入值和解析后的页码数组
+                resolve({ parsedPages, inputValue }) // 解析 Promise 并返回输入值和解析后的页码数组
             },
             onCancel: () => {
-                resolve({ parsedPages: [], originalInput: '' }) // 如果用户取消，则解析 Promise 并返回空数组和空字符串
+                resolve({ parsedPages: [], inputValue: '' }) // 如果用户取消，则解析 Promise 并返回空数组和空字符串
             }
         })
 
@@ -190,13 +191,13 @@ export class EditorStamp extends Editor {
             })
             this.currentShapeGroup.konvaGroup.add(this.stampImage)
 
-            const { parsedPages, originalInput } = await setBatchStampPageNumbers()
+            const { parsedPages, inputValue } = await setBatchStampPageNumbers()
 
             if (parsedPages.length > 0) {
                 const text = new Konva.Text({
                     x: pos.x - crosshair.x,
                     y: pos.y - crosshair.y,
-                    text: `应用范围：${originalInput}`,
+                    text: `应用范围：${inputValue}`,
                     fontSize: 12,
                     fill: 'red'
                 })
@@ -238,7 +239,7 @@ export class EditorStamp extends Editor {
                 }),
                 {
                     image: this.stampUrl,
-                    text: originalInput || '',
+                    text: inputValue || '',
                     batchPdfjsAnnotationStorage: batchPdfjsAnnotationStorage
                 }
             )

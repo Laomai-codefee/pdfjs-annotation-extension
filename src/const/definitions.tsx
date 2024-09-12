@@ -162,15 +162,15 @@ export enum AnnotationType {
 
 // 配置默认颜色
 // 提供一组默认的颜色选项
-export const DefaultColors = ['#FF0000', '#FFBE00', '#CC0000', '#FFFF00', '#83D33C', '#00B445', '#00B2F4', '#0071C4', '#001F63', '#7828A4']
+export const DefaultColors = ['#ff0000', '#ffbe00', '#cc0000', '#ffff00', '#83d33c', '#00b445', '#00b2f4', '#0071c4', '#001f63', '#7828a4']
 
 // 配置默认字体大小
 // 提供一组默认的字体大小选项
-export const DefaultFontSize = [12, 14, 16, 18, 20, 22, 24]
+export const DefaultFontSize = [14, 16, 18, 20, 22, 24]
 
 // 配置默认的签名设置
 export const DefaultSignatureSetting = {
-    COLORS: ['#000000', '#FF0000'], // 签名的默认颜色选项
+    COLORS: ['#000000', '#ff0000'], // 签名的默认颜色选项
     WIDTH: 366, // 签名框的宽度
     HEIGHT: 200 // 签名框的高度
 }
@@ -182,7 +182,7 @@ export const DefaultStampSetting = {
 // 配置默认的选择设置
 // 提供默认的选择工具的颜色和线条宽度
 export const DefaultChooseSetting = {
-    COLOR: '#0071C4', // 选择工具的颜色
+    COLOR: '#0071c4', // 选择工具的颜色
     STROKEWIDTH: 2 // 选择工具的线条宽度
 }
 

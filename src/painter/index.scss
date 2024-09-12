@@ -58,19 +58,3 @@
         cursor: var(--PdfjsAnnotationExtension-image-cursor);
     }
 }
-
-.PdfjsAnnotationExtension_free_text_input {
-    width: auto;
-    position: absolute;
-    z-index: 999;
-    padding: 0px;
-    overflow: hidden;
-    background: #fff;
-    outline: none;
-    overflow-wrap: break-word;
-    white-space: pre-wrap;
-    user-select: text;
-    word-break: normal;
-    font-weight: normal;
-    font-style: normal;
-}

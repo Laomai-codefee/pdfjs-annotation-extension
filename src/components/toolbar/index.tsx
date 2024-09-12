@@ -1,8 +1,8 @@
 import './index.scss'
-import { ColorPicker, Dropdown, message } from 'antd'
+import { ColorPicker, message } from 'antd'
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
-import { annotationDefinitions, AnnotationType, DefaultColors, DefaultFontSize, DefaultSettings, IAnnotationType, PdfjsAnnotationEditorType } from '../../const/definitions'
-import { FontSizeIcon, PaletteIcon } from '../../const/icon'
+import { annotationDefinitions, AnnotationType, DefaultColors, DefaultSettings, IAnnotationType, PdfjsAnnotationEditorType } from '../../const/definitions'
+import { PaletteIcon } from '../../const/icon'
 import { SignatureTool } from './signature'
 import { StampTool } from './stamp'
 
@@ -96,20 +96,6 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
         setCurrentAnnotation(updatedAnnotation)
     }
 
-    const handleFontSizeChange = (size: number) => {
-        if (!currentAnnotation) return
-        const updatedAnnotation = { ...currentAnnotation, style: { ...currentAnnotation.style, fontSize: size } }
-        const updatedAnnotations = annotations.map(annotation => (annotation.type === currentAnnotation.type ? updatedAnnotation : annotation))
-        setAnnotations(updatedAnnotations)
-        setCurrentAnnotation(updatedAnnotation)
-    }
-
-    const fontSizeMenuItems = DefaultFontSize.map(size => ({
-        key: size.toString(),
-        label: size,
-        onClick: () => handleFontSizeChange(size)
-    }))
-
     return (
         <div className="CustomToolbar">
             <ul className="buttons">{buttons}</ul>
@@ -130,14 +116,6 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
                         <div className="name">颜色</div>
                     </li>
                 </ColorPicker>
-                <Dropdown menu={{ items: fontSizeMenuItems }} trigger={['click']}>
-                    <li className={isFontSizeDisabled ? 'disabled' : ''}>
-                        <div className="icon">
-                            <FontSizeIcon />
-                        </div>
-                        <div className="name">字号</div>
-                    </li>
-                </Dropdown>
             </ul>
         </div>
     )

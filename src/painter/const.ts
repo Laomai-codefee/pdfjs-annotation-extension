@@ -33,7 +33,3 @@ export const SELECTOR_HOVER_STYLE = `${STYLE_PREFIX}_selector_hover`
  */
 export const CURSOR_CSS_PROPERTY = `--${STYLE_PREFIX}-image-cursor`
 
-/**
- * 常量：自由文本输入框的类名
- */
-export const FREE_TEXT_TEXT_CLASS_NAME = `${STYLE_PREFIX}_free_text_input`

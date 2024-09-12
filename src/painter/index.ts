@@ -317,6 +317,10 @@ export class Painter {
                     annotation,
                     onAdd: (shapeGroup, pdfjsAnnotationStorage, annotationContent) => {
                         this.saveToStore(shapeGroup, pdfjsAnnotationStorage, annotationContent)
+                        if (annotation.isOnce) {
+                            this.setDefaultMode()
+                            this.selector.select(shapeGroup.id)
+                        }
                     }
                 })
                 break
