@@ -52,6 +52,8 @@ export class Store {
         } else {
             storage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}`, pdfjsAnnotationStorage)
         }
+
+        console.log('%c [ annotationStore ]', 'font-size:13px; background:#6318bc; color:#a75cff;', this.annotationStore)
     }
 
     /**
@@ -134,14 +136,14 @@ export class Store {
         for (const [id, annotation] of entries) {
             if (annotation.content?.image) {
                 const batchPdfjsAnnotationStorage = annotation.content.batchPdfjsAnnotationStorage
-                const bitmap = await base64ToImageBitmap(annotation.content.image)
-
                 if (batchPdfjsAnnotationStorage?.length) {
                     for (const store of batchPdfjsAnnotationStorage) {
+                        const bitmap = await base64ToImageBitmap(annotation.content.image)
                         store.bitmap = bitmap
                         annotationStorage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}-${store.pageIndex}`, store)
                     }
                 } else {
+                    const bitmap = await base64ToImageBitmap(annotation.content.image)
                     annotation.pdfjsAnnotationStorage.bitmap = bitmap
                     annotationStorage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}`, annotation.pdfjsAnnotationStorage)
                 }
