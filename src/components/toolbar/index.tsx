@@ -2,13 +2,14 @@ import './index.scss'
 import { ColorPicker, message } from 'antd'
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 import { annotationDefinitions, AnnotationType, DefaultColors, DefaultSettings, IAnnotationType, PdfjsAnnotationEditorType } from '../../const/definitions'
-import { PaletteIcon, SaveIcon } from '../../const/icon'
+import { DownloadIcon, PaletteIcon, SaveIcon } from '../../const/icon'
 import { SignatureTool } from './signature'
 import { StampTool } from './stamp'
 
 interface CustomToolbarProps {
     onChange: (annotation: IAnnotationType | null, dataTransfer: string | null) => void
-    onSave:() => void
+    onSave: () => void
+    onDownload: () => void
 }
 
 export interface CustomToolbarRef {
@@ -98,9 +99,8 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
 
     return (
         <div className="CustomToolbar">
-            <ul className="buttons">{buttons}</ul>
-            <div className="splitToolbarButtonSeparator"></div>
             <ul className="buttons">
+                {buttons}
                 <ColorPicker
                     arrow={false}
                     disabledAlpha
@@ -117,14 +117,32 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
                         <div className="name">颜色</div>
                     </li>
                 </ColorPicker>
-                <li onClick={()=> {
-                    props.onSave()
-                }}>
-                    <div className="icon">
-                        <SaveIcon />
-                    </div>
-                    <div className="name">保存</div>
-                </li>
+            </ul>
+            <div className="splitToolbarButtonSeparator"></div>
+            <ul className="buttons">
+                {
+                    DefaultSettings.DOWNLOAD_BUTTON && <li onClick={() => {
+                        props.onDownload()
+                    }}>
+                        <div className="icon">
+                            <DownloadIcon />
+                        </div>
+                        <div className="name">下载</div>
+                    </li>
+                }
+
+                {
+                    DefaultSettings.SAVE_BUTTON && <li onClick={() => {
+                        props.onSave()
+                    }}>
+                        <div className="icon">
+                            <SaveIcon />
+                        </div>
+                        <div className="name">保存</div>
+                    </li>
+                }
+
+
             </ul>
         </div>
     )

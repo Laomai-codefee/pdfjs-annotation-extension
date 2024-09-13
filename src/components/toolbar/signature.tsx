@@ -43,6 +43,7 @@ const SignatureTool: React.FC<SignatureToolProps> = props => {
 
     // 打开 Modal 窗口
     const openModal = () => {
+        handleOpenChange(false)
         setIsModalOpen(true)
     }
 

@@ -17,6 +17,9 @@
     .ant-message{
         z-index: 9999999;
     }
+    .ant-modal-mask{
+        backdrop-filter: blur(8px)
+    }
 }
 .PdfjsAnnotationExtension_scalechanging{
     .PdfjsAnnotationExtension_painter_wrapper{

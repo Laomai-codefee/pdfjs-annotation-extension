@@ -6,7 +6,7 @@ import { createRoot } from 'react-dom/client'
 
 import { CustomPopbar, CustomPopbarRef } from './components/popbar'
 import { CustomToolbar, CustomToolbarRef } from './components/toolbar'
-import { annotationDefinitions } from './const/definitions'
+import { annotationDefinitions, DefaultSettings } from './const/definitions'
 import { Painter } from './painter'
 
 class PdfjsAnnotationExtension {
@@ -74,6 +74,9 @@ class PdfjsAnnotationExtension {
                 onChange={(currentAnnotation, dataTransfer) => {
                     this.painter.activate(currentAnnotation, dataTransfer)
                 }}
+                onDownload={() => {
+                    this.downLoadPdf()
+                }}
                 onSave={() => {
                     this.savePdf()
                 }}
@@ -101,29 +104,17 @@ class PdfjsAnnotationExtension {
      * @description 隐藏 PDF.js 编辑模式按钮
      */
     private hidePdfjsEditorModeButtons(): void {
-        // 查找所有需要隐藏的元素
-        const elementsToHide: HTMLElement[] = [
-            document.querySelector('#editorModeButtons') as HTMLDivElement,
-            document.querySelector('#editorModeSeparator') as HTMLDivElement,
-            document.querySelector('#pageRotateCw') as HTMLButtonElement,
-            document.querySelector('#pageRotateCcw') as HTMLButtonElement,
-            document.querySelector('#download') as HTMLButtonElement
-        ];
-
-        // 处理紧邻 pageRotateCcw 的下一个兄弟元素
-        const pageRotateCcw = elementsToHide[3]; // 第四个元素是 #pageRotateCcw
-        const nextDiv = pageRotateCcw?.nextElementSibling as HTMLElement;
-        if (nextDiv) {
-            nextDiv.style.display = 'none';
-        }
-        // 隐藏所有找到的元素
-        elementsToHide.forEach((element) => {
+        DefaultSettings.HIDE_PDFJS_ELEMENT.forEach(item => {
+            const element = document.querySelector(item) as HTMLElement;
             if (element) {
                 element.style.display = 'none';
+                const nextDiv = element.nextElementSibling as HTMLElement;
+                if(nextDiv.classList.contains('horizontalToolbarSeparator')){
+                    nextDiv.style.display = 'none'
+                }
             }
         });
     }
-
 
     /**
      * @description 隐藏绘图层
@@ -170,18 +161,21 @@ class PdfjsAnnotationExtension {
     }
 
     private async savePdf() {
-        // 下载到本地
-        this.PDFJS_EventBus.dispatch("download")
-
+        this.painter.resetPdfjsAnnotationStorage()
+        const fileName = this.PDFJS_PDFViewerApplication._title || '未命名.pdf'
         // 保存到远程地址
-        // const data = await this.PDFJS_PDFViewerApplication?.pdfDocument?.saveDocument()
-        // const blob = new Blob([data], { type: 'application/pdf' })
-        // const formData = new FormData()
-        // formData.append('file', blob, '未命名.pdf')
-        // fetch('save.action', {
-        //     method: 'POST',
-        //     body: formData
-        // })
+        const data = await this.PDFJS_PDFViewerApplication?.pdfDocument?.saveDocument()
+        const blob = new Blob([data], { type: 'application/pdf' })
+        const formData = new FormData()
+        formData.append('file', blob, fileName)
+        fetch('save.action', {
+            method: 'POST',
+            body: formData
+        })
+    }
+
+    private async downLoadPdf() {
+        this.PDFJS_EventBus.dispatch("download")
     }
 }
 

@@ -176,7 +176,7 @@ export const DefaultSignatureSetting = {
 }
 
 export const DefaultStampSetting = {
-    MAX_SIZE: 1024 * 1024 * 1024 // 最大文件大小为 10MB
+    MAX_SIZE: 1024 * 1024 * 5 // 最大文件大小为 5MB
 }
 
 // 配置默认的选择设置
@@ -196,7 +196,16 @@ export const DefaultSettings = {
     UNDERLINE_COLOR: DefaultColors[6], // 默认下划线颜色
     STROKE_WIDTH: 2, // 默认线条宽度
     OPACITY: 1, // 默认不透明度
-    MAX_CURSOR_SIZE: 96 // 鼠标指针图片最大宽度/高度
+    MAX_CURSOR_SIZE: 96, // 鼠标指针图片最大宽度/高度
+    DOWNLOAD_BUTTON: true, // 下载按钮
+    SAVE_BUTTON: false, // 保存按钮
+    HIDE_PDFJS_ELEMENT: [ // 需要隐藏的 pdfjs 按钮
+        '#editorModeButtons',
+        '#editorModeSeparator',
+        '#pageRotateCw',
+        '#pageRotateCcw',
+        '#download'
+    ]
 }
 
 // 定义批注类型的接口
