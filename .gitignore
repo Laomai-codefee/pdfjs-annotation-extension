@@ -12,6 +12,7 @@
 *.swp
 tags
 nbproject/*
+.vscode
 
 # Windows
 Thumbs.db
