@@ -5,6 +5,8 @@ import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } f
 
 import { annotationDefinitions, IAnnotationType, PdfjsAnnotationEditorType } from '../../const/definitions'
 
+import { useTranslation } from 'react-i18next'
+
 
 interface CustomPopbarProps {
     onChange: (annotation: IAnnotationType | null, range: Range | null) => void
@@ -25,6 +27,8 @@ const CustomPopbar = forwardRef<CustomPopbarRef, CustomPopbarProps>(function Cus
     const [currentRange, setCurrentRange] = useState<Range | null>(null)
 
     const containerRef = useRef<HTMLDivElement | null>(null)
+
+    const { t } = useTranslation()
 
     useImperativeHandle(ref, () => ({
         open,
@@ -89,7 +93,7 @@ const CustomPopbar = forwardRef<CustomPopbarRef, CustomPopbarProps>(function Cus
         return (
             <li key={index} onMouseDown={() => handleAnnotationClick(annotation)}>
                 <div className="icon">{annotation.icon}</div>
-                <div className="name">{annotation.name}</div>
+                <div className="name">{t(`annotations.${annotation.name}`)}</div>
             </li>
         )
     })

@@ -1,0 +1,46 @@
+{
+    "annotations": {
+        "select": "选择",
+        "highlight": "高亮",
+        "strikeout": "删除线",
+        "underline": "下划线",
+        "rectangle": "矩形",
+        "circle": "圆形",
+        "freehand": "自由绘制",
+        "freeHighlight": "自由高亮",
+        "freeText": "文字",
+        "signature": "签名",
+        "stamp": "盖章"
+    },
+    "toolbar": {
+        "buttons": {
+            "createSignature": "创建签名"
+        },
+        "message": {
+            "selectPosition": "请选择放置位置",
+            "signatureArea": "签名处"
+        }
+    },
+    "editor": {
+        "stamp": {
+            "multiPageStamping": "批量设置盖章位置",
+            "stampRange": "应用范围"
+        },
+        "text": {
+            "startTyping": "开始输入..."
+        }
+    },
+    "normal": {
+        "ok": "确定",
+        "cancel": "取消",
+        "clear": "清空",
+        "fileSizeLimit": "文件大小超出 {{value}} 限制",
+        "deleteConfirm": "是否删除",
+        "yes": "是",
+        "no": "否",
+        "example": "例如：",
+        "color": "颜色",
+        "download": "下载",
+        "save": "保存"
+    }
+}

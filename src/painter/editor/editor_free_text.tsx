@@ -9,12 +9,13 @@ import { Dropdown, InputRef, Modal } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import { FontSizeIcon } from '../../const/icon'
 import './editor_free_text.scss'
+import i18n from 'i18next'
 
 async function setInputText(color: string, fontSize: number): Promise<{ inputValue: string, color: string, fontSize: number }> {
     let currentColor = color;
     let currentFontSize = fontSize;
     return new Promise(resolve => {
-        const placeholder = '开始输入...';
+        const placeholder =i18n.t('editor.text.startTyping');
         let inputValue = '';
         let status: '' | 'error' | 'warning' = 'error'; // 初始状态设置为错误，确保初始时提交按钮禁用
         let modal: any;
@@ -28,7 +29,7 @@ async function setInputText(color: string, fontSize: number): Promise<{ inputVal
 
         const updateModalContent = () => {
             modal.update({
-                title: `插入文字-${currentFontSize}px`,
+                title: `${i18n.t('annotations.freeText')}-${currentFontSize}px`,
                 content: (
                     <div>
                         <TextArea
@@ -72,7 +73,7 @@ async function setInputText(color: string, fontSize: number): Promise<{ inputVal
         };
 
         modal = Modal.confirm({
-            title: `插入文字-${currentFontSize}px`,
+            title: `${i18n.t('annotations.freeText')}-${currentFontSize}px`,
             icon: null,
             content: (
                 <div className='EditorFreeText-Modal'>
@@ -101,8 +102,8 @@ async function setInputText(color: string, fontSize: number): Promise<{ inputVal
                 </div>
             ),
             destroyOnClose: true,
-            okText: '确定',
-            cancelText: '取消',
+            okText: i18n.t('normal.ok'),
+            cancelText: i18n.t('normal.cancel'),
             okButtonProps: {
                 disabled: status === 'error',
             },

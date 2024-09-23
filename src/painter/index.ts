@@ -7,7 +7,7 @@ import { AnnotationType, IAnnotationContent, IAnnotationType, IPdfjsAnnotationSt
 import { isElementInDOM, removeCssCustomProperty } from '../utils/utils'
 import { CURSOR_CSS_PROPERTY, PAINTER_IS_PAINTING_STYLE, PAINTER_PAINTING_TYPE, PAINTER_WRAPPER_PREFIX } from './const'
 import { Editor, IShapeGroup } from './editor/editor'
-import { EditorEllipse } from './editor/editor_ellipse'
+import { EditorCircle } from './editor/editor_circle'
 import { EditorFreeHand } from './editor/editor_free_hand'
 import { EditorFreeHighlight } from './editor/editor_free_highlight'
 import { EditorFreeText } from './editor/editor_free_text'
@@ -336,8 +336,8 @@ export class Painter {
                 })
                 break
 
-            case AnnotationType.ELLIPSE:
-                editor = new EditorEllipse({
+            case AnnotationType.CIRCLE:
+                editor = new EditorCircle({
                     pdfViewerApplication: this.pdfViewerApplication,
                     konvaStage,
                     pageNumber,
@@ -534,7 +534,7 @@ export class Painter {
         switch (annotation.type) {
             case AnnotationType.FREETEXT:
             case AnnotationType.RECTANGLE:
-            case AnnotationType.ELLIPSE:
+            case AnnotationType.CIRCLE:
             case AnnotationType.FREEHAND:
             case AnnotationType.FREE_HIGHLIGHT:
             case AnnotationType.SIGNATURE:

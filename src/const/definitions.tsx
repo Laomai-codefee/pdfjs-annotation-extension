@@ -1,5 +1,5 @@
 import {
-    EllipseIcon,
+    CircleIcon,
     FreehandIcon,
     FreeHighlightIcon,
     FreetextIcon,
@@ -153,7 +153,7 @@ export enum AnnotationType {
     UNDERLINE = 3, // 下划线批注
     FREETEXT = 4, // 自由文本批注
     RECTANGLE = 5, // 矩形批注
-    ELLIPSE = 6, // 圆形批注
+    CIRCLE = 6, // 圆形批注
     FREEHAND = 7, // 自由绘制批注
     FREE_HIGHLIGHT = 8, // 自由高亮批注
     SIGNATURE = 9, // 签名批注
@@ -254,7 +254,7 @@ export interface IAnnotationStore {
 // 用于描述所有支持的批注类型及其属性
 export const annotationDefinitions: IAnnotationType[] = [
     {
-        name: '选择', // 批注名称
+        name: 'select', // 批注名称
         type: AnnotationType.SELECT, // 批注类型
         pdfjsType: PdfjsAnnotationEditorType.NONE, // 对应的 PDF.js 批注类型
         isOnce: false, // 是否只绘制一次
@@ -262,7 +262,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         icon: <SelectIcon /> // 图标
     },
     {
-        name: '高亮',
+        name: 'highlight',
         type: AnnotationType.HIGHLIGHT,
         pdfjsType: PdfjsAnnotationEditorType.HIGHLIGHT,
         isOnce: false,
@@ -274,7 +274,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         }
     },
     {
-        name: '删除线',
+        name: 'strikeout',
         type: AnnotationType.STRIKEOUT,
         pdfjsType: PdfjsAnnotationEditorType.HIGHLIGHT,
         isOnce: false,
@@ -286,7 +286,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         }
     },
     {
-        name: '下划线',
+        name: 'underline',
         type: AnnotationType.UNDERLINE,
         pdfjsType: PdfjsAnnotationEditorType.HIGHLIGHT,
         isOnce: false,
@@ -298,7 +298,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         }
     },
     {
-        name: '矩形',
+        name: 'rectangle',
         type: AnnotationType.RECTANGLE,
         pdfjsType: PdfjsAnnotationEditorType.INK,
         isOnce: false,
@@ -311,12 +311,12 @@ export const annotationDefinitions: IAnnotationType[] = [
         }
     },
     {
-        name: '圆形',
-        type: AnnotationType.ELLIPSE,
+        name: 'circle',
+        type: AnnotationType.CIRCLE,
         pdfjsType: PdfjsAnnotationEditorType.INK,
         isOnce: false,
         readonly: false,
-        icon: <EllipseIcon />,
+        icon: <CircleIcon />,
         style: {
             color: DefaultSettings.COLOR, // 默认圆形颜色
             strokeWidth: DefaultSettings.STROKE_WIDTH, // 默认线条宽度
@@ -324,7 +324,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         }
     },
     {
-        name: '自由绘制',
+        name: 'freehand',
         type: AnnotationType.FREEHAND,
         pdfjsType: PdfjsAnnotationEditorType.INK,
         isOnce: false,
@@ -337,7 +337,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         }
     },
     {
-        name: '自由高亮',
+        name: 'freeHighlight',
         type: AnnotationType.FREE_HIGHLIGHT,
         pdfjsType: PdfjsAnnotationEditorType.INK,
         isOnce: false,
@@ -350,7 +350,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         }
     },
     {
-        name: '文字',
+        name: 'freeText',
         type: AnnotationType.FREETEXT,
         pdfjsType: PdfjsAnnotationEditorType.STAMP,
         isOnce: true,
@@ -363,7 +363,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         }
     },
     {
-        name: '签名',
+        name: 'signature',
         type: AnnotationType.SIGNATURE,
         pdfjsType: PdfjsAnnotationEditorType.STAMP,
         isOnce: true,
@@ -375,7 +375,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         }
     },
     {
-        name: '盖章',
+        name: 'stamp',
         type: AnnotationType.STAMP,
         pdfjsType: PdfjsAnnotationEditorType.STAMP,
         isOnce: true,

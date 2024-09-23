@@ -1,0 +1,46 @@
+{
+    "annotations": {
+        "select": "Select",
+        "highlight": "Highlight",
+        "strikeout": "Strikeout",
+        "underline": "Underline",
+        "rectangle": "Rectangle",
+        "circle": "Circle",
+        "freehand": "Free Hand",
+        "freeHighlight": "Free Highlight",
+        "freeText": "Text",
+        "signature": "Signature",
+        "stamp": "Stamp"
+    },
+    "toolbar": {
+        "buttons": {
+            "createSignature": "Create signature"
+        },
+        "message": {
+            "selectPosition": "Please select a position",
+            "signatureArea": "Signature Area"
+        }
+    },
+    "editor": {
+        "stamp": {
+            "multiPageStamping": "Multi Page Stamping",
+            "stampRange": "Pages range"
+        },
+        "text": {
+            "startTyping": "Start typing…"
+        }
+    },
+    "normal": {
+        "ok": "OK",
+        "cancel": "Cancel",
+        "clear": "Clear",
+        "fileSizeLimit": "The file size exceeds the {{value}} limit",
+        "deleteConfirm": "Are you sure you want to delete?",
+        "yes": "Yes",
+        "no": "No",
+        "example": "e.g. ",
+        "color": "Color",
+        "download": "Download",
+        "save": "Save"
+    }
+}

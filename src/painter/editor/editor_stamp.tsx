@@ -8,6 +8,7 @@ import { AnnotationType, DefaultSettings, IAnnotationStore, IAnnotationType, IPd
 import { base64ToImageBitmap, parsePageRanges, resizeImage, setCssCustomProperty } from '../../utils/utils'
 import { CURSOR_CSS_PROPERTY } from '../const'
 import { Editor, IEditorOptions } from './editor'
+import i18n from 'i18next'
 
 /**
  * 批量设置盖章位置
@@ -15,7 +16,7 @@ import { Editor, IEditorOptions } from './editor'
  */
 async function setBatchStampPageNumbers(): Promise<{ parsedPages: number[]; inputValue: string }> {
     return new Promise(resolve => {
-        const placeholder = '格式: 1,1-2,3-4'
+        const placeholder = `${i18n.t('normal.example')}1,1-2,3-4`
         let inputValue = '' // 临时变量来存储输入值
         let status: '' | 'error' | 'warning' = 'error' // 初始状态设置为错误，确保初始时提交按钮禁用
         let parsedPages: number[] = [] // 用于存储解析后的页码数组
@@ -40,7 +41,7 @@ async function setBatchStampPageNumbers(): Promise<{ parsedPages: number[]; inpu
             modal.update({
                 content: (
                     <div>
-                        <div> 应用范围：{status === 'error' && placeholder}</div>
+                        <div> {i18n.t('editor.stamp.stampRange')} {status === 'error' && placeholder}</div>
                         <Input ref={inputRef} status={status} placeholder={placeholder} onChange={handleChange} />
                     </div>
                 ),
@@ -51,16 +52,16 @@ async function setBatchStampPageNumbers(): Promise<{ parsedPages: number[]; inpu
         }
 
         modal = Modal.confirm({
-            title: '批量设置盖章位置',
+            title: i18n.t('editor.stamp.multiPageStamping'),
             icon: null,
             content: (
                 <div>
-                    <div> 应用范围：</div>
+                    <div> {i18n.t('editor.stamp.stampRange')}</div>
                     <Input ref={inputRef} status={status} placeholder={placeholder} onChange={handleChange} />
                 </div>
             ),
-            okText: '确定',
-            cancelText: '取消',
+            okText: i18n.t('normal.ok'),
+            cancelText: i18n.t('normal.cancel'),
             okButtonProps: {
                 disabled: status === 'error'
             },
@@ -196,8 +197,8 @@ export class EditorStamp extends Editor {
                 const text = new Konva.Text({
                     x: pos.x - crosshair.x,
                     y: pos.y - crosshair.y,
-                    text: `应用范围：${inputValue}`,
-                    fontSize: 12,
+                    text: `${i18n.t('editor.stamp.stampRange')}: ${inputValue}`,
+                    fontSize: 10,
                     fill: 'red'
                 })
                 this.currentShapeGroup.konvaGroup.add(text)

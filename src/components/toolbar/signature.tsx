@@ -9,6 +9,8 @@ import {
 
 import { DefaultSignatureSetting, IAnnotationType } from '../../const/definitions' // 导入自定义类型和默认设置
 
+import { useTranslation } from 'react-i18next'
+
 interface SignatureToolProps {
     annotation: IAnnotationType // 签名工具的注释类型
     onAdd: (signatureDataUrl: string) => void // 回调函数，当签名被添加时调用
@@ -25,6 +27,8 @@ const SignatureTool: React.FC<SignatureToolProps> = props => {
     const [isOKButtonDisabled, setIsOKButtonDisabled] = useState(true) // 初始状态下禁用 OK 按钮
 
     const [signatures, setSignatures] = useState<string[]>([]) // 存储所有签名的数组
+
+    const { t } = useTranslation()
 
     // 更新 colorRef 当 currentColor 改变时
     useEffect(() => {
@@ -180,7 +184,7 @@ const SignatureTool: React.FC<SignatureToolProps> = props => {
                         </ul>
                         <div className="SignaturePop-Toolbar">
                             <Button block type="link" onClick={openModal} icon={<PlusCircleOutlined />}>
-                                创建签名
+                                {t('toolbar.buttons.createSignature')}
                             </Button>
                         </div>
                     </div>
@@ -193,23 +197,24 @@ const SignatureTool: React.FC<SignatureToolProps> = props => {
             >
                 <>
                     <div className="icon">{props.annotation.icon}</div>
-                    <div className="name">{props.annotation.name}</div>
+                    <div className="name">{t(`annotations.${props.annotation.name}`)}</div>
                 </>
             </Popover>
             <Modal
-                title="新签名"
+                title={t('toolbar.buttons.createSignature')}
                 open={isModalOpen}
                 onOk={handleOk}
                 onCancel={handleCancel}
                 destroyOnClose={true}
-                okText="确定"
-                cancelText="取消"
+                okText={t('normal.ok')}
+                cancelText={t('normal.cancel')}
                 afterOpenChange={afterOpen}
                 okButtonProps={{ disabled: isOKButtonDisabled }}
                 className="SignatureTool"
             >
                 <div>
                     <div className="SignatureTool-Container" style={{ width: DefaultSignatureSetting.WIDTH }}>
+                        <div className="SignatureTool-Container-info">{t('toolbar.message.signatureArea')}</div>
                         <div ref={containerRef} style={{ height: DefaultSignatureSetting.HEIGHT, width: DefaultSignatureSetting.WIDTH }}></div>
                     </div>
                     <div className="SignatureTool-Toolbar" style={{ width: DefaultSignatureSetting.WIDTH }}>
@@ -231,7 +236,7 @@ const SignatureTool: React.FC<SignatureToolProps> = props => {
                                 }
                             }}
                         >
-                            清空
+                            {t('normal.clear')}
                         </div>
                     </div>
                 </div>

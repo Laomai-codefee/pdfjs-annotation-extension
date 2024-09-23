@@ -8,7 +8,7 @@ import { Editor, IEditorOptions } from './editor'
 /**
  * 椭圆编辑器类，继承自基础编辑器类 Editor，用于在画布上绘制椭圆。
  */
-export class EditorEllipse extends Editor {
+export class EditorCircle extends Editor {
     private ellipse: Konva.Ellipse | null // 当前正在绘制的椭圆对象
     private vertex: { x: number; y: number } // 用于存储椭圆的起点（顶点）坐标
 
@@ -17,7 +17,7 @@ export class EditorEllipse extends Editor {
      * @param EditorOptions 编辑器选项接口
      */
     constructor(EditorOptions: IEditorOptions) {
-        super({ ...EditorOptions, editorType: AnnotationType.ELLIPSE })
+        super({ ...EditorOptions, editorType: AnnotationType.CIRCLE })
         this.ellipse = null
         this.vertex = { x: 0, y: 0 }
     }

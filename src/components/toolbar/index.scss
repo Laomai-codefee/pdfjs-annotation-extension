@@ -72,8 +72,7 @@
             cursor: crosshair;
         }
 
-        &::after {
-            content: '签名处...';
+        &-info {
             font-size: 20px;
             z-index: 0;
             color: #ccc;

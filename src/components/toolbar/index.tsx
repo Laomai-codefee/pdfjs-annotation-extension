@@ -5,6 +5,7 @@ import { annotationDefinitions, AnnotationType, DefaultColors, DefaultSettings, 
 import { DownloadIcon, PaletteIcon, SaveIcon } from '../../const/icon'
 import { SignatureTool } from './signature'
 import { StampTool } from './stamp'
+import { useTranslation } from 'react-i18next'
 
 interface CustomToolbarProps {
     onChange: (annotation: IAnnotationType | null, dataTransfer: string | null) => void
@@ -23,6 +24,7 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
     const [currentAnnotation, setCurrentAnnotation] = useState<IAnnotationType | null>(null)
     const [annotations, setAnnotations] = useState<IAnnotationType[]>(annotationDefinitions.filter(item => item.pdfjsType !== PdfjsAnnotationEditorType.HIGHLIGHT))
     const [dataTransfer, setDataTransfer] = useState<string | null>(null)
+    const { t } = useTranslation()
 
     useImperativeHandle(ref, () => ({
         activeAnnotation
@@ -44,7 +46,7 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
     const handleAdd = (signatureDataUrl, annotation) => {
         message.open({
             type: 'info',
-            content: '请选择放置位置',
+            content: t('toolbar.message.selectPosition'),
         })
         setDataTransfer(signatureDataUrl)
         setCurrentAnnotation(annotation)
@@ -60,23 +62,23 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
         switch (annotation.type) {
             case AnnotationType.STAMP:
                 return (
-                    <li key={index} {...commonProps}>
+                    <li title={t(`annotations.${annotation.name}`)} key={index} {...commonProps}>
                         <StampTool annotation={annotation} onAdd={(signatureDataUrl) => handleAdd(signatureDataUrl, annotation)} />
                     </li>
                 )
 
             case AnnotationType.SIGNATURE:
                 return (
-                    <li key={index} {...commonProps}>
+                    <li title={t(`annotations.${annotation.name}`)} key={index} {...commonProps}>
                         <SignatureTool annotation={annotation} onAdd={(signatureDataUrl) => handleAdd(signatureDataUrl, annotation)} />
                     </li>
                 )
 
             default:
                 return (
-                    <li key={index} {...commonProps} onClick={() => handleAnnotationClick(isSelected ? null : annotation)}>
+                    <li title={t(`annotations.${annotation.name}`)} key={index} {...commonProps} onClick={() => handleAnnotationClick(isSelected ? null : annotation)}>
                         <div className="icon">{annotation.icon}</div>
-                        <div className="name">{annotation.name}</div>
+                        <div className="name">{t(`annotations.${annotation.name}`)}</div>
                     </li>
                 )
         }
@@ -108,37 +110,37 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
                     disabled={isColorDisabled}
                     showText={false}
                     onChangeComplete={color => handleColorChange(color.toHexString())}
-                    presets={[{ label: '标准色', colors: DefaultColors }]}
+                    presets={[{ label: '', colors: DefaultColors }]}
                 >
-                    <li className={isColorDisabled ? 'disabled' : ''}>
+                    <li className={isColorDisabled ? 'disabled' : ''}  title={t('normal.color')}>
                         <div className="icon">
                             <PaletteIcon style={{ color: currentAnnotation?.style?.color }} />
                         </div>
-                        <div className="name">颜色</div>
+                        <div className="name">{t('normal.color')}</div>
                     </li>
                 </ColorPicker>
             </ul>
             <div className="splitToolbarButtonSeparator"></div>
             <ul className="buttons">
                 {
-                    DefaultSettings.DOWNLOAD_BUTTON && <li onClick={() => {
+                    DefaultSettings.DOWNLOAD_BUTTON && <li  title={t('normal.download')} onClick={() => {
                         props.onDownload()
                     }}>
                         <div className="icon">
                             <DownloadIcon />
                         </div>
-                        <div className="name">下载</div>
+                        <div className="name">{t('normal.download')}</div>
                     </li>
                 }
 
                 {
-                    DefaultSettings.SAVE_BUTTON && <li onClick={() => {
+                    DefaultSettings.SAVE_BUTTON && <li  title={t('normal.save')} onClick={() => {
                         props.onSave()
                     }}>
                         <div className="icon">
                             <SaveIcon />
                         </div>
-                        <div className="name">保存</div>
+                        <div className="name">{t('normal.save')}</div>
                     </li>
                 }
 

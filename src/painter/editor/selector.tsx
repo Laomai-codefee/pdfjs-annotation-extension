@@ -4,7 +4,7 @@ import { DefaultChooseSetting, IAnnotationStore } from '../../const/definitions'
 import { SELECTOR_HOVER_STYLE, SHAPE_GROUP_NAME } from '../const'
 import { KonvaCanvas } from '../index'
 import { Modal } from 'antd'
-
+import i18n from 'i18next'
 /**
  * 定义选择器的选项接口
  */
@@ -137,12 +137,12 @@ export class Selector {
 
         shape.on('pointerdblclick', () => {
             Modal.confirm({
-                title: `是否删除`,
+                title: i18n.t('normal.deleteConfirm'),
                 type: 'warn',
                 destroyOnClose: true,
                 centered: true,
-                okText: '是',
-                cancelText: '否',
+                okText: i18n.t('normal.yes'),
+                cancelText: i18n.t('normal.no'),
                 onOk: () => {
                     this.onDelete(this.currentTransformerId)
                     this.clearTransformers()

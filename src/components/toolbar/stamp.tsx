@@ -5,6 +5,8 @@ import React from 'react' // 导入 React
 import { DefaultStampSetting, IAnnotationType } from '../../const/definitions' // 导入自定义注释类型
 import { formatFileSize } from '../../utils/utils' // 导入文件大小格式化工具
 
+import { useTranslation } from 'react-i18next'
+
 // 定义组件的 props 类型
 interface StampToolProps {
     annotation: IAnnotationType // 注释类型
@@ -12,6 +14,7 @@ interface StampToolProps {
 }
 
 const StampTool: React.FC<StampToolProps> = props => {
+    const { t } = useTranslation()
     const maxSize: number = DefaultStampSetting.MAX_SIZE
 
     // 文件输入变化的事件处理函数
@@ -22,7 +25,8 @@ const StampTool: React.FC<StampToolProps> = props => {
             const _file = files[0] // 获取第一个文件
             if (_file.size > maxSize) {
                 // 如果文件大小超过最大限制，显示提示并返回
-                alert(`文件大小超出 ${formatFileSize(maxSize)} 限制`)
+                alert(t('normal.fileSizeLimit', { value: formatFileSize(maxSize) }))
+                // alert(`文件大小超出 ${formatFileSize(maxSize)} 限制`)
                 return
             }
             const reader = new FileReader() // 创建文件读取器
@@ -41,9 +45,9 @@ const StampTool: React.FC<StampToolProps> = props => {
 
     return (
         <div className="StampTool">
-            <input title="" type="file" accept=".png,.jpg" onChange={onInputFileChange} />
+            <input type="file" accept=".png,.jpg" onChange={onInputFileChange} />
             <div className="icon">{props.annotation.icon}</div>
-            <div className="name">{props.annotation.name}</div>
+            <div className="name">{t(`annotations.${props.annotation.name}`)}</div>
         </div>
     )
 }

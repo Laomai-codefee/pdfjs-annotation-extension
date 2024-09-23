@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "resolveJsonModule": true,
     "lib": ["DOM", "ESNext"],
     "target": "ES5",
     "jsx": "preserve",

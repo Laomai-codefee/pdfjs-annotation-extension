@@ -3,7 +3,7 @@ import './scss/app.scss'
 import { EventBus, PDFPageView, PDFViewerApplication } from 'pdfjs'
 import { createRef } from 'react'
 import { createRoot } from 'react-dom/client'
-
+import { initializeI18n } from './locale/index'
 import { CustomPopbar, CustomPopbarRef } from './components/popbar'
 import { CustomToolbar, CustomToolbarRef } from './components/toolbar'
 import { annotationDefinitions, DefaultSettings } from './const/definitions'
@@ -30,6 +30,9 @@ class PdfjsAnnotationExtension {
         // 使用 createRef 方法创建 React 引用
         this.customToolbarRef = createRef<CustomToolbarRef>()
         this.customPopbarRef = createRef<CustomPopbarRef>()
+        // 加载多语言
+        initializeI18n(this.PDFJS_PDFViewerApplication.l10n.getLanguage())
+
         // 创建画笔实例
         this.painter = new Painter({
             PDFViewerApplication: this.PDFJS_PDFViewerApplication,
@@ -109,7 +112,7 @@ class PdfjsAnnotationExtension {
             if (element) {
                 element.style.display = 'none';
                 const nextDiv = element.nextElementSibling as HTMLElement;
-                if(nextDiv.classList.contains('horizontalToolbarSeparator')){
+                if (nextDiv.classList.contains('horizontalToolbarSeparator')) {
                     nextDiv.style.display = 'none'
                 }
             }

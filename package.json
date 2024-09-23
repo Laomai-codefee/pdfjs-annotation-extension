@@ -56,9 +56,11 @@
   "dependencies": {
     "@floating-ui/dom": "^1.6.10",
     "antd": "^5.15.3",
+    "i18next": "^23.15.1",
     "konva": "^9.3.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-i18next": "^15.0.2",
     "web-highlighter": "^0.7.4"
   }
 }

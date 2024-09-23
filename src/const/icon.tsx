@@ -144,7 +144,7 @@ const FreetextIcon = (props: Partial<CustomIconComponentProps>) => <Icon compone
 
 const RectangleIcon = (props: Partial<CustomIconComponentProps>) => <Icon component={RectangleSvg} {...props} />
 
-const EllipseIcon = (props: Partial<CustomIconComponentProps>) => <Icon component={EllipseSvg} {...props} />
+const CircleIcon = (props: Partial<CustomIconComponentProps>) => <Icon component={EllipseSvg} {...props} />
 
 const FreehandIcon = (props: Partial<CustomIconComponentProps>) => <Icon component={FreehandSvg} {...props} />
 
@@ -163,7 +163,7 @@ const SaveIcon = (props: Partial<CustomIconComponentProps>) => <Icon component={
 const DownloadIcon = (props: Partial<CustomIconComponentProps>) => <Icon component={DownLoadSvg} {...props} />
 
 export {
-    EllipseIcon,
+    CircleIcon,
     FontSizeIcon,
     FreehandIcon,
     FreeHighlightIcon,
