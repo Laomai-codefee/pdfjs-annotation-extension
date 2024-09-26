@@ -203,6 +203,17 @@ function parsePageRanges(input: string): number[] | null {
     return Array.from(pages).sort((a, b) => a - b)
 }
 
+function convertToRGB(array, index = 0) {
+    if (index < 0 || index * 3 + 2 >= array.length) {
+        throw new Error("Index out of bounds");
+    }
+    const r = array[index * 3];
+    const g = array[index * 3 + 1];
+    const b = array[index * 3 + 2];
+
+    return `rgb(${r}, ${g}, ${b})`;
+}
+
 export {
     base64ToImageBitmap,
     formatFileSize,
@@ -213,5 +224,6 @@ export {
     parsePageRanges,
     removeCssCustomProperty,
     resizeImage,
-    setCssCustomProperty
+    setCssCustomProperty,
+    convertToRGB
 }

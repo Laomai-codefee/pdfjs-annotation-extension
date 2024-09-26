@@ -18,6 +18,7 @@ import { EditorStamp } from './editor/editor_stamp'
 import { Selector } from './editor/selector'
 import { Store } from './store'
 import { WebSelection } from './webSelection'
+import { Transform } from './transform/transform'
 
 // KonvaCanvas 接口定义
 export interface KonvaCanvas {
@@ -37,6 +38,7 @@ export class Painter {
     private currentAnnotation: IAnnotationType | null = null // 当前批注类型
     private store: Store // 存储实例
     private selector: Selector // 选择器实例
+    private transform: Transform // 转换器
     private tempDataTransfer: string | null // 临时数据传输
     public readonly setDefaultMode: () => void // 设置默认模式的函数引用
     public readonly onWebSelectionSelected: (range: Range) => void
@@ -114,6 +116,7 @@ export class Painter {
                 })
             }
         })
+        this.transform = new Transform(PDFViewerApplication)
         this.bindGlobalEvents() // 绑定全局事件
     }
 
@@ -567,4 +570,11 @@ export class Painter {
         this.currentAnnotation = annotation
         this.webSelection.highlight(range)
     }
+
+    public async saveOriginalAnnotations() {
+        const annotationMap = await this.transform.decode()
+
+        console.log(annotationMap)
+    }
+
 }

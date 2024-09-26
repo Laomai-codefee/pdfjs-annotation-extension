@@ -5,5 +5,5 @@
     "target": "ES5",
     "jsx": "preserve",
     "esModuleInterop": true
-  }
+  },
 }

@@ -21,7 +21,6 @@ class PdfjsAnnotationExtension {
 
     constructor() {
         // 初始化 PDF.js 对象和相关属性
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.PDFJS_PDFViewerApplication = (window as any).PDFViewerApplication
         this.PDFJS_EventBus = this.PDFJS_PDFViewerApplication.eventBus
         this.$PDFJS_sidebarContainer = this.PDFJS_PDFViewerApplication.appConfig.sidebar.sidebarContainer
@@ -151,8 +150,9 @@ class PdfjsAnnotationExtension {
             this.hidePainter()
         })
         // 监听文档加载完成事件
-        this.PDFJS_EventBus._on('documentloaded', (event) => {
+        this.PDFJS_EventBus._on('documentloaded', async (source) => {
             this.painter.initWebSelection(this.$PDFJS_viewerContainer)
+            await this.painter.saveOriginalAnnotations()
         })
         // 重置 Pdfjs AnnotationStorage 解决有嵌入图片打印、下载会ImageBitmap报错的问题
         this.PDFJS_EventBus._on('beforeprint', () => {
