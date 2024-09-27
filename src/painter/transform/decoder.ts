@@ -56,5 +56,20 @@ export abstract class Decoder {
         return { x: point.x, y: pageHeight - point.y }
     }
 
+    protected convertCoordinates(
+        coordinates: [number, number, number, number],
+        scale: number,
+        height: number
+    ): { x: number; y: number; x1: number; y1: number } {
+        const pageHeight = height / scale;
+        const x = coordinates[0];
+        const y = pageHeight - coordinates[1];
+        const x1 = coordinates[2];
+        const y1 = pageHeight - coordinates[3];
+        
+        return { x, y, x1, y1 };
+    }
+    
+
     public abstract decodePdfAnnotation(annotation: Annotation): IAnnotationStore
 }

@@ -53,7 +53,7 @@ export class Store {
         //     storage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}`, pdfjsAnnotationStorage)
         // }
 
-        console.log('%c [ annotationStore ]', 'font-size:13px; background:#6318bc; color:#a75cff;', this.annotationStore)
+        // console.log('%c [ annotationStore ]', 'font-size:13px; background:#6318bc; color:#a75cff;', this.annotationStore)
     }
 
     /**

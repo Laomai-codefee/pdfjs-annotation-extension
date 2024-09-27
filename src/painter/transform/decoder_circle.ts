@@ -10,7 +10,7 @@ export class CircleDecoder extends Decoder {
         super(options)
     }
 
-    public decodePdfAnnotation(annotation: CircleAnnotation) {
+    public decodePdfAnnotation(annotation: CircleAnnotation) {        
         const color = convertToRGB(annotation.color)
         const { x, y, width, height } = this.convertRect(
             annotation.rect,
@@ -29,7 +29,8 @@ export class CircleDecoder extends Decoder {
             y: y + height /2,
             strokeScaleEnabled: false,
             strokeWidth: annotation.borderStyle.width,
-            stroke: color
+            stroke: color,
+            dash: annotation.borderStyle.style === 2 ? annotation.borderStyle.dashArray : [],
         })
         ghostGroup.add(circle)
         const annotationStore: IAnnotationStore = {
