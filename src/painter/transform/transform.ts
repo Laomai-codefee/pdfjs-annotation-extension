@@ -4,7 +4,8 @@ import { CircleDecoder } from './decoder_circle'
 import { Decoder } from './decoder'
 import { FreeTextDecoder } from './decoder_free_text'
 import { HighlightDecoder } from './decoder_highlight'
-import { RectangleDecoder } from './decoder_rectangle'
+import { SquareDecoder } from './decoder_square'
+import { InkDecoder } from './decoder_ink'
 
 export class Transform {
     private pdfViewerApplication: PDFViewerApplication
@@ -42,7 +43,8 @@ export class Transform {
             [PdfjsAnnotationType.HIGHLIGHT]: HighlightDecoder,
             [PdfjsAnnotationType.UNDERLINE]: HighlightDecoder,
             [PdfjsAnnotationType.STRIKEOUT]: HighlightDecoder,
-            [PdfjsAnnotationType.SQUARE]: RectangleDecoder,
+            [PdfjsAnnotationType.SQUARE]: SquareDecoder,
+            [PdfjsAnnotationType.INK]: InkDecoder,
         };
         const DecoderClass = decoderMap[annotation.annotationType];
         if (DecoderClass) {

@@ -1,11 +1,11 @@
-import { Annotation, SquareAnnotation } from 'pdfjs'
-import { Decoder, IDecoderOptions } from './decoder'
+import { SquareAnnotation } from 'pdfjs'
+import { Decoder } from './decoder'
 import Konva from 'konva'
 import { SHAPE_GROUP_NAME } from '../const'
 import { convertToRGB } from '../../utils/utils'
-import { AnnotationType, IAnnotationStore, PdfjsAnnotationEditorType, PdfjsAnnotationType } from '../../const/definitions'
+import { AnnotationType, IAnnotationStore, PdfjsAnnotationEditorType } from '../../const/definitions'
 
-export class RectangleDecoder extends Decoder {
+export class SquareDecoder extends Decoder {
     constructor(options) {
         super(options)
     }

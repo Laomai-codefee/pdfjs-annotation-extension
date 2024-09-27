@@ -7,7 +7,7 @@ export interface IDecoderOptions {
 }
 
 interface quadPoint {
-    x: number,
+    x: number
     y: number
 }
 
@@ -38,17 +38,22 @@ export abstract class Decoder {
     /**
      * @description pdfjs annotation quadPoint 转为 konva 的 rect
      * @param quadPoint  [左上，右上，左下，右下]
-     * @param scale 
-     * @param height 
-     * @returns 
+     * @param scale
+     * @param height
+     * @returns
      */
-    protected convertQuadPoints(quadPoint: QuadPoint[], scale: number, height: number) :{ x: number; y: number; width: number; height: number } {
+    protected convertQuadPoints(quadPoint: QuadPoint[], scale: number, height: number): { x: number; y: number; width: number; height: number } {
         const pageHeight = height / scale
         const x = quadPoint[0].x
         const y = pageHeight - quadPoint[0].y
         const width = quadPoint[1].x - quadPoint[0].x
-        const _height = quadPoint[1].y - quadPoint[3].y 
+        const _height = quadPoint[1].y - quadPoint[3].y
         return { x, y, width, height: _height }
+    }
+
+    protected convertPoint(point: { x: number; y: number }, scale: number, height: number): { x: number; y: number } {
+        const pageHeight = height / scale
+        return { x: point.x, y: pageHeight - point.y }
     }
 
     public abstract decodePdfAnnotation(annotation: Annotation): IAnnotationStore
