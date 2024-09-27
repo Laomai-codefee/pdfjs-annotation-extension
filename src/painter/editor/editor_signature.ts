@@ -118,20 +118,26 @@ export class EditorSignature extends Editor {
             const { x, y, width, height } = this.fixImageCoordinateForGroup(this.signatureImage, this.currentShapeGroup.konvaGroup)
             const id = this.currentShapeGroup.konvaGroup.id()
             this.setShapeGroupDone(
-                id,
-                await this.calculateImageForStorage({
-                    x,
-                    y,
-                    width,
-                    height,
-                    annotationType: this.currentAnnotation.pdfjsType,
-                    pageIndex: this.pageNumber - 1,
-                    signatureUrl: this.signatureUrl,
-                    id
-                }),
                 {
-                    image: this.signatureUrl
+                    id,
+                    contentsObj: {
+                        text: '',
+                        image: this.signatureUrl
+                    }
                 }
+                // await this.calculateImageForStorage({
+                //     x,
+                //     y,
+                //     width,
+                //     height,
+                //     annotationType: this.currentAnnotation.pdfjsType,
+                //     pageIndex: this.pageNumber - 1,
+                //     signatureUrl: this.signatureUrl,
+                //     id
+                // }),
+                // {
+                //     image: this.signatureUrl
+                // }
             )
             this.signatureImage = null
         })
@@ -149,22 +155,23 @@ export class EditorSignature extends Editor {
         groupString: string,
         rawAnnotationStore: IAnnotationStore
     ): Promise<{ annotationStorage: IPdfjsAnnotationStorage; batchPdfjsAnnotationStorage?: IPdfjsAnnotationStorage[] }> {
-        const ghostGroup = Konva.Node.create(groupString)
-        const image = this.getGroupNodesByClassName(ghostGroup, 'Image')[0] as Konva.Image
-        const { x, y, width, height } = this.fixImageCoordinateForGroup(image, ghostGroup)
+        return null
+        // const ghostGroup = Konva.Node.create(groupString)
+        // const image = this.getGroupNodesByClassName(ghostGroup, 'Image')[0] as Konva.Image
+        // const { x, y, width, height } = this.fixImageCoordinateForGroup(image, ghostGroup)
 
-        // 计算并返回更新后的 PDF.js 注解存储对象
-        const annotationStorage = await this.calculateImageForStorage({
-            x,
-            y,
-            width,
-            height,
-            annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
-            pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex,
-            signatureUrl: image.getAttr('base64'),
-            id: groupId
-        })
-        return { annotationStorage }
+        // // 计算并返回更新后的 PDF.js 注解存储对象
+        // const annotationStorage = await this.calculateImageForStorage({
+        //     x,
+        //     y,
+        //     width,
+        //     height,
+        //     annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
+        //     pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex,
+        //     signatureUrl: image.getAttr('base64'),
+        //     id: groupId
+        // })
+        // return { annotationStorage }
     }
 
     /**

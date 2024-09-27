@@ -93,15 +93,18 @@ export class EditorFreeHand extends Editor {
             this.line.destroy()
             Editor.TimerStart(this.pageNumber, () => {
                 this.setShapeGroupDone(
-                    group.id(),
-                    this.calculateLinesForStorage({
-                        group: this.currentShapeGroup.konvaGroup,
-                        annotationType: this.currentAnnotation.pdfjsType,
-                        color: getRGB(this.currentAnnotation.style.color),
-                        thickness: this.currentAnnotation.style.strokeWidth || 2,
-                        opacity: this.currentAnnotation.style.opacity || 1,
-                        pageIndex: this.pageNumber - 1
-                    })
+                    {
+                        id: group.id(),
+                        color: this.currentAnnotation.style.color
+                    }
+                    // this.calculateLinesForStorage({
+                    //     group: this.currentShapeGroup.konvaGroup,
+                    //     annotationType: this.currentAnnotation.pdfjsType,
+                    //     color: getRGB(this.currentAnnotation.style.color),
+                    //     thickness: this.currentAnnotation.style.strokeWidth || 2,
+                    //     opacity: this.currentAnnotation.style.opacity || 1,
+                    //     pageIndex: this.pageNumber - 1
+                    // })
                 )
                 this.currentShapeGroup = null
             })
@@ -111,15 +114,18 @@ export class EditorFreeHand extends Editor {
         // 否则，延时保存形状组状态
         Editor.TimerStart(this.pageNumber, () => {
             this.setShapeGroupDone(
-                group.id(),
-                this.calculateLinesForStorage({
-                    group: this.currentShapeGroup.konvaGroup,
-                    annotationType: this.currentAnnotation.pdfjsType,
-                    color: getRGB(this.currentAnnotation.style.color),
-                    thickness: this.currentAnnotation.style.strokeWidth || 2,
-                    opacity: this.currentAnnotation.style.opacity || 1,
-                    pageIndex: this.pageNumber - 1
-                })
+                {
+                    id: group.id(),
+                    color: this.currentAnnotation.style.color
+                }
+                // this.calculateLinesForStorage({
+                //     group: this.currentShapeGroup.konvaGroup,
+                //     annotationType: this.currentAnnotation.pdfjsType,
+                //     color: getRGB(this.currentAnnotation.style.color),
+                //     thickness: this.currentAnnotation.style.strokeWidth || 2,
+                //     opacity: this.currentAnnotation.style.opacity || 1,
+                //     pageIndex: this.pageNumber - 1
+                // })
             )
             this.currentShapeGroup = null
         })
@@ -145,17 +151,18 @@ export class EditorFreeHand extends Editor {
      * @returns 更新后的 Pdfjs 注释存储对象
      */
     public async refreshPdfjsAnnotationStorage(groupId: string, groupString: string, rawAnnotationStore: IAnnotationStore) {
-        const ghostGroup = Konva.Node.create(groupString) // 通过序列化字符串创建临时组
-        return {
-            annotationStorage: this.calculateLinesForStorage({
-                group: ghostGroup,
-                annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
-                color: rawAnnotationStore.pdfjsAnnotationStorage.color,
-                thickness: rawAnnotationStore.pdfjsAnnotationStorage.thickness,
-                opacity: rawAnnotationStore.pdfjsAnnotationStorage.opacity,
-                pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex
-            })
-        }
+        return null
+        // const ghostGroup = Konva.Node.create(groupString) // 通过序列化字符串创建临时组
+        // return {
+        //     annotationStorage: this.calculateLinesForStorage({
+        //         group: ghostGroup,
+        //         annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
+        //         color: rawAnnotationStore.pdfjsAnnotationStorage.color,
+        //         thickness: rawAnnotationStore.pdfjsAnnotationStorage.thickness,
+        //         opacity: rawAnnotationStore.pdfjsAnnotationStorage.opacity,
+        //         pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex
+        //     })
+        // }
     }
 
     /**

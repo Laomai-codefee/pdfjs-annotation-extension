@@ -2,7 +2,7 @@ import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 import { PDFViewerApplication } from 'pdfjs'
 
-import { AnnotationType, IAnnotationContent, IAnnotationStore, IAnnotationType, IPdfjsAnnotationStorage } from '../../const/definitions'
+import { AnnotationType, IAnnotationContentsObj, IAnnotationStore, IAnnotationType, IPdfjsAnnotationStorage } from '../../const/definitions'
 import { generateUUID } from '../../utils/utils'
 import { SHAPE_GROUP_NAME } from '../const'
 
@@ -20,7 +20,7 @@ export interface IEditorOptions {
      * @param pdfjsAnnotationStorage PDF.js 注解存储对象
      * @param annotationContent 注解内容，可选
      */
-    onAdd: (shapeGroup: IShapeGroup, pdfjsAnnotationStorage: IPdfjsAnnotationStorage, annotationContent?: IAnnotationContent) => void
+    onAdd: (annotationStore: IAnnotationStore) => void
 }
 
 /**
@@ -40,7 +40,7 @@ export interface IShapeGroup {
 export abstract class Editor {
     protected pdfViewerApplication: PDFViewerApplication
     public readonly id: string // 编辑器实例的唯一标识符
-    public readonly onAdd: (shapeGroup: IShapeGroup, pdfjsAnnotationStorage: IPdfjsAnnotationStorage, annotationContent?: IAnnotationContent) => void // 添加形状组的回调函数
+    public readonly onAdd: (annotationStore: IAnnotationStore) => void // 添加形状组的回调函数
     protected konvaStage: Konva.Stage // Konva Stage对象
     protected readonly pageNumber: number // 页面编号
     protected currentAnnotation: IAnnotationType | null // 当前注解对象，可以为 null
@@ -72,8 +72,37 @@ export abstract class Editor {
      * @param pdfjsAnnotationStorage PDF.js 注解存储对象
      * @param annotationContent 注解内容，可选
      */
-    private dispatchAddEvent(pdfjsAnnotationStorage: IPdfjsAnnotationStorage, annotationContent?: IAnnotationContent) {
-        this.onAdd(this.currentShapeGroup, pdfjsAnnotationStorage, annotationContent) // 调用 onAdd 回调函数
+    private dispatchAddEvent({
+        shapeGroup,
+        contentsObj,
+        pageRanges,
+        color,
+        fontSize
+    }: {
+        shapeGroup: IShapeGroup
+        contentsObj?: IAnnotationContentsObj
+        pageRanges?: number[]
+        color?: string
+        fontSize?: number
+    }) {
+        const { id, pageNumber, konvaGroup, annotation } = shapeGroup
+        const annotationStore: IAnnotationStore = {
+            id,
+            pageNumber,
+            pageRanges,
+            konvaString: konvaGroup.toJSON(),
+            title: '不具名用户',
+            type: annotation.type,
+            pdfjsType: annotation.pdfjsAnnotationType,
+            pdfjsEditorType: annotation.pdfjsEditorType,
+            color,
+            fontSize,
+            date: '123123123123',
+            contentsObj,
+            comments: [],
+            readonly: annotation.readonly
+        }
+        this.onAdd(annotationStore) // 调用 onAdd 回调函数
     }
 
     /**
@@ -96,7 +125,7 @@ export abstract class Editor {
 
         // Mobile Touch Events
         this.konvaStage.on('touchstart', e => {
-            console.log("touchstart")
+            console.log('touchstart')
             if (e.evt.touches.length === 1) {
                 this.mouseDownHandler(e)
             }
@@ -150,16 +179,31 @@ export abstract class Editor {
 
     /**
      * 设置指定 ID 的形状组为已完成状态，并触发添加事件。
-     * @param id 要设置为已完成的形状组的 ID
-     * @param pdfjsAnnotationStorage PDF.js 注解存储对象
-     * @param annotationContent 注解内容，可选
      * @protected
      */
-    protected setShapeGroupDone(id: string, pdfjsAnnotationStorage: IPdfjsAnnotationStorage, annotationContent?: IAnnotationContent) {
+    protected setShapeGroupDone({
+        id,
+        contentsObj,
+        pageRanges,
+        color,
+        fontSize
+    }: {
+        id: string
+        contentsObj?: IAnnotationContentsObj
+        pageRanges?: number[]
+        color?: string
+        fontSize?: number
+    }) {
         const shapeGroup = this.shapeGroupStore.get(id) // 获取指定 ID 的形状组对象
         if (shapeGroup) {
             shapeGroup.isDone = true // 设置形状组为已完成状态
-            this.dispatchAddEvent(pdfjsAnnotationStorage, annotationContent) // 触发添加事件
+            this.dispatchAddEvent({
+                shapeGroup,
+                contentsObj,
+                pageRanges,
+                color,
+                fontSize
+            }) // 触发添加事件
         }
     }
 

@@ -93,18 +93,21 @@ export class EditorRectangle extends Editor {
         }
         const { x, y, width, height } = this.fixShapeCoordinateForGroup(this.rect, this.currentShapeGroup.konvaGroup) // 调整矩形在组中的坐标
         this.setShapeGroupDone(
-            group.id(),
-            this.calculateRectForStorage({
-                x,
-                y,
-                width,
-                height,
-                annotationType: this.currentAnnotation.pdfjsType,
-                color: getRGB(this.currentAnnotation.style.color),
-                thickness: this.currentAnnotation.style.strokeWidth || 2,
-                opacity: this.currentAnnotation.style.opacity,
-                pageIndex: this.pageNumber - 1
-            })
+            {
+                id: group.id(),
+                color: this.currentAnnotation.style.color
+            }
+            // this.calculateRectForStorage({
+            //     x,
+            //     y,
+            //     width,
+            //     height,
+            //     annotationType: this.currentAnnotation.pdfjsType,
+            //     color: getRGB(this.currentAnnotation.style.color),
+            //     thickness: this.currentAnnotation.style.strokeWidth || 2,
+            //     opacity: this.currentAnnotation.style.opacity,
+            //     pageIndex: this.pageNumber - 1
+            // })
         ) // 更新 PDF.js 注解存储
         this.rect = null
     }
@@ -131,22 +134,23 @@ export class EditorRectangle extends Editor {
         groupString: string,
         rawAnnotationStore: IAnnotationStore
     ): Promise<{ annotationStorage: IPdfjsAnnotationStorage; batchPdfjsAnnotationStorage?: IPdfjsAnnotationStorage[] }> {
-        const ghostGroup = Konva.Node.create(groupString) // 根据序列化的组字符串创建 Konva 节点
-        const rect = this.getGroupNodesByClassName(ghostGroup, 'Rect')[0] as Konva.Rect // 获取组中的矩形对象
-        const { x, y, width, height } = this.fixShapeCoordinateForGroup(rect, ghostGroup) // 调整矩形在组中的坐标
-        return {
-            annotationStorage: this.calculateRectForStorage({
-                x,
-                y,
-                width,
-                height,
-                annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
-                color: rawAnnotationStore.pdfjsAnnotationStorage.color,
-                thickness: rawAnnotationStore.pdfjsAnnotationStorage.thickness,
-                opacity: rawAnnotationStore.pdfjsAnnotationStorage.opacity,
-                pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex
-            }) // 计算并返回更新后的 PDF.js 注解存储对象
-        }
+        return null
+        // const ghostGroup = Konva.Node.create(groupString) // 根据序列化的组字符串创建 Konva 节点
+        // const rect = this.getGroupNodesByClassName(ghostGroup, 'Rect')[0] as Konva.Rect // 获取组中的矩形对象
+        // const { x, y, width, height } = this.fixShapeCoordinateForGroup(rect, ghostGroup) // 调整矩形在组中的坐标
+        // return {
+        //     annotationStorage: this.calculateRectForStorage({
+        //         x,
+        //         y,
+        //         width,
+        //         height,
+        //         annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
+        //         color: rawAnnotationStore.pdfjsAnnotationStorage.color,
+        //         thickness: rawAnnotationStore.pdfjsAnnotationStorage.thickness,
+        //         opacity: rawAnnotationStore.pdfjsAnnotationStorage.opacity,
+        //         pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex
+        //     }) // 计算并返回更新后的 PDF.js 注解存储对象
+        // }
     }
 
     /**

@@ -95,8 +95,8 @@ declare module 'pdfjs' {
         creationDate: string | null
         popupRef: string | null
         annotationType: AnnotationType
-        _pageNumber: number
-        _pageViewer: PDFPageView
+        pageNumber: number
+        pageViewer: PDFPageView
     }
     
     interface BorderStyle {

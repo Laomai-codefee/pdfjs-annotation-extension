@@ -15,7 +15,7 @@ async function setInputText(color: string, fontSize: number): Promise<{ inputVal
     let currentColor = color;
     let currentFontSize = fontSize;
     return new Promise(resolve => {
-        const placeholder =i18n.t('editor.text.startTyping');
+        const placeholder = i18n.t('editor.text.startTyping');
         let inputValue = '';
         let status: '' | 'error' | 'warning' = 'error'; // 初始状态设置为错误，确保初始时提交按钮禁用
         let modal: any;
@@ -183,51 +183,55 @@ export class EditorFreeText extends Editor {
             width: finalWidth,
             fontSize: fontSize,
             fill: color,
-            padding: 2,
             wrap: textWidth > maxWidth ? 'word' : 'none'
         });
         this.currentShapeGroup.konvaGroup.add(text)
+
+        const id = this.currentShapeGroup.konvaGroup.id()
+            this.setShapeGroupDone(
+                {
+                    id,
+                    contentsObj: {
+                        text: value,
+                    },
+                    color,
+                    fontSize
+                }
+            )
+
         // 将 Text 节点转换为 Image
-        const imageUrl = await new Promise<string>(resolve => {
-            text.toDataURL({
-                callback: url => resolve(url)
-            })
-        })
-        // 使用生成的 imageUrl 创建 Konva.Image
-        Konva.Image.fromURL(imageUrl, async image => {
-            const { width: width_rec, height: height_rec } = text.getClientRect()
-            // 删除之前的文本节点
-            this.getGroupNodesByClassName(this.currentShapeGroup.konvaGroup, 'Text')[0]?.destroy()
-            this.currentShapeGroup.konvaGroup.add(image)
-            image.setAttrs({
-                x: pos.x,
-                y: pos.y,
-                width: width_rec / scale.x,
-                height: height_rec / scale.y,
-                base64: imageUrl
-            })
+        // const imageUrl = await new Promise<string>(resolve => {
+        //     text.toDataURL({
+        //         callback: url => resolve(url)
+        //     })
+        // })
+        // // 使用生成的 imageUrl 创建 Konva.Image
+        // Konva.Image.fromURL(imageUrl, async image => {
+        //     const { width: width_rec, height: height_rec } = text.getClientRect()
+        //     // 删除之前的文本节点
+        //     this.getGroupNodesByClassName(this.currentShapeGroup.konvaGroup, 'Text')[0]?.destroy()
+        //     this.currentShapeGroup.konvaGroup.add(image)
+        //     image.setAttrs({
+        //         x: pos.x,
+        //         y: pos.y,
+        //         width: width_rec / scale.x,
+        //         height: height_rec / scale.y,
+        //         base64: imageUrl
+        //     })
+        //     const id = this.currentShapeGroup.konvaGroup.id()
+        //     this.setShapeGroupDone(
+        //         {
+        //             id,
+        //             contentsObj: {
+        //                 text: value,
+        //                 image: imageUrl
+        //             },
+        //             color,
+        //             fontSize
+        //         }
+        //     )
 
-            // 修正图像的坐标和尺寸
-            const { x, y, width, height } = this.fixImageCoordinateForGroup(image, this.currentShapeGroup.konvaGroup)
-            const id = this.currentShapeGroup.konvaGroup.id()
-
-            // 计算并保存图像的存储信息
-            const storage = await this.calculateImageForStorage({
-                x,
-                y,
-                width,
-                height,
-                annotationType: this.currentAnnotation.pdfjsType,
-                pageIndex: this.pageNumber - 1,
-                imageUrl,
-                id
-            })
-
-            // 标记当前形状组为完成状态
-            this.setShapeGroupDone(id, storage, {
-                image: imageUrl
-            })
-        })
+        // })
     }
 
     /**
@@ -242,24 +246,26 @@ export class EditorFreeText extends Editor {
         groupString: string,
         rawAnnotationStore: IAnnotationStore
     ): Promise<{ annotationStorage: IPdfjsAnnotationStorage; batchPdfjsAnnotationStorage?: IPdfjsAnnotationStorage[] }> {
-        const ghostGroup = Konva.Node.create(groupString)
-        const image = this.getGroupNodesByClassName(ghostGroup, 'Image')[0] as Konva.Image
 
-        const { x, y, width, height } = this.fixImageCoordinateForGroup(image, ghostGroup)
+        return null
+        // const ghostGroup = Konva.Node.create(groupString)
+        // const image = this.getGroupNodesByClassName(ghostGroup, 'Image')[0] as Konva.Image
 
-        // 计算并返回注解的存储信息
-        const annotationStorage = await this.calculateImageForStorage({
-            x,
-            y,
-            width,
-            height,
-            annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
-            pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex,
-            imageUrl: image.getAttr('base64'),
-            id: groupId
-        })
+        // const { x, y, width, height } = this.fixImageCoordinateForGroup(image, ghostGroup)
 
-        return { annotationStorage }
+        // // 计算并返回注解的存储信息
+        // const annotationStorage = await this.calculateImageForStorage({
+        //     x,
+        //     y,
+        //     width,
+        //     height,
+        //     annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
+        //     pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex,
+        //     imageUrl: image.getAttr('base64'),
+        //     id: groupId
+        // })
+
+        // return { annotationStorage }
     }
 
     /**
@@ -335,26 +341,5 @@ export class EditorFreeText extends Editor {
         }
 
         return annotationStorage
-    }
-
-    /**
-     * 将序列化的组字符串添加到 Konva 舞台的背景层中。
-     * @param konvaStage Konva 舞台对象
-     * @param konvaString 序列化的 Konva 字符串
-     */
-    public addSerializedGroupToLayer(konvaStage: Konva.Stage, konvaString: string) {
-        const ghostGroup = Konva.Node.create(konvaString)
-        const oldImage = this.getGroupNodesByClassName(ghostGroup, 'Image')[0] as Konva.Image
-        const imageUrl = oldImage.getAttr('base64')
-
-        // 使用 imageUrl 创建新的 Konva.Image
-        Konva.Image.fromURL(imageUrl, async image => {
-            image.setAttrs(oldImage.getAttrs())
-            oldImage.destroy()
-            ghostGroup.add(image)
-        })
-
-        // 将组添加到背景层
-        this.getBgLayer(konvaStage).add(ghostGroup)
     }
 }

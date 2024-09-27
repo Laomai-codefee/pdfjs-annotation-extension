@@ -22,7 +22,7 @@ export interface CustomToolbarRef {
  */
 const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function CustomToolbar(props, ref) {
     const [currentAnnotation, setCurrentAnnotation] = useState<IAnnotationType | null>(null)
-    const [annotations, setAnnotations] = useState<IAnnotationType[]>(annotationDefinitions.filter(item => item.pdfjsType !== PdfjsAnnotationEditorType.HIGHLIGHT))
+    const [annotations, setAnnotations] = useState<IAnnotationType[]>(annotationDefinitions.filter(item => item.pdfjsEditorType !== PdfjsAnnotationEditorType.HIGHLIGHT))
     const [dataTransfer, setDataTransfer] = useState<string | null>(null)
     const { t } = useTranslation()
 

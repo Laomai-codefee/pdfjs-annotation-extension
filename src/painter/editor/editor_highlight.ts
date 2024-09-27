@@ -36,8 +36,12 @@ export class EditorHighLight extends Editor {
             this.currentShapeGroup.konvaGroup.add(shape)
         })
 
-        this.setShapeGroupDone(this.currentShapeGroup.id, this.calculateHighlightForStorage(), {
-            text: this.getElementOuterText(elements)
+        this.setShapeGroupDone({
+            id: this.currentShapeGroup.id,
+            contentsObj: {
+                text: this.getElementOuterText(elements)
+            },
+            color: this.currentAnnotation.style.color
         })
     }
 
@@ -162,55 +166,56 @@ export class EditorHighLight extends Editor {
      * @returns 返回高亮注释的存储信息 IPdfjsAnnotationStorage
      */
     private calculateHighlightForStorage(): IPdfjsAnnotationStorage {
-        const allHighlights: Konva.Rect[] = this.getNodesByClassName<Konva.Rect>('Rect')
-        const quadPoints: number[] = []
-        const outlines: number[][] = []
+        return null
+        // const allHighlights: Konva.Rect[] = this.getNodesByClassName<Konva.Rect>('Rect')
+        // const quadPoints: number[] = []
+        // const outlines: number[][] = []
 
-        let minX = Infinity
-        let minY = Infinity
-        let maxX = -Infinity
-        let maxY = -Infinity
+        // let minX = Infinity
+        // let minY = Infinity
+        // let maxX = -Infinity
+        // let maxY = -Infinity
 
-        const canvasHeight = this.konvaStage.size().height / this.konvaStage.scale().y
+        // const canvasHeight = this.konvaStage.size().height / this.konvaStage.scale().y
 
-        allHighlights.forEach(shape => {
-            const { x, y, width, height } = shape.attrs
+        // allHighlights.forEach(shape => {
+        //     const { x, y, width, height } = shape.attrs
 
-            // 计算矩形的四个顶点坐标，并转换到 PDF.js 坐标系
-            const topLeft = [x, canvasHeight - y]
-            const bottomLeft = [x, canvasHeight - (y + height)]
-            const bottomRight = [x + width, canvasHeight - (y + height)]
-            const topRight = [x + width, canvasHeight - y]
+        //     // 计算矩形的四个顶点坐标，并转换到 PDF.js 坐标系
+        //     const topLeft = [x, canvasHeight - y]
+        //     const bottomLeft = [x, canvasHeight - (y + height)]
+        //     const bottomRight = [x + width, canvasHeight - (y + height)]
+        //     const topRight = [x + width, canvasHeight - y]
 
-            // 对于 outlines，顺序是：左上，左下，右下，右上
-            const rectOutlines = [...topLeft, ...bottomLeft, ...bottomRight, ...topRight]
-            outlines.push(rectOutlines)
+        //     // 对于 outlines，顺序是：左上，左下，右下，右上
+        //     const rectOutlines = [...topLeft, ...bottomLeft, ...bottomRight, ...topRight]
+        //     outlines.push(rectOutlines)
 
-            // 对于 quadPoints，顺序是：左上，右上，左下，右下
-            const rectQuadPoints = [...topLeft, ...topRight, ...bottomLeft, ...bottomRight]
-            quadPoints.push(...rectQuadPoints)
+        //     // 对于 quadPoints，顺序是：左上，右上，左下，右下
+        //     const rectQuadPoints = [...topLeft, ...topRight, ...bottomLeft, ...bottomRight]
+        //     quadPoints.push(...rectQuadPoints)
 
-            // 更新边界
-            minX = Math.min(minX, x)
-            minY = Math.min(minY, y)
-            maxX = Math.max(maxX, x + width)
-            maxY = Math.max(maxY, y + height)
-        })
+        //     // 更新边界
+        //     minX = Math.min(minX, x)
+        //     minY = Math.min(minY, y)
+        //     maxX = Math.max(maxX, x + width)
+        //     maxY = Math.max(maxY, y + height)
+        // })
 
-        // 构建包含所有形状的边界矩形 (rect)
-        const rect: [number, number, number, number] = [minX, canvasHeight - maxY, maxX, canvasHeight - minY]
+        // // 构建包含所有形状的边界矩形 (rect)
+        // const rect: [number, number, number, number] = [minX, canvasHeight - maxY, maxX, canvasHeight - minY]
 
-        // 构建综合存储对象
-        return {
-            annotationType: this.currentAnnotation.pdfjsType,
-            color: getRGB(this.currentAnnotation.style.color),
-            opacity: this.currentAnnotation.style.opacity,
-            quadPoints: quadPoints,
-            outlines: outlines,
-            rect: rect,
-            pageIndex: this.pageNumber - 1,
-            rotation: 0
-        }
+        // // 构建综合存储对象
+        // return {
+        //     annotationType: this.currentAnnotation.pdfjsType,
+        //     color: getRGB(this.currentAnnotation.style.color),
+        //     opacity: this.currentAnnotation.style.opacity,
+        //     quadPoints: quadPoints,
+        //     outlines: outlines,
+        //     rect: rect,
+        //     pageIndex: this.pageNumber - 1,
+        //     rotation: 0
+        // }
     }
 
     /**

@@ -12,14 +12,14 @@ import i18n from 'i18next'
 
 /**
  * 批量设置盖章位置
- * @returns {Promise<{ parsedPages: number[], inputValue: string }>}
+ * @returns {Promise<{ pageRanges: number[], inputValue: string }>}
  */
-async function setBatchStampPageNumbers(): Promise<{ parsedPages: number[]; inputValue: string }> {
+async function setBatchStampPageNumbers(): Promise<{ pageRanges: number[]; inputValue: string }> {
     return new Promise(resolve => {
         const placeholder = `${i18n.t('normal.example')}1,1-2,3-4`
         let inputValue = '' // 临时变量来存储输入值
         let status: '' | 'error' | 'warning' = 'error' // 初始状态设置为错误，确保初始时提交按钮禁用
-        let parsedPages: number[] = [] // 用于存储解析后的页码数组
+        let pageRanges: number[] = [] // 用于存储解析后的页码数组
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, prefer-const
         let modal: any
         const inputRef = React.createRef<InputRef>() // 使用 React.createRef 以确保类型正确
@@ -27,15 +27,15 @@ async function setBatchStampPageNumbers(): Promise<{ parsedPages: number[]; inpu
         const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             inputValue = e.target.value // 更新输入值
             try {
-                parsedPages = parsePageRanges(inputValue)
-                if (parsedPages.length > 0) {
+                pageRanges = parsePageRanges(inputValue)
+                if (pageRanges.length > 0) {
                     status = '' // 清除错误状态
                 } else {
                     status = 'error'
                 }
             } catch (error) {
                 status = 'error'
-                parsedPages = [] // 清空解析结果
+                pageRanges = [] // 清空解析结果
             }
             // 强制重新渲染 Modal
             modal.update({
@@ -66,10 +66,10 @@ async function setBatchStampPageNumbers(): Promise<{ parsedPages: number[]; inpu
                 disabled: status === 'error'
             },
             onOk: () => {
-                resolve({ parsedPages, inputValue }) // 解析 Promise 并返回输入值和解析后的页码数组
+                resolve({ pageRanges, inputValue }) // 解析 Promise 并返回输入值和解析后的页码数组
             },
             onCancel: () => {
-                resolve({ parsedPages: [], inputValue: '' }) // 如果用户取消，则解析 Promise 并返回空数组和空字符串
+                resolve({ pageRanges: [], inputValue: '' }) // 如果用户取消，则解析 Promise 并返回空数组和空字符串
             }
         })
 
@@ -190,10 +190,8 @@ export class EditorStamp extends Editor {
                 base64: this.stampUrl
             })
             this.currentShapeGroup.konvaGroup.add(this.stampImage)
-
-            const { parsedPages, inputValue } = await setBatchStampPageNumbers()
-
-            if (parsedPages.length > 0) {
+            const { pageRanges, inputValue } = await setBatchStampPageNumbers()
+            if (pageRanges.length > 0) {
                 const text = new Konva.Text({
                     x: pos.x - crosshair.x,
                     y: pos.y - crosshair.y,
@@ -203,45 +201,33 @@ export class EditorStamp extends Editor {
                 })
                 this.currentShapeGroup.konvaGroup.add(text)
             }
-
             // 调整图片坐标并更新 PDF.js 注解存储
             const { x, y, width, height } = this.fixImageCoordinateForGroup(this.stampImage, this.currentShapeGroup.konvaGroup)
             const id = this.currentShapeGroup.konvaGroup.id()
-
-            const batchPdfjsAnnotationStorage: IPdfjsAnnotationStorage[] = []
-            for (const pageNumber of parsedPages) {
-                if (pageNumber <= this.pdfViewerApplication.pagesCount) {
-                    const batchStore = await this.calculateImageForStorage({
-                        x,
-                        y,
-                        width,
-                        height,
-                        annotationType: this.currentAnnotation.pdfjsType,
-                        pageIndex: pageNumber - 1,
-                        stampUrl: this.stampUrl,
-                        id: `${id}-${pageNumber - 1}`
-                    })
-                    batchPdfjsAnnotationStorage.push(batchStore)
-                }
-            }
-
             this.setShapeGroupDone(
-                id,
-                await this.calculateImageForStorage({
-                    x,
-                    y,
-                    width,
-                    height,
-                    annotationType: this.currentAnnotation.pdfjsType,
-                    pageIndex: this.pageNumber - 1,
-                    stampUrl: this.stampUrl,
-                    id
-                }),
                 {
-                    image: this.stampUrl,
-                    text: inputValue || '',
-                    batchPdfjsAnnotationStorage: batchPdfjsAnnotationStorage
+                    id,
+                    contentsObj: {
+                        text: inputValue,
+                        image: this.stampUrl
+                    },
+                    pageRanges
                 }
+                // await this.calculateImageForStorage({
+                //     x,
+                //     y,
+                //     width,
+                //     height,
+                //     annotationType: this.currentAnnotation.pdfjsType,
+                //     pageIndex: this.pageNumber - 1,
+                //     stampUrl: this.stampUrl,
+                //     id
+                // }),
+                // {
+                //     image: this.stampUrl,
+                //     text: inputValue || '',
+                //     batchPdfjsAnnotationStorage: batchPdfjsAnnotationStorage
+                // }
             )
 
             this.stampImage = null
@@ -260,44 +246,45 @@ export class EditorStamp extends Editor {
         groupString: string,
         rawAnnotationStore: IAnnotationStore
     ): Promise<{ annotationStorage: IPdfjsAnnotationStorage; batchPdfjsAnnotationStorage?: IPdfjsAnnotationStorage[] }> {
-        const ghostGroup = Konva.Node.create(groupString)
-        const image = this.getGroupNodesByClassName(ghostGroup, 'Image')[0] as Konva.Image
-        const { x, y, width, height } = this.fixImageCoordinateForGroup(image, ghostGroup)
-        const stampUrl = image.getAttr('base64')
+        return null
+        // const ghostGroup = Konva.Node.create(groupString)
+        // const image = this.getGroupNodesByClassName(ghostGroup, 'Image')[0] as Konva.Image
+        // const { x, y, width, height } = this.fixImageCoordinateForGroup(image, ghostGroup)
+        // const stampUrl = image.getAttr('base64')
 
-        // 计算并返回更新后的 PDF.js 注解存储对象
-        const annotationStorage = await this.calculateImageForStorage({
-            x,
-            y,
-            width,
-            height,
-            annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
-            pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex,
-            stampUrl: stampUrl,
-            id: groupId
-        })
+        // // 计算并返回更新后的 PDF.js 注解存储对象
+        // const annotationStorage = await this.calculateImageForStorage({
+        //     x,
+        //     y,
+        //     width,
+        //     height,
+        //     annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
+        //     pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex,
+        //     stampUrl: stampUrl,
+        //     id: groupId
+        // })
 
-        // 处理批量 PDF.js 注解存储
-        const batchPdfjsAnnotationStorage: IPdfjsAnnotationStorage[] = []
-        const batchStores = rawAnnotationStore.content?.batchPdfjsAnnotationStorage
+        // // 处理批量 PDF.js 注解存储
+        // const batchPdfjsAnnotationStorage: IPdfjsAnnotationStorage[] = []
+        // const batchStores = rawAnnotationStore.content?.batchPdfjsAnnotationStorage
 
-        if (batchStores?.length > 0) {
-            for (const store of batchStores) {
-                const newStore = await this.calculateImageForStorage({
-                    x,
-                    y,
-                    width,
-                    height,
-                    annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
-                    pageIndex: store.pageIndex,
-                    stampUrl: stampUrl,
-                    id: `${groupId}-${store.pageIndex}`
-                })
-                batchPdfjsAnnotationStorage.push(newStore)
-            }
-        }
+        // if (batchStores?.length > 0) {
+        //     for (const store of batchStores) {
+        //         const newStore = await this.calculateImageForStorage({
+        //             x,
+        //             y,
+        //             width,
+        //             height,
+        //             annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
+        //             pageIndex: store.pageIndex,
+        //             stampUrl: stampUrl,
+        //             id: `${groupId}-${store.pageIndex}`
+        //         })
+        //         batchPdfjsAnnotationStorage.push(newStore)
+        //     }
+        // }
 
-        return { annotationStorage, batchPdfjsAnnotationStorage }
+        // return { annotationStorage, batchPdfjsAnnotationStorage }
     }
 
     /**

@@ -1,16 +1,16 @@
-import { Annotation, CircleAnnotation } from 'pdfjs'
+import { Annotation, SquareAnnotation } from 'pdfjs'
 import { Decoder, IDecoderOptions } from './decoder'
 import Konva from 'konva'
 import { SHAPE_GROUP_NAME } from '../const'
 import { convertToRGB } from '../../utils/utils'
 import { AnnotationType, IAnnotationStore, PdfjsAnnotationEditorType, PdfjsAnnotationType } from '../../const/definitions'
 
-export class CircleDecoder extends Decoder {
+export class RectangleDecoder extends Decoder {
     constructor(options) {
         super(options)
     }
 
-    public decodePdfAnnotation(annotation: CircleAnnotation) {
+    public decodePdfAnnotation(annotation: SquareAnnotation) {
         const color = convertToRGB(annotation.color)
         const { x, y, width, height } = this.convertRect(
             annotation.rect,
@@ -22,23 +22,25 @@ export class CircleDecoder extends Decoder {
             name: SHAPE_GROUP_NAME,
             id: annotation.id
         })
-        const circle = new Konva.Ellipse({
-            radiusX: width / 2,
-            radiusY: height / 2,
-            x: x + width /2,
-            y: y + height /2,
+        const rect = new Konva.Rect({
+            x,
+            y,
+            width,
+            height,
             strokeScaleEnabled: false,
+            stroke: color,
             strokeWidth: annotation.borderStyle.width,
-            stroke: color
+            fill: annotation.borderStyle.width === 0 ? color : null,
+            opacity: annotation.borderStyle.width === 0 ? 0.3 : 1
         })
-        ghostGroup.add(circle)
+        ghostGroup.add(rect)
         const annotationStore: IAnnotationStore = {
             id: annotation.id,
             pageNumber: annotation.pageNumber,
             pageRanges: null,
             konvaString: ghostGroup.toJSON(),
             title: annotation.titleObj.str,
-            type: AnnotationType.CIRCLE,
+            type: AnnotationType.RECTANGLE,
             color,
             pdfjsType: annotation.annotationType,
             pdfjsAnnotation: annotation,

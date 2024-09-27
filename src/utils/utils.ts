@@ -1,3 +1,4 @@
+import { nanoid } from 'nanoid'
 /**
  * 根据颜色字符串获取 RGB 数组。
  * 支持以下格式：'#RRGGBB'、'rgb(R, G, B)'、'rgba(R, G, B, A)'。
@@ -39,20 +40,11 @@ function isElementInDOM(element: HTMLElement): boolean {
 }
 
 /**
- * 生成一个符合 RFC 4122 标准的 UUID v4。
- * UUID v4 格式为：xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
- * 其中的 x 是随机生成的十六进制数，y 是 8, 9, A, 或 B。
- * @returns 生成的 UUID v4 字符串
+ * 生成uuid
+ * @returns nanoid
  */
 function generateUUID(): string {
-    const bytes = getRandomBytes(16)
-    bytes[6] = (bytes[6] & 0x0f) | 0x40 // 设置版本号 4
-    bytes[8] = (bytes[8] & 0x3f) | 0x80 // 设置变体 10xx
-    return Array.from(bytes, byte => byte.toString(16).padStart(2, '0'))
-        .join('')
-        .match(/^(.{8})(.{4})(.{4})(.{4})(.{12})$/)!
-        .slice(1)
-        .join('-')
+    return nanoid()
 }
 
 /**

@@ -112,19 +112,22 @@ export class EditorCircle extends Editor {
 
         // 提取椭圆的属性并保存形状组的状态
         const { x, y, radiusX, radiusY } = this.ellipse.attrs
-        this.setShapeGroupDone(
-            group.id(),
-            this.calculateEllipseForStorage({
-                x,
-                y,
-                radiusX,
-                radiusY,
-                annotationType: this.currentAnnotation.pdfjsType,
-                color: getRGB(this.currentAnnotation.style.color),
-                thickness: this.currentAnnotation.style.strokeWidth || 2,
-                opacity: this.currentAnnotation.style.opacity,
-                pageIndex: this.pageNumber - 1
-            })
+        this.setShapeGroupDone({
+            id: group.id(),
+            color: this.currentAnnotation.style.color
+        }
+            
+            // this.calculateEllipseForStorage({
+            //     x,
+            //     y,
+            //     radiusX,
+            //     radiusY,
+            //     annotationType: this.currentAnnotation.pdfjsType,
+            //     color: getRGB(this.currentAnnotation.style.color),
+            //     thickness: this.currentAnnotation.style.strokeWidth || 2,
+            //     opacity: this.currentAnnotation.style.opacity,
+            //     pageIndex: this.pageNumber - 1
+            // })
         )
         this.ellipse = null // 重置当前椭圆对象为 null
     }
@@ -147,22 +150,23 @@ export class EditorCircle extends Editor {
      * @returns 更新后的 Pdfjs 注释存储对象
      */
     public async refreshPdfjsAnnotationStorage(groupId: string, groupString: string, rawAnnotationStore: IAnnotationStore) {
-        const ghostGroup = Konva.Node.create(groupString) // 通过序列化字符串创建临时组
-        const ellipse = this.getGroupNodesByClassName(ghostGroup, 'Ellipse')[0] as Konva.Ellipse // 获取椭圆对象
-        const { x, y, radiusX, radiusY } = this.fixShapeCoordinateForGroup(ellipse, ghostGroup) // 修正椭圆坐标
-        return {
-            annotationStorage: this.calculateEllipseForStorage({
-                x,
-                y,
-                radiusX,
-                radiusY,
-                annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
-                color: rawAnnotationStore.pdfjsAnnotationStorage.color,
-                thickness: rawAnnotationStore.pdfjsAnnotationStorage.thickness,
-                opacity: rawAnnotationStore.pdfjsAnnotationStorage.opacity,
-                pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex
-            })
-        }
+        return null
+        // const ghostGroup = Konva.Node.create(groupString) // 通过序列化字符串创建临时组
+        // const ellipse = this.getGroupNodesByClassName(ghostGroup, 'Ellipse')[0] as Konva.Ellipse // 获取椭圆对象
+        // const { x, y, radiusX, radiusY } = this.fixShapeCoordinateForGroup(ellipse, ghostGroup) // 修正椭圆坐标
+        // return {
+        //     annotationStorage: this.calculateEllipseForStorage({
+        //         x,
+        //         y,
+        //         radiusX,
+        //         radiusY,
+        //         annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
+        //         color: rawAnnotationStore.pdfjsAnnotationStorage.color,
+        //         thickness: rawAnnotationStore.pdfjsAnnotationStorage.thickness,
+        //         opacity: rawAnnotationStore.pdfjsAnnotationStorage.opacity,
+        //         pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex
+        //     })
+        // }
     }
 
     /**

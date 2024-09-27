@@ -22,7 +22,7 @@ export interface CustomPopbarRef {
  */
 const CustomPopbar = forwardRef<CustomPopbarRef, CustomPopbarProps>(function CustomPopbar(props, ref) {
     const [show, setShow] = useState(false)
-    const [annotations] = useState<IAnnotationType[]>(annotationDefinitions.filter(item => item.pdfjsType === PdfjsAnnotationEditorType.HIGHLIGHT))
+    const [annotations] = useState<IAnnotationType[]>(annotationDefinitions.filter(item => item.pdfjsEditorType === PdfjsAnnotationEditorType.HIGHLIGHT))
 
     const [currentRange, setCurrentRange] = useState<Range | null>(null)
 
@@ -37,7 +37,6 @@ const CustomPopbar = forwardRef<CustomPopbarRef, CustomPopbarProps>(function Cus
 
     const open = (range: Range | null) => {
         setCurrentRange(range);
-
         // 如果 range 为空或 startContainer 和 endContainer 都不是文本节点，隐藏菜单
         if (!range || (range.endContainer.nodeType !== 3 && range.startContainer.nodeType !== 3)) {
             setShow(false);

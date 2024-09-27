@@ -29,29 +29,29 @@ export class Store {
      * @param pdfjsAnnotationStorage - PDF.js 注释存储对象
      * @param annotationContent - 注释内容对象（可选）
      */
-    public save(shapeGroup: IShapeGroup, pdfjsAnnotationStorage: IPdfjsAnnotationStorage, annotationContent?: IAnnotationContent) {
-        const id = shapeGroup.id
-        const store = {
-            id,
-            pageNumber: shapeGroup.pageNumber,
-            konvaString: shapeGroup.konvaGroup.toJSON(),
-            type: shapeGroup.annotation.type,
-            readonly: shapeGroup.annotation.readonly,
-            pdfjsAnnotationStorage,
-            content: annotationContent,
-            time: Date.now()
-        }
+    public save(store: IAnnotationStore) {
+        // const id = shapeGroup.id
+        // const store = {
+        //     id,
+        //     pageNumber: shapeGroup.pageNumber,
+        //     konvaString: shapeGroup.konvaGroup.toJSON(),
+        //     type: shapeGroup.annotation.type,
+        //     readonly: shapeGroup.annotation.readonly,
+        //     pdfjsAnnotationStorage,
+        //     content: annotationContent,
+        //     time: Date.now()
+        // }
 
-        this.annotationStore.set(id, store)
+        this.annotationStore.set(store.id, store)
 
-        const storage = this.pdfViewerApplication.pdfDocument.annotationStorage
-        if (annotationContent?.batchPdfjsAnnotationStorage?.length) {
-            annotationContent.batchPdfjsAnnotationStorage.forEach(store => {
-                storage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}-${store.pageIndex}`, store)
-            })
-        } else {
-            storage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}`, pdfjsAnnotationStorage)
-        }
+        // const storage = this.pdfViewerApplication.pdfDocument.annotationStorage
+        // if (annotationContent?.batchPdfjsAnnotationStorage?.length) {
+        //     annotationContent.batchPdfjsAnnotationStorage.forEach(store => {
+        //         storage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}-${store.pageIndex}`, store)
+        //     })
+        // } else {
+        //     storage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}`, pdfjsAnnotationStorage)
+        // }
 
         console.log('%c [ annotationStore ]', 'font-size:13px; background:#6318bc; color:#a75cff;', this.annotationStore)
     }

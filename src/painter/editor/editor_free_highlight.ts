@@ -94,16 +94,19 @@ export class EditorFreeHighlight extends Editor {
             const correctedPoints = this.correctLineIfStraight(originalPoints)
             this.line.points(correctedPoints) // 更新线条点集为修正后的点集
             this.setShapeGroupDone(
-                group.id(),
-                this.calculateLinesForStorage({
-                    line: this.line,
-                    group: this.currentShapeGroup.konvaGroup,
-                    annotationType: this.currentAnnotation.pdfjsType,
-                    color: getRGB(this.currentAnnotation.style.color),
-                    thickness: this.currentAnnotation.style.strokeWidth || 2,
-                    opacity: this.currentAnnotation.style.opacity,
-                    pageIndex: this.pageNumber - 1
-                })
+                {
+                    id: group.id(),
+                    color: this.currentAnnotation.style.color
+                }
+                // this.calculateLinesForStorage({
+                //     line: this.line,
+                //     group: this.currentShapeGroup.konvaGroup,
+                //     annotationType: this.currentAnnotation.pdfjsType,
+                //     color: getRGB(this.currentAnnotation.style.color),
+                //     thickness: this.currentAnnotation.style.strokeWidth || 2,
+                //     opacity: this.currentAnnotation.style.opacity,
+                //     pageIndex: this.pageNumber - 1
+                // })
             )
             this.line = null
         }
@@ -283,18 +286,19 @@ export class EditorFreeHighlight extends Editor {
      * @returns 更新后的 Pdfjs 注释存储对象
      */
     public async refreshPdfjsAnnotationStorage(groupId: string, groupString: string, rawAnnotationStore: IAnnotationStore) {
-        const ghostGroup = Konva.Node.create(groupString)
-        const line = this.getGroupNodesByClassName(ghostGroup, 'Line')[0] as Konva.Line
-        return {
-            annotationStorage: this.calculateLinesForStorage({
-                group: ghostGroup,
-                line,
-                annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
-                color: rawAnnotationStore.pdfjsAnnotationStorage.color,
-                thickness: rawAnnotationStore.pdfjsAnnotationStorage.thickness,
-                opacity: rawAnnotationStore.pdfjsAnnotationStorage.opacity,
-                pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex
-            })
-        }
+        return null
+        // const ghostGroup = Konva.Node.create(groupString)
+        // const line = this.getGroupNodesByClassName(ghostGroup, 'Line')[0] as Konva.Line
+        // return {
+        //     annotationStorage: this.calculateLinesForStorage({
+        //         group: ghostGroup,
+        //         line,
+        //         annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
+        //         color: rawAnnotationStore.pdfjsAnnotationStorage.color,
+        //         thickness: rawAnnotationStore.pdfjsAnnotationStorage.thickness,
+        //         opacity: rawAnnotationStore.pdfjsAnnotationStorage.opacity,
+        //         pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex
+        //     })
+        // }
     }
 }
