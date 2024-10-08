@@ -1,4 +1,4 @@
-import { FreeTextAnnotation } from 'pdfjs'
+import { Annotation, FreeTextAnnotation } from 'pdfjs'
 import { Decoder, IDecoderOptions } from './decoder'
 import Konva from 'konva'
 import { SHAPE_GROUP_NAME } from '../const'
@@ -10,9 +10,10 @@ export class FreeTextDecoder extends Decoder {
         super(options)
     }
 
-    public decodePdfAnnotation(annotation: FreeTextAnnotation): IAnnotationStore {
+    public decodePdfAnnotation(annotation: FreeTextAnnotation, allAnnotations: Annotation[]): IAnnotationStore {
         const color = convertToRGB(annotation.defaultAppearanceData.fontColor);
         const fontSize = annotation.defaultAppearanceData.fontSize;
+        const textStr = annotation.contentsObj.str
         const { x, y, width, height } = this.convertRect(
             annotation.rect,
             annotation.pageViewer.viewport.scale,
@@ -28,7 +29,7 @@ export class FreeTextDecoder extends Decoder {
         const text = new Konva.Text({
             x,
             y: y + 2,
-            text: annotation.contentsObj.str,
+            text: textStr,
             // width,
             fontSize,
             fill: color,
@@ -42,14 +43,16 @@ export class FreeTextDecoder extends Decoder {
             konvaString: ghostGroup.toJSON(),
             title: annotation.titleObj.str,
             type: AnnotationType.FREETEXT,
-            color: '123', // 这里的 color 应该使用上面的 color 变量
+            color,
             fontSize,
             pdfjsType: annotation.annotationType,
             pdfjsAnnotation: annotation,
             pdfjsEditorType: PdfjsAnnotationEditorType.INK,
             date: annotation.modificationDate,
-            contentsObj: null,
-            comments: [],
+            contentsObj: {
+                text: textStr
+            },
+            comments: this.getComments(annotation, allAnnotations),
             readonly: false
         };
     

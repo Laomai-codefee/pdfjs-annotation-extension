@@ -1,4 +1,4 @@
-import { LineAnnotation } from 'pdfjs'
+import { Annotation, LineAnnotation } from 'pdfjs'
 import { Decoder } from './decoder'
 import Konva from 'konva'
 import { SHAPE_GROUP_NAME } from '../const'
@@ -10,7 +10,7 @@ export class LineDecoder extends Decoder {
         super(options)
     }
 
-    public decodePdfAnnotation(annotation: LineAnnotation) {
+    public decodePdfAnnotation(annotation: LineAnnotation, allAnnotations: Annotation[]) {
         const color = convertToRGB(annotation.color)
         const width = annotation.borderStyle.width === 1 ? annotation.borderStyle.width + 1 : annotation.borderStyle.width
         const ghostGroup = new Konva.Group({
@@ -48,8 +48,10 @@ export class LineDecoder extends Decoder {
             pdfjsAnnotation: annotation,
             pdfjsEditorType: PdfjsAnnotationEditorType.INK,
             date: annotation.modificationDate,
-            contentsObj: null,
-            comments: [],
+            contentsObj: {
+                text: annotation.contentsObj.str
+            },
+            comments: this.getComments(annotation, allAnnotations),
             readonly: false
         }
 

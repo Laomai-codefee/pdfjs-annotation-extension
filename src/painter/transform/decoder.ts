@@ -1,5 +1,5 @@
 import { Annotation, PDFViewerApplication, QuadPoint } from 'pdfjs'
-import { IAnnotationStore } from '../../const/definitions'
+import { IAnnotationComment, IAnnotationStore, PdfjsAnnotationType } from '../../const/definitions'
 
 export interface IDecoderOptions {
     pdfViewerApplication: PDFViewerApplication
@@ -69,7 +69,22 @@ export abstract class Decoder {
         
         return { x, y, x1, y1 };
     }
+
+    protected getComments(annotation: Annotation, allAnnotations: Annotation[]) : IAnnotationComment[]{
+        const reply: IAnnotationComment[] = []
+        allAnnotations.forEach((_item) => {
+            if(_item.annotationType === PdfjsAnnotationType.TEXT && _item.inReplyTo  === annotation.id) {
+                reply.push({
+                    id: _item.id,
+                    title: _item.titleObj.str,
+                    date: _item.modificationDate,
+                    content: _item.contentsObj.str
+                })
+            }
+        })
+        return reply
+    }
     
 
-    public abstract decodePdfAnnotation(annotation: Annotation): IAnnotationStore
+    public abstract decodePdfAnnotation(annotation: Annotation, allAnnotations: Annotation[]): IAnnotationStore
 }

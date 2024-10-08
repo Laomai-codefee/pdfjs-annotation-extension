@@ -267,6 +267,7 @@ export interface IAnnotationStyle {
 // 批注的内容接口
 // 用于描述批注的文本或图像内容
 export interface IAnnotationComment {
+    id: string;
     title: string; // 批注标题
     date: string; // 批注日期
     content: string; // 批注内容

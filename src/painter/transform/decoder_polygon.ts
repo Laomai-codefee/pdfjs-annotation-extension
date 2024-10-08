@@ -1,4 +1,4 @@
-import { PolygonAnnotation, Vertices } from 'pdfjs'
+import { Annotation, PolygonAnnotation, Vertices } from 'pdfjs'
 import { Decoder } from './decoder'
 import Konva from 'konva'
 import { SHAPE_GROUP_NAME } from '../const'
@@ -10,7 +10,7 @@ export class PolygonDecoder extends Decoder {
         super(options)
     }
 
-    public decodePdfAnnotation(annotation: PolygonAnnotation) {
+    public decodePdfAnnotation(annotation: PolygonAnnotation,  allAnnotations: Annotation[]) {
         const color = convertToRGB(annotation.color)
         const width = annotation.borderStyle.width === 1 ? annotation.borderStyle.width + 1 : annotation.borderStyle.width
         const ghostGroup = new Konva.Group({
@@ -52,8 +52,10 @@ export class PolygonDecoder extends Decoder {
             pdfjsAnnotation: annotation,
             pdfjsEditorType: PdfjsAnnotationEditorType.INK,
             date: annotation.modificationDate,
-            contentsObj: null,
-            comments: [],
+            contentsObj: {
+                text: annotation.contentsObj.str
+            },
+            comments: this.getComments(annotation, allAnnotations),
             readonly: false
         }
 

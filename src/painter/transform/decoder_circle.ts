@@ -1,16 +1,16 @@
 import { Annotation, CircleAnnotation } from 'pdfjs'
-import { Decoder, IDecoderOptions } from './decoder'
+import { Decoder } from './decoder'
 import Konva from 'konva'
 import { SHAPE_GROUP_NAME } from '../const'
 import { convertToRGB } from '../../utils/utils'
-import { AnnotationType, IAnnotationStore, PdfjsAnnotationEditorType, PdfjsAnnotationType } from '../../const/definitions'
+import { AnnotationType, IAnnotationStore, PdfjsAnnotationEditorType } from '../../const/definitions'
 
 export class CircleDecoder extends Decoder {
     constructor(options) {
         super(options)
     }
 
-    public decodePdfAnnotation(annotation: CircleAnnotation) {        
+    public decodePdfAnnotation(annotation: CircleAnnotation, allAnnotations: Annotation[]) {        
         const color = convertToRGB(annotation.color)
         const { x, y, width, height } = this.convertRect(
             annotation.rect,
@@ -45,8 +45,10 @@ export class CircleDecoder extends Decoder {
             pdfjsAnnotation: annotation,
             pdfjsEditorType: PdfjsAnnotationEditorType.INK,
             date: annotation.modificationDate,
-            contentsObj: null,
-            comments: [],
+            contentsObj: {
+                text: annotation.contentsObj.str
+            },
+            comments: this.getComments(annotation, allAnnotations),
             readonly: false
         }
 

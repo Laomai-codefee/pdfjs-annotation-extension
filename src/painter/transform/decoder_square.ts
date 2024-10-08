@@ -1,4 +1,4 @@
-import { SquareAnnotation } from 'pdfjs'
+import { Annotation, SquareAnnotation } from 'pdfjs'
 import { Decoder } from './decoder'
 import Konva from 'konva'
 import { SHAPE_GROUP_NAME } from '../const'
@@ -10,7 +10,7 @@ export class SquareDecoder extends Decoder {
         super(options)
     }
 
-    public decodePdfAnnotation(annotation: SquareAnnotation) {
+    public decodePdfAnnotation(annotation: SquareAnnotation, allAnnotations: Annotation[]) {
         const color = convertToRGB(annotation.color)
         const { x, y, width, height } = this.convertRect(
             annotation.rect,
@@ -46,8 +46,10 @@ export class SquareDecoder extends Decoder {
             pdfjsAnnotation: annotation,
             pdfjsEditorType: PdfjsAnnotationEditorType.INK,
             date: annotation.modificationDate,
-            contentsObj: null,
-            comments: [],
+            contentsObj: {
+                text: annotation.contentsObj.str
+            },
+            comments: this.getComments(annotation, allAnnotations),
             readonly: false
         }
 

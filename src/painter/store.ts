@@ -42,6 +42,8 @@ export class Store {
         //     time: Date.now()
         // }
 
+        console.log(store)
+
         this.annotationStore.set(store.id, store)
 
         // const storage = this.pdfViewerApplication.pdfDocument.annotationStorage

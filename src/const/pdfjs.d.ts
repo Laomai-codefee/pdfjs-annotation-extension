@@ -96,6 +96,7 @@ declare module 'pdfjs' {
         popupRef: string | null
         annotationType: AnnotationType
         pageNumber: number
+        inReplyTo?: string
         pageViewer: PDFPageView
     }
     

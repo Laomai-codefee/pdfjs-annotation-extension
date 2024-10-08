@@ -1,4 +1,4 @@
-import { InkAnnotation } from 'pdfjs'
+import { Annotation, InkAnnotation } from 'pdfjs'
 import { Decoder } from './decoder'
 import Konva from 'konva'
 import { SHAPE_GROUP_NAME } from '../const'
@@ -10,7 +10,7 @@ export class InkDecoder extends Decoder {
         super(options)
     }
 
-    public decodePdfAnnotation(annotation: InkAnnotation) {
+    public decodePdfAnnotation(annotation: InkAnnotation, allAnnotations: Annotation[]) {
         const color = convertToRGB(annotation.color)
         const ghostGroup = new Konva.Group({
             draggable: false,
@@ -55,8 +55,10 @@ export class InkDecoder extends Decoder {
             pdfjsAnnotation: annotation,
             pdfjsEditorType: PdfjsAnnotationEditorType.INK,
             date: annotation.modificationDate,
-            contentsObj: null,
-            comments: [],
+            contentsObj: {
+                text: annotation.contentsObj.str
+            },
+            comments: this.getComments(annotation, allAnnotations),
             readonly: false
         }
         ghostGroup.destroy()

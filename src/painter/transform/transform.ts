@@ -39,7 +39,7 @@ export class Transform {
         return nestedAnnotations.flat()
     }
 
-    private decodeAnnotation(annotation: Annotation): IAnnotationStore | null {
+    private decodeAnnotation(annotation: Annotation, allAnnotations: Annotation[]): IAnnotationStore | null {
         const decoderMap: { [key: string]: new (options: any) => Decoder } = {
             [PdfjsAnnotationType.CIRCLE]: CircleDecoder,
             [PdfjsAnnotationType.FREETEXT]: FreeTextDecoder,
@@ -58,18 +58,17 @@ export class Transform {
                 pdfViewerApplication: this.pdfViewerApplication,
                 id: annotation.id
             });
-            return decoder.decodePdfAnnotation(annotation);
+            return decoder.decodePdfAnnotation(annotation, allAnnotations);
         }
         return null; // 不支持的类型返回 null
     }
-    
 
     public async decodePdfAnnotation(): Promise<Map<string, IAnnotationStore>> {
         const allAnnotations = await this.getAnnotations()
         console.log(allAnnotations)
         const annotationStoreMap = new Map<string, IAnnotationStore>()
         allAnnotations.forEach(annotation => {
-            const decodedAnnotation = this.decodeAnnotation(annotation)
+            const decodedAnnotation = this.decodeAnnotation(annotation, allAnnotations)
             if (decodedAnnotation) {
                 annotationStoreMap.set(annotation.id, decodedAnnotation)
             }

@@ -1,4 +1,4 @@
-import { HighlightAnnotation, QuadPoint, StrikeOutAnnotation, UnderlineAnnotation } from 'pdfjs'
+import { Annotation, HighlightAnnotation, QuadPoint, StrikeOutAnnotation, UnderlineAnnotation } from 'pdfjs'
 import { Decoder } from './decoder'
 import Konva from 'konva'
 import { SHAPE_GROUP_NAME } from '../const'
@@ -69,7 +69,7 @@ export class HighlightDecoder extends Decoder {
         })
     }
 
-    public decodePdfAnnotation(annotation: HighlightAnnotation | StrikeOutAnnotation | UnderlineAnnotation) {
+    public decodePdfAnnotation(annotation: HighlightAnnotation | StrikeOutAnnotation | UnderlineAnnotation, allAnnotations: Annotation[]) {
         const color = convertToRGB(annotation.color);
 
         const typeMap: { [key: string]: AnnotationType } = {
@@ -119,8 +119,10 @@ export class HighlightDecoder extends Decoder {
             pdfjsAnnotation: annotation,
             pdfjsEditorType: PdfjsAnnotationEditorType.INK,
             date: annotation.modificationDate,
-            contentsObj: null,
-            comments: [],
+            contentsObj: {
+                text: annotation.contentsObj.str
+            },
+            comments: this.getComments(annotation, allAnnotations),
             readonly: true,
         };
     
