@@ -49,7 +49,7 @@ export class InkDecoder extends Decoder {
             pageRanges: null,
             konvaString: ghostGroup.toJSON(),
             title: annotation.titleObj.str,
-            type: AnnotationType.RECTANGLE,
+            type: AnnotationType.FREEHAND,
             color,
             pdfjsType: annotation.annotationType,
             pdfjsAnnotation: annotation,
@@ -59,7 +59,6 @@ export class InkDecoder extends Decoder {
             comments: [],
             readonly: false
         }
-
         ghostGroup.destroy()
         return annotationStore
     }

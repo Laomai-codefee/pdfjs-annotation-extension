@@ -7,6 +7,8 @@ import { HighlightDecoder } from './decoder_highlight'
 import { SquareDecoder } from './decoder_square'
 import { InkDecoder } from './decoder_ink'
 import { LineDecoder } from './decoder_line'
+import { PolygonDecoder } from './decoder_polygon'
+import { PolylineDecoder } from './decoder_polyline'
 
 export class Transform {
     private pdfViewerApplication: PDFViewerApplication
@@ -47,6 +49,8 @@ export class Transform {
             [PdfjsAnnotationType.SQUARE]: SquareDecoder,
             [PdfjsAnnotationType.INK]: InkDecoder,
             [PdfjsAnnotationType.LINE]: LineDecoder,
+            [PdfjsAnnotationType.POLYGON]: PolygonDecoder,
+            [PdfjsAnnotationType.POLYLINE]: PolylineDecoder,
         };
         const DecoderClass = decoderMap[annotation.annotationType];
         if (DecoderClass) {

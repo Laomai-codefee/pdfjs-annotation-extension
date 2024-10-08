@@ -1,16 +1,16 @@
-import { LineAnnotation } from 'pdfjs'
+import { PolygonAnnotation, Vertices } from 'pdfjs'
 import { Decoder } from './decoder'
 import Konva from 'konva'
 import { SHAPE_GROUP_NAME } from '../const'
 import { convertToRGB } from '../../utils/utils'
 import { AnnotationType, IAnnotationStore, PdfjsAnnotationEditorType } from '../../const/definitions'
 
-export class LineDecoder extends Decoder {
+export class PolygonDecoder extends Decoder {
     constructor(options) {
         super(options)
     }
 
-    public decodePdfAnnotation(annotation: LineAnnotation) {
+    public decodePdfAnnotation(annotation: PolygonAnnotation) {
         const color = convertToRGB(annotation.color)
         const width = annotation.borderStyle.width === 1 ? annotation.borderStyle.width + 1 : annotation.borderStyle.width
         const ghostGroup = new Konva.Group({
@@ -18,23 +18,27 @@ export class LineDecoder extends Decoder {
             name: SHAPE_GROUP_NAME,
             id: annotation.id
         })
-        const createLine = (points: number[], lineEndings: [string, string]) => {     
+        const createLine = (vertices: Vertices[]) => {
+            const points: number[] = []
+            vertices?.forEach(point => {
+                const { x, y } = this.convertPoint(point, annotation.pageViewer.viewport.scale, annotation.pageViewer.viewport.height)
+                points.push(x)
+                points.push(y)
+                
+            })
             return new Konva.Line({
                 strokeScaleEnabled: false,
                 stroke: color,
                 strokeWidth: width,
+                lineCap: 'round',
+                lineJoin: 'round',
                 hitStrokeWidth: 20,
-                dash: annotation.borderStyle.style === 2 ? annotation.borderStyle.dashArray : [],
+                closed: true,
                 globalCompositeOperation: 'source-over',
                 points
             })
         }
-        const { x, y, x1, y1 } = this.convertCoordinates(
-            annotation.lineCoordinates,
-            annotation.pageViewer.viewport.scale,
-            annotation.pageViewer.viewport.height
-        )
-        const line = createLine([x, y, x1, y1], annotation.lineEndings)
+        const line = createLine(annotation.vertices)
         ghostGroup.add(line)
         const annotationStore: IAnnotationStore = {
             id: annotation.id,
