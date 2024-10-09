@@ -1,9 +1,9 @@
 import { Annotation, FreeTextAnnotation } from 'pdfjs'
-import { Decoder, IDecoderOptions } from './decoder'
+import { Decoder } from './decoder'
 import Konva from 'konva'
 import { SHAPE_GROUP_NAME } from '../const'
 import { convertToRGB } from '../../utils/utils'
-import { AnnotationType, IAnnotationStore, PdfjsAnnotationEditorType, PdfjsAnnotationType } from '../../const/definitions'
+import { AnnotationType, IAnnotationStore, PdfjsAnnotationEditorType } from '../../const/definitions'
 
 export class FreeTextDecoder extends Decoder {
     constructor(options) {
@@ -46,8 +46,8 @@ export class FreeTextDecoder extends Decoder {
             color,
             fontSize,
             pdfjsType: annotation.annotationType,
-            pdfjsAnnotation: annotation,
             pdfjsEditorType: PdfjsAnnotationEditorType.INK,
+            subtype: annotation.subtype,
             date: annotation.modificationDate,
             contentsObj: {
                 text: textStr

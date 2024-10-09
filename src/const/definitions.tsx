@@ -135,6 +135,26 @@ export interface IPdfjsAnnotationStorage {
     user?: string
 }
 
+export type PdfjsAnnotationSubtype =
+    | 'Link'
+    | 'Text'
+    | 'Widget'
+    | 'Popup'
+    | 'FreeText'
+    | 'Line'
+    | 'Square'
+    | 'Circle'
+    | 'PolyLine'
+    | 'Polygon'
+    | 'Caret'
+    | 'Ink'
+    | 'Highlight'
+    | 'Underline'
+    | 'Squiggly'
+    | 'StrikeOut'
+    | 'Stamp'
+    | 'FileAttachment'
+
 // PDF.js 批注类型
 export enum PdfjsAnnotationType {
     NONE = 0,
@@ -249,6 +269,7 @@ export interface IAnnotationType {
     type: AnnotationType // 自定义的批注类型
     pdfjsEditorType: PdfjsAnnotationEditorType // 对应的 Pdfjs 批注类型
     pdfjsAnnotationType: PdfjsAnnotationType
+    subtype?: PdfjsAnnotationSubtype
     isOnce: boolean // 是否只绘制一次
     readonly: boolean // 绘制的图形是否可以调整修改
     icon?: React.JSX.Element // 可选的图标，用于表示批注类型
@@ -288,9 +309,9 @@ export interface IAnnotationStore {
     title: string; // 批注标题
     type: AnnotationType; // 批注类型
     color?: string | null; // 可选颜色，可以是 undefined 或 null
-    fontSize?: number | null
+    subtype: PdfjsAnnotationSubtype;
+    fontSize?: number | null;
     pdfjsType: PdfjsAnnotationType; // PDF.js 批注类型
-    pdfjsAnnotation?: Annotation | null; // 可选的 PDF.js 批注对象
     pdfjsEditorType: PdfjsAnnotationEditorType; // PDF.js 编辑器类型
     date: string; // 创建或修改日期
     contentsObj?: IAnnotationContentsObj | null; // 可选的内容对象
@@ -315,6 +336,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         type: AnnotationType.HIGHLIGHT,
         pdfjsEditorType: PdfjsAnnotationEditorType.HIGHLIGHT,
         pdfjsAnnotationType: PdfjsAnnotationType.HIGHLIGHT,
+        subtype: 'Highlight',
         isOnce: false,
         readonly: true,
         icon: <HighlightIcon />,
@@ -328,6 +350,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         type: AnnotationType.STRIKEOUT,
         pdfjsEditorType: PdfjsAnnotationEditorType.HIGHLIGHT,
         pdfjsAnnotationType: PdfjsAnnotationType.STRIKEOUT,
+        subtype: 'StrikeOut',
         isOnce: false,
         readonly: true,
         icon: <StrikeoutIcon />,
@@ -341,6 +364,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         type: AnnotationType.UNDERLINE,
         pdfjsEditorType: PdfjsAnnotationEditorType.HIGHLIGHT,
         pdfjsAnnotationType: PdfjsAnnotationType.UNDERLINE,
+        subtype: 'Underline',
         isOnce: false,
         readonly: true,
         icon: <UnderlineIcon />,
@@ -354,6 +378,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         type: AnnotationType.RECTANGLE,
         pdfjsEditorType: PdfjsAnnotationEditorType.INK,
         pdfjsAnnotationType: PdfjsAnnotationType.SQUARE,
+        subtype: 'Square',
         isOnce: false,
         readonly: false,
         icon: <RectangleIcon />,
@@ -368,6 +393,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         type: AnnotationType.CIRCLE,
         pdfjsEditorType: PdfjsAnnotationEditorType.INK,
         pdfjsAnnotationType: PdfjsAnnotationType.CIRCLE,
+        subtype: 'Circle',
         isOnce: false,
         readonly: false,
         icon: <CircleIcon />,
@@ -382,6 +408,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         type: AnnotationType.FREEHAND,
         pdfjsEditorType: PdfjsAnnotationEditorType.INK,
         pdfjsAnnotationType: PdfjsAnnotationType.INK,
+        subtype: 'Ink',
         isOnce: false,
         readonly: false,
         icon: <FreehandIcon />,
@@ -396,6 +423,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         type: AnnotationType.FREE_HIGHLIGHT,
         pdfjsEditorType: PdfjsAnnotationEditorType.INK,
         pdfjsAnnotationType: PdfjsAnnotationType.SQUARE,
+        subtype: 'Ink',
         isOnce: false,
         readonly: false,
         icon: <FreeHighlightIcon />,
@@ -410,6 +438,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         type: AnnotationType.FREETEXT,
         pdfjsEditorType: PdfjsAnnotationEditorType.STAMP,
         pdfjsAnnotationType: PdfjsAnnotationType.FREETEXT,
+        subtype: 'FreeText',
         isOnce: true,
         readonly: false,
         icon: <FreetextIcon />,
@@ -424,6 +453,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         type: AnnotationType.SIGNATURE,
         pdfjsEditorType: PdfjsAnnotationEditorType.STAMP,
         pdfjsAnnotationType: PdfjsAnnotationType.STAMP,
+        subtype: 'Stamp',
         isOnce: true,
         readonly: false,
         icon: <SignatureIcon />,
@@ -437,6 +467,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         type: AnnotationType.STAMP,
         pdfjsEditorType: PdfjsAnnotationEditorType.STAMP,
         pdfjsAnnotationType: PdfjsAnnotationType.STAMP,
+        subtype: 'Stamp',
         isOnce: true,
         readonly: false,
         icon: <StampIcon />

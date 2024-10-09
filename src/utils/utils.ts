@@ -206,6 +206,52 @@ function convertToRGB(array, index = 0) {
     return `rgb(${r}, ${g}, ${b})`;
 }
 
+function formatTimestamp(timestamp) {
+    const date = new Date(timestamp);
+
+    // 获取各个部分
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    // 偏移时区，例如 +08'00'
+    const timezoneOffset = -date.getTimezoneOffset();
+    const timezoneHours = String(Math.floor(Math.abs(timezoneOffset) / 60)).padStart(2, '0');
+    const timezoneMinutes = String(Math.abs(timezoneOffset) % 60).padStart(2, '0');
+    const timezoneSign = timezoneOffset >= 0 ? '+' : '-';
+
+    // 拼接最终结果
+    return `D:${year}${month}${day}${hours}${minutes}${seconds}${timezoneSign}${timezoneHours}'${timezoneMinutes}'`;
+}
+
+function formatPDFDate(dateString) {
+    // 提取日期部分 D:YYYYMMDDHHMMSS+TZD 中的 YYYYMMDDHHMMSS
+    const datePart = dateString.slice(2, 16);
+
+    // 使用正则表达式解析日期部分
+    const year = datePart.slice(0, 4);
+    const month = datePart.slice(4, 6);
+    const day = datePart.slice(6, 8);
+    const hour = datePart.slice(8, 10);
+    const minute = datePart.slice(10, 12);
+
+    // 获取当前年份
+    const currentYear = new Date().getFullYear().toString();
+
+    // 如果是当前年，则不输出年
+    if (year === currentYear) {
+        return `${month}/${day} ${hour}:${minute}`;
+    } else {
+        return `${year}/${month}/${day} ${hour}:${minute}`;
+    }
+}
+
+
+
+
 export {
     base64ToImageBitmap,
     formatFileSize,
@@ -217,5 +263,7 @@ export {
     removeCssCustomProperty,
     resizeImage,
     setCssCustomProperty,
-    convertToRGB
+    convertToRGB,
+    formatTimestamp,
+    formatPDFDate
 }

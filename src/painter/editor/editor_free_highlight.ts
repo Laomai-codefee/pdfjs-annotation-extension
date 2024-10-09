@@ -96,7 +96,10 @@ export class EditorFreeHighlight extends Editor {
             this.setShapeGroupDone(
                 {
                     id: group.id(),
-                    color: this.currentAnnotation.style.color
+                    color: this.currentAnnotation.style.color,
+                    contentsObj: {
+                        text: ''
+                    }
                 }
                 // this.calculateLinesForStorage({
                 //     line: this.line,

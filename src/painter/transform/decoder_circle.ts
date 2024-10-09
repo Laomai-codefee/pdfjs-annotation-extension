@@ -42,8 +42,8 @@ export class CircleDecoder extends Decoder {
             type: AnnotationType.CIRCLE,
             color,
             pdfjsType: annotation.annotationType,
-            pdfjsAnnotation: annotation,
             pdfjsEditorType: PdfjsAnnotationEditorType.INK,
+            subtype: annotation.subtype,
             date: annotation.modificationDate,
             contentsObj: {
                 text: annotation.contentsObj.str

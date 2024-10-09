@@ -31,7 +31,7 @@ export class SquareDecoder extends Decoder {
             stroke: color,
             strokeWidth: annotation.borderStyle.width,
             fill: annotation.borderStyle.width === 0 ? color : null,
-            opacity: annotation.borderStyle.width === 0 ? 0.3 : 1
+            opacity: annotation.borderStyle.width === 0 ? 0.5 : 1
         })
         ghostGroup.add(rect)
         const annotationStore: IAnnotationStore = {
@@ -43,8 +43,8 @@ export class SquareDecoder extends Decoder {
             type: AnnotationType.RECTANGLE,
             color,
             pdfjsType: annotation.annotationType,
-            pdfjsAnnotation: annotation,
             pdfjsEditorType: PdfjsAnnotationEditorType.INK,
+            subtype: annotation.subtype,
             date: annotation.modificationDate,
             contentsObj: {
                 text: annotation.contentsObj.str

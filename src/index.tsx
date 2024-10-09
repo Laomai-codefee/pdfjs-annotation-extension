@@ -8,27 +8,34 @@ import { CustomPopbar, CustomPopbarRef } from './components/popbar'
 import { CustomToolbar, CustomToolbarRef } from './components/toolbar'
 import { annotationDefinitions, DefaultSettings } from './const/definitions'
 import { Painter } from './painter'
+import { CustomComment, CustomCommentRef } from './components/comment'
 
 class PdfjsAnnotationExtension {
     PDFJS_PDFViewerApplication: PDFViewerApplication // PDF.js 的 PDFViewerApplication 对象
     PDFJS_EventBus: EventBus // PDF.js 的 EventBus 对象
+    $PDFJS_mainContainer: HTMLDivElement
     $PDFJS_sidebarContainer: HTMLDivElement // PDF.js 侧边栏容器
     $PDFJS_toolbar_container: HTMLDivElement // PDF.js 工具栏容器
     $PDFJS_viewerContainer: HTMLDivElement // PDF.js 页面视图容器
     customToolbarRef: React.RefObject<CustomToolbarRef> // 自定义工具栏的引用
     customPopbarRef: React.RefObject<CustomPopbarRef>
+    customCommentRef: React.RefObject<CustomCommentRef>
     painter: Painter // 画笔实例
 
     constructor() {
+
         // 初始化 PDF.js 对象和相关属性
         this.PDFJS_PDFViewerApplication = (window as any).PDFViewerApplication
         this.PDFJS_EventBus = this.PDFJS_PDFViewerApplication.eventBus
+        console.log(this.PDFJS_PDFViewerApplication.appConfig)
         this.$PDFJS_sidebarContainer = this.PDFJS_PDFViewerApplication.appConfig.sidebar.sidebarContainer
         this.$PDFJS_toolbar_container = this.PDFJS_PDFViewerApplication.appConfig.toolbar.container
         this.$PDFJS_viewerContainer = this.PDFJS_PDFViewerApplication.appConfig.viewerContainer
+        this.$PDFJS_mainContainer = this.PDFJS_PDFViewerApplication.appConfig.mainContainer
         // 使用 createRef 方法创建 React 引用
         this.customToolbarRef = createRef<CustomToolbarRef>()
         this.customPopbarRef = createRef<CustomPopbarRef>()
+        this.customCommentRef = createRef<CustomCommentRef>()
         // 加载多语言
         initializeI18n(this.PDFJS_PDFViewerApplication.l10n.getLanguage())
 
@@ -41,6 +48,10 @@ class PdfjsAnnotationExtension {
             },
             onWebSelectionSelected: range => {
                 this.customPopbarRef.current.open(range)
+            },
+            onStoreChange: annotationStore => {
+                this.customCommentRef.current.addAnnotation(annotationStore)
+                console.log(annotationStore)
             }
         })
         // 初始化操作
@@ -55,6 +66,7 @@ class PdfjsAnnotationExtension {
         this.bindPdfjsEvents()
         this.renderToolbar()
         this.renderPopBar()
+        this.renderComment()
     }
 
     /**
@@ -97,6 +109,23 @@ class PdfjsAnnotationExtension {
                 ref={this.customPopbarRef}
                 onChange={(currentAnnotation, range) => {
                     this.painter.highlight(range, currentAnnotation)
+                }}
+            />
+        )
+    }
+
+    /**
+     * @description 渲染自定义留言条
+     */
+    private renderComment(): void {
+        const comment = document.createElement('div')
+        console.log(this.$PDFJS_mainContainer)
+        this.$PDFJS_mainContainer.insertAdjacentElement('afterend', comment)
+        createRoot(comment).render(
+            <CustomComment
+                ref={this.customCommentRef}
+                onChange={() => {
+                    console.log(123123)
                 }}
             />
         )

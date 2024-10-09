@@ -10,25 +10,10 @@ module.exports = merge(webpackConfiguration, {
   /* Manage source maps generation process */
   devtool: 'eval-source-map',
 
-  /* Development Server Configuration */
-  devServer: {
-    static: {
-      directory: environment.paths.output,
-      publicPath: '/',
-      watch: true,
-    },
-    client: {
-      overlay: true,
-    },
-    open: true,
-    compress: true,
-    hot: false,
-  },
-
   /* File watcher options */
   watchOptions: {
-    aggregateTimeout: 300,
-    poll: 300,
+    aggregateTimeout: 100,
+    poll: 100,
     ignored: /node_modules/,
   },
 

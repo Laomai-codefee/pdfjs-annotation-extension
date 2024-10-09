@@ -587,7 +587,7 @@ const defaultOptions = {
     kind: OptionKind.VIEWER + OptionKind.PREFERENCE
   },
   annotationMode: {
-    value: 2,
+    value: 0,
     kind: OptionKind.VIEWER + OptionKind.PREFERENCE
   },
   cursorToolOnLoad: {
@@ -1401,7 +1401,7 @@ class BasePreferences {
   });
   #defaults = Object.freeze({
     annotationEditorMode: 0,
-    annotationMode: 2,
+    annotationMode: 0,
     cursorToolOnLoad: 0,
     defaultZoomDelay: 400,
     defaultZoomValue: "",

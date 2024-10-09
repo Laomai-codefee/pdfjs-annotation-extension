@@ -3,7 +3,7 @@ import { KonvaEventObject } from 'konva/lib/Node'
 import { PDFViewerApplication } from 'pdfjs'
 
 import { AnnotationType, IAnnotationContentsObj, IAnnotationStore, IAnnotationType, IPdfjsAnnotationStorage } from '../../const/definitions'
-import { generateUUID } from '../../utils/utils'
+import { formatTimestamp, generateUUID } from '../../utils/utils'
 import { SHAPE_GROUP_NAME } from '../const'
 
 /**
@@ -31,7 +31,7 @@ export interface IShapeGroup {
     konvaGroup: Konva.Group // Konva.Group 对象
     isDone: boolean // 标识形状组是否已完成
     pageNumber: number // 所属页面的页码
-    annotation: IAnnotationType // 关联的注解对象
+    annotation?: IAnnotationType // 关联的注解对象
 }
 
 /**
@@ -95,9 +95,10 @@ export abstract class Editor {
             type: annotation.type,
             pdfjsType: annotation.pdfjsAnnotationType,
             pdfjsEditorType: annotation.pdfjsEditorType,
+            subtype: annotation.subtype,
             color,
             fontSize,
-            date: '123123123123',
+            date: formatTimestamp(Date.now()),
             contentsObj,
             comments: [],
             readonly: annotation.readonly
@@ -331,7 +332,17 @@ export abstract class Editor {
      */
     public addSerializedGroupToLayer(konvaStage: Konva.Stage, konvaString: string) {
         const ghostGroup = Konva.Node.create(konvaString) // 根据序列化字符串创建 Konva.Group 对象
+        const id = ghostGroup.id()
         this.getBgLayer(konvaStage).add(ghostGroup) // 将 Konva.Group 对象添加到背景图层
+        if(this.shapeGroupStore.has(id)) return
+        const shapeGroup: IShapeGroup = {
+            // 创建形状组对象
+            id,
+            konvaGroup: ghostGroup,
+            pageNumber: this.pageNumber,
+            isDone: true
+        }
+        this.shapeGroupStore.set(id, shapeGroup) 
     }
 
     /**

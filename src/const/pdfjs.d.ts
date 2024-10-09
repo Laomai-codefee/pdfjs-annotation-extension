@@ -20,6 +20,7 @@ declare module 'pdfjs' {
         sidebar: Sidebar
         toolbar: Toolbar
         viewerContainer: HTMLDivElement
+        mainContainer: HTMLDivElement
         [key: string]: any // 其他未知属性的类型定义
     }
     interface PDFPageView {
@@ -47,6 +48,25 @@ declare module 'pdfjs' {
     interface EventBus {
         [key: string]: any // 其他未知属性的类型定义
     }
+    type Subtype =
+        | 'Link'
+        | 'Text'
+        | 'Widget'
+        | 'Popup'
+        | 'FreeText'
+        | 'Line'
+        | 'Square'
+        | 'Circle'
+        | 'PolyLine'
+        | 'Polygon'
+        | 'Caret'
+        | 'Ink'
+        | 'Highlight'
+        | 'Underline'
+        | 'Squiggly'
+        | 'StrikeOut'
+        | 'Stamp'
+        | 'FileAttachment'
     type AnnotationType =
         | 1 // TEXT
         | 2 // LINK
@@ -87,7 +107,7 @@ declare module 'pdfjs' {
         id: string
         modificationDate: string | null
         rect: [number, number, number, number]
-        subtype: string
+        subtype: Subtype
         hasOwnCanvas: boolean
         noRotate: boolean
         noHTML: boolean
@@ -99,7 +119,7 @@ declare module 'pdfjs' {
         inReplyTo?: string
         pageViewer: PDFPageView
     }
-    
+
     interface BorderStyle {
         width: number
         style: number

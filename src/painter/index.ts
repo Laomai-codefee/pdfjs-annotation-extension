@@ -42,6 +42,7 @@ export class Painter {
     private tempDataTransfer: string | null // 临时数据传输
     public readonly setDefaultMode: () => void // 设置默认模式的函数引用
     public readonly onWebSelectionSelected: (range: Range) => void
+    public readonly onStoreChange: (annotationStore:IAnnotationStore) => void
 
     /**
      * 构造函数，初始化 PDFViewerApplication, EventBus, 和 WebSelection
@@ -51,17 +52,20 @@ export class Painter {
         PDFViewerApplication,
         PDFJS_EventBus,
         setDefaultMode,
-        onWebSelectionSelected
+        onWebSelectionSelected,
+        onStoreChange
     }: {
         PDFViewerApplication: PDFViewerApplication
         PDFJS_EventBus: EventBus
         setDefaultMode: () => void
         onWebSelectionSelected: (range: Range) => void
+        onStoreChange: (annotationStore: IAnnotationStore) => void
     }) {
         this.pdfViewerApplication = PDFViewerApplication // 初始化 PDFViewerApplication
         this.pdfjsEventBus = PDFJS_EventBus // 初始化 PDF.js EventBus
         this.setDefaultMode = setDefaultMode // 设置默认模式的函数
         this.onWebSelectionSelected = onWebSelectionSelected
+        this.onStoreChange = onStoreChange
         this.store = new Store({ PDFViewerApplication }) // 初始化存储实例
         this.selector = new Selector({
             // 初始化选择器实例
@@ -71,14 +75,13 @@ export class Painter {
             },
             // eslint-disable-next-line prettier/prettier
             onChange: async (id, groupString, rawAnnotationStore) => {
+                console.log('%c [ rawAnnotationStore ]-74-「painter/index.ts」', 'font-size:13px; background:#940946; color:#d84d8a;', rawAnnotationStore)
+                console.log('%c [ id ]-74-「painter/index.ts」', 'font-size:13px; background:#af1270; color:#f356b4;', id)
                 const editor = this.findEditorForGroupId(id)
+                console.log(editor)
                 if (editor) {
-                    const { annotationStorage, batchPdfjsAnnotationStorage } = await editor.refreshPdfjsAnnotationStorage(id, groupString, rawAnnotationStore)
                     this.store.update(id, {
-                        konvaString: groupString,
-                        pdfjsAnnotationStorage: annotationStorage,
-                        // eslint-disable-line prettier/prettier
-                        ...(batchPdfjsAnnotationStorage && batchPdfjsAnnotationStorage.length > 0 && { content: { batchPdfjsAnnotationStorage } })
+                        konvaString: groupString
                     })
                 }
             },
@@ -259,8 +262,8 @@ export class Painter {
     /**
      * 保存到存储
      */
-    private saveToStore(annotationStore: IAnnotationStore) {
-        this.store.save(annotationStore)
+    private saveToStore(annotationStore: IAnnotationStore, isOriginal: boolean = false) {
+        this.onStoreChange(this.store.save(annotationStore, isOriginal))
     }
 
     /**
@@ -270,6 +273,7 @@ export class Painter {
      */
     private findEditorForGroupId(groupId: string): Editor {
         let editor: Editor = null
+        console.log('%c [ this.editorStore ]-277-「painter/index.ts」', 'font-size:13px; background:#ef9098; color:#ffd4dc;', this.editorStore)
         this.editorStore.forEach(_editor => {
             if (_editor.shapeGroupStore?.has(groupId)) {
                 editor = _editor
@@ -458,20 +462,24 @@ export class Painter {
     private reDrawAnnotation(pageNumber: number): void {
         const konvaCanvasStore = this.konvaCanvasStore.get(pageNumber) // 获取 KonvaCanvas 实例
         const annotationStores = this.store.getByPage(pageNumber) // 获取指定页码的批注存储
+        console.log('%c [ annotationStores ]-465-「painter/index.ts」', 'font-size:13px; background:#b6a8ba; color:#faecfe;', annotationStores)
         annotationStores.forEach(annotationStore => {
-            const storeEditor = this.findEditor(pageNumber, annotationStore.type) // 查找编辑器实例
-            if (storeEditor) {
-                storeEditor.addSerializedGroupToLayer(konvaCanvasStore.konvaStage, annotationStore.konvaString) // 添加序列化组到图层
-            } else {
+            let storeEditor = this.findEditor(pageNumber, annotationStore.type) // 查找编辑器实例
+
+            if (!storeEditor) {
+                // 如果编辑器不存在，启用编辑器
+                const annotationDefinition = annotationDefinitions.find(item => item.type === annotationStore.type)
                 this.enableEditor({
                     konvaStage: konvaCanvasStore.konvaStage,
                     pageNumber,
-                    annotation: annotationDefinitions.find(item => item.type === annotationStore.type)
+                    annotation: annotationDefinition
                 })
-                const storeEditor = this.findEditor(pageNumber, annotationStore.type)
-                if (storeEditor) {
-                    storeEditor.addSerializedGroupToLayer(konvaCanvasStore.konvaStage, annotationStore.konvaString)
-                }
+                storeEditor = this.findEditor(pageNumber, annotationStore.type) // 重新查找编辑器
+            }
+
+            if (storeEditor) {
+                // 添加序列化组到图层
+                storeEditor.addSerializedGroupToLayer(konvaCanvasStore.konvaStage, annotationStore.konvaString)
             }
         })
     }
@@ -556,7 +564,7 @@ export class Painter {
             return
         }
 
-        console.log(`Painting mode active type: ${annotation.type} | pdfjs annotationStorage type: ${annotation.pdfjsType}`)
+        console.log(`Painting mode active type: ${annotation.type} | pdfjs annotationStorage type: ${annotation.pdfjsEditorType}`)
         switch (annotation.type) {
             case AnnotationType.FREETEXT:
             case AnnotationType.RECTANGLE:
@@ -597,7 +605,7 @@ export class Painter {
     public async saveOriginalAnnotations() {
         const annotationMap = await this.transform.decodePdfAnnotation()
         annotationMap.forEach(annotation => {
-            this.saveToStore(annotation)
+            this.saveToStore(annotation, true)
         })
     }
 }

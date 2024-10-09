@@ -1,13 +1,15 @@
 import { PDFViewerApplication } from 'pdfjs'
 
-import { IAnnotationContent, IAnnotationStore, IPdfjsAnnotationStorage } from '../const/definitions'
-import { base64ToImageBitmap } from '../utils/utils'
-import { IShapeGroup } from './editor/editor'
+import { IAnnotationStore } from '../const/definitions'
+import { base64ToImageBitmap, formatTimestamp } from '../utils/utils'
 
 const PDFJS_INTERNAL_EDITOR_PREFIX = 'pdfjs_internal_editor_'
 
 export class Store {
+    // 所有注释
     private annotationStore: Map<string, IAnnotationStore> = new Map()
+    // 原有注释
+    private originalAnnotationStore: Map<string, IAnnotationStore> = new Map()
     private pdfViewerApplication: PDFViewerApplication
 
     constructor({ PDFViewerApplication }: { PDFViewerApplication: PDFViewerApplication }) {
@@ -24,27 +26,16 @@ export class Store {
     }
 
     /**
-     * 保存注释到本地存储和 PDF.js
-     * @param shapeGroup - 形状组对象
-     * @param pdfjsAnnotationStorage - PDF.js 注释存储对象
-     * @param annotationContent - 注释内容对象（可选）
+     * 保存注释
+     * @param store  
+     * @param isOriginal  是否是原有注释
      */
-    public save(store: IAnnotationStore) {
-        // const id = shapeGroup.id
-        // const store = {
-        //     id,
-        //     pageNumber: shapeGroup.pageNumber,
-        //     konvaString: shapeGroup.konvaGroup.toJSON(),
-        //     type: shapeGroup.annotation.type,
-        //     readonly: shapeGroup.annotation.readonly,
-        //     pdfjsAnnotationStorage,
-        //     content: annotationContent,
-        //     time: Date.now()
-        // }
-
-        console.log(store)
-
+    public save(store: IAnnotationStore, isOriginal: boolean) {
         this.annotationStore.set(store.id, store)
+        if(isOriginal) {
+            this.originalAnnotationStore.set(store.id, store)
+        }
+        return store
 
         // const storage = this.pdfViewerApplication.pdfDocument.annotationStorage
         // if (annotationContent?.batchPdfjsAnnotationStorage?.length) {
@@ -70,18 +61,19 @@ export class Store {
                 const updatedAnnotation = {
                     ...existingAnnotation,
                     ...updates,
-                    time: Date.now()
+                    date: formatTimestamp(Date.now())
+
                 }
                 this.annotationStore.set(id, updatedAnnotation)
 
-                const storage = this.pdfViewerApplication.pdfDocument.annotationStorage
-                if (updates.content?.batchPdfjsAnnotationStorage?.length) {
-                    updates.content.batchPdfjsAnnotationStorage.forEach(store => {
-                        storage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}-${store.pageIndex}`, store)
-                    })
-                } else {
-                    storage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}`, updates.pdfjsAnnotationStorage)
-                }
+                // const storage = this.pdfViewerApplication.pdfDocument.annotationStorage
+                // if (updates.content?.batchPdfjsAnnotationStorage?.length) {
+                //     updates.content.batchPdfjsAnnotationStorage.forEach(store => {
+                //         storage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}-${store.pageIndex}`, store)
+                //     })
+                // } else {
+                //     storage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}`, updates.pdfjsAnnotationStorage)
+                // }
             }
         } else {
             console.warn(`Annotation with id ${id} not found.`)

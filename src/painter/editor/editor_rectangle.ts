@@ -95,7 +95,10 @@ export class EditorRectangle extends Editor {
         this.setShapeGroupDone(
             {
                 id: group.id(),
-                color: this.currentAnnotation.style.color
+                color: this.currentAnnotation.style.color,
+                contentsObj: {
+                    text: ''
+                }
             }
             // this.calculateRectForStorage({
             //     x,
