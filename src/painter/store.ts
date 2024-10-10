@@ -65,9 +65,7 @@ export class Store {
                 }
                 this.annotationStore.set(id, updatedAnnotation)
                 console.log('%c [ this.annotationStore ]-67-「painter/store.ts」', 'font-size:13px; background:#f57a85; color:#ffbec9;', this.annotationStore)
-
-
-
+                return updatedAnnotation
                 // const storage = this.pdfViewerApplication.pdfDocument.annotationStorage
                 // if (updates.content?.batchPdfjsAnnotationStorage?.length) {
                 //     updates.content.batchPdfjsAnnotationStorage.forEach(store => {
@@ -79,6 +77,7 @@ export class Store {
             }
         } else {
             console.warn(`Annotation with id ${id} not found.`)
+            return null
         }
     }
 

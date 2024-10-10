@@ -12,6 +12,7 @@ import {
     StrikeoutIcon,
     UnderlineIcon
 } from './icon'
+import { IRect } from 'konva/lib/types'
 
 /**
  * 描述批注路径数据的接口
@@ -306,6 +307,7 @@ export interface IAnnotationStore {
     pageNumber: number; // 批注所在的页码
     pageRanges?: number[] | null; // 可选的页码范围数组
     konvaString: string; // Konva 的序列化表示
+    konvaClientRect: IRect
     title: string; // 批注标题
     type: AnnotationType; // 批注类型
     color?: string | null; // 可选颜色，可以是 undefined 或 null

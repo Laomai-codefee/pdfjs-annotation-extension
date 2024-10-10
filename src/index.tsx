@@ -48,12 +48,15 @@ class PdfjsAnnotationExtension {
             onWebSelectionSelected: range => {
                 this.customPopbarRef.current.open(range)
             },
-            onStoreChange: annotation => {
+            onStoreAdd: annotation => {
                 console.log('%c [ annotation ]-52-「src/index.tsx」', 'font-size:13px; background:#50953d; color:#94d981;', annotation)
                 this.customCommentRef.current.addAnnotation(annotation)
             },
-            onAnnotationSelected: annotation => {
-                this.customCommentRef.current.selectedAnnotation(annotation)
+            onAnnotationSelected: (annotation, isClick) => {
+                this.customCommentRef.current.selectedAnnotation(annotation, isClick)
+            },
+            onAnnotationChange: (annotation) => {
+                this.customCommentRef.current.updateAnnotation(annotation)
             }
         })
         // 初始化操作

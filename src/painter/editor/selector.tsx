@@ -5,14 +5,15 @@ import { SELECTOR_HOVER_STYLE, SHAPE_GROUP_NAME } from '../const'
 import { KonvaCanvas } from '../index'
 import { Modal } from 'antd'
 import i18n from 'i18next'
+import { IRect } from 'konva/lib/types'
 /**
  * 定义选择器的选项接口
  */
 export interface ISelectorOptions {
     konvaCanvasStore: Map<number, KonvaCanvas> // 存储各个页面的 Konva 画布实例
     getAnnotationStore: (id: string) => IAnnotationStore // 获取注解存储的方法
-    onSelected: (id: string) => void // 选中回调
-    onChange: (id: string, konvaGroupString: string, rawAnnotationStore: IAnnotationStore) => void // 注解变化时的回调
+    onSelected: (id: string, isClick: boolean) => void // 选中回调
+    onChange: (id: string, konvaGroupString: string, rawAnnotationStore: IAnnotationStore, konvaClientRect: IRect) => void // 注解变化时的回调
     onDelete: (id: string) => void // 删除注解时的回调
 }
 
@@ -20,8 +21,8 @@ export interface ISelectorOptions {
  * 定义选择器类
  */
 export class Selector {
-    public readonly onSelected: (id: string) => void
-    public readonly onChange: (id: string, konvaGroupString: string, rawAnnotationStore: IAnnotationStore) => void
+    public readonly onSelected: (id: string, isClick: boolean) => void
+    public readonly onChange: (id: string, konvaGroupString: string, rawAnnotationStore: IAnnotationStore, konvaClientRect: IRect) => void
     public readonly onDelete: (id: string) => void
     private transformerStore: Map<string, Konva.Transformer> = new Map() // 存储变换器实例
     private getAnnotationStore: (id: string) => IAnnotationStore // 获取注解存储的方法
@@ -183,12 +184,10 @@ export class Selector {
      * @param shape - 被点击的形状。
      * @param konvaStage - 形状所在的 Konva Stage。
      */
-    private handleShapeClick(shape: Konva.Shape, konvaStage: Konva.Stage, dispatchEvent: boolean = false): void {
+    private handleShapeClick(shape: Konva.Shape, konvaStage: Konva.Stage, isClick: boolean = false): void {
         const group = shape.findAncestor(`.${SHAPE_GROUP_NAME}`) as Konva.Group
         if (!group) return
-        if (dispatchEvent) {
-            this.onSelected(group.id())
-        }
+        this.onSelected(group.id(), isClick)
         this.clearTransformers() // 清除之前的变换器
         this.createTransformer(group, konvaStage)
         this.bindGlobalEvents() // 绑定全局事件
@@ -223,11 +222,11 @@ export class Selector {
         group.draggable(!rawAnnotationStore.readonly)
         transformer.off('transformend')
         transformer.on('transformend', () => {
-            this.onChange(group.id(), group.toJSON(), { ...rawAnnotationStore })
+            this.onChange(group.id(), group.toJSON(), { ...rawAnnotationStore }, Konva.Node.create(group.toJSON()).getClientRect())
         })
 
         transformer.on('dragend', () => {
-            this.onChange(group.id(), group.toJSON(), { ...rawAnnotationStore })
+            this.onChange(group.id(), group.toJSON(), { ...rawAnnotationStore }, Konva.Node.create(group.toJSON()).getClientRect())
         })
 
         transformer.nodes([group])
@@ -345,7 +344,7 @@ export class Selector {
         if (!shape) {
             return
         }
-        this.handleShapeClick(shape, konvaStage)
+        this.handleShapeClick(shape, konvaStage, false)
     }
 
     /**

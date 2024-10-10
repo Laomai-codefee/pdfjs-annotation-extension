@@ -41,6 +41,14 @@
         "example": "例如：",
         "color": "颜色",
         "download": "下载",
-        "save": "保存"
+        "save": "保存",
+        "reply": "回复",
+        "edit": "编辑",
+        "delete": "删除",
+        "confirm": "确认"
+    },
+    "comment": {
+        "total": "共 {{value}} 个注释",
+        "page": "第{{value}}页"
     }
 }

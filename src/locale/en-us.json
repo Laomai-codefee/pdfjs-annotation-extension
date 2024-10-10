@@ -41,6 +41,14 @@
         "example": "e.g. ",
         "color": "Color",
         "download": "Download",
-        "save": "Save"
+        "save": "Save",
+        "reply": "Reply",
+        "edit": "Edit",
+        "delete": "Delete",
+        "confirm": "Confirm"
+    },
+    "comment": {
+        "total": "Comment {{value}}",
+        "page": "Page {{value}}"
     }
 }

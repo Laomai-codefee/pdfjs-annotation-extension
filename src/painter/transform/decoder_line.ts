@@ -41,6 +41,7 @@ export class LineDecoder extends Decoder {
             pageNumber: annotation.pageNumber,
             pageRanges: null,
             konvaString: ghostGroup.toJSON(),
+            konvaClientRect: ghostGroup.getClientRect(),
             title: annotation.titleObj.str,
             type: AnnotationType.FREEHAND,
             color,

@@ -95,7 +95,10 @@ export class EditorFreeHand extends Editor {
                 this.setShapeGroupDone(
                     {
                         id: group.id(),
-                        color: this.currentAnnotation.style.color
+                        color: this.currentAnnotation.style.color,
+                        contentsObj: {
+                            text: ''
+                        }
                     }
                     // this.calculateLinesForStorage({
                     //     group: this.currentShapeGroup.konvaGroup,
@@ -116,7 +119,10 @@ export class EditorFreeHand extends Editor {
             this.setShapeGroupDone(
                 {
                     id: group.id(),
-                    color: this.currentAnnotation.style.color
+                    color: this.currentAnnotation.style.color,
+                    contentsObj: {
+                        text: ''
+                    }
                 }
                 // this.calculateLinesForStorage({
                 //     group: this.currentShapeGroup.konvaGroup,

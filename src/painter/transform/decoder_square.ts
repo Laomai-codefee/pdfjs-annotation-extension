@@ -34,11 +34,13 @@ export class SquareDecoder extends Decoder {
             opacity: annotation.borderStyle.width === 0 ? 0.5 : 1
         })
         ghostGroup.add(rect)
+        console.log(ghostGroup.getStage())
         const annotationStore: IAnnotationStore = {
             id: annotation.id,
             pageNumber: annotation.pageNumber,
             pageRanges: null,
             konvaString: ghostGroup.toJSON(),
+            konvaClientRect: ghostGroup.getClientRect(),
             title: annotation.titleObj.str,
             type: AnnotationType.RECTANGLE,
             color,

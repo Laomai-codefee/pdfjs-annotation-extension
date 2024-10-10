@@ -1,5 +1,5 @@
 .CustomComment {
-    width: 300px;
+    width: 330px;
     position: absolute;
     top: 107px;
     right: 0;
@@ -31,14 +31,14 @@
             }
             .title {
                 display: flex;
-                align-items: flex-start; 
-                .annotation-icon{
+                align-items: flex-start;
+                .annotation-icon {
                     margin-right: 5px;
                 }
                 .tool {
-                    margin-left: auto; 
+                    margin-left: auto;
                     display: flex;
-                    align-items: center; 
+                    align-items: center;
                     .icon {
                         margin-left: 5px;
                         border-radius: 8px;
@@ -48,8 +48,6 @@
                     }
                 }
             }
-            
-            
             .reply {
                 background-color: var(--dropdown-btn-bg-color);
                 border-radius: 5px;
@@ -58,9 +56,6 @@
                 .icon:hover {
                     background-color: var(--toggled-btn-bg-color) !important;
                 }
-            }
-            .reply-input {
-                margin-top: 8px;
             }
         }
         .selected {

@@ -42,8 +42,9 @@ export class Painter {
     private tempDataTransfer: string | null // 临时数据传输
     public readonly setDefaultMode: () => void // 设置默认模式的函数引用
     public readonly onWebSelectionSelected: (range: Range) => void
-    public readonly onStoreChange: (annotationStore: IAnnotationStore) => void
-    public readonly onAnnotationSelected: (annotationStore: IAnnotationStore) => void
+    public readonly onStoreAdd: (annotationStore: IAnnotationStore) => void
+    public readonly onAnnotationSelected: (annotationStore: IAnnotationStore, isClick: boolean) => void
+    public readonly onAnnotationChange: (annotationStore: IAnnotationStore) => void
 
     /**
      * 构造函数，初始化 PDFViewerApplication, EventBus, 和 WebSelection
@@ -54,22 +55,25 @@ export class Painter {
         PDFJS_EventBus,
         setDefaultMode,
         onWebSelectionSelected,
-        onStoreChange,
-        onAnnotationSelected
+        onStoreAdd,
+        onAnnotationSelected,
+        onAnnotationChange
     }: {
         PDFViewerApplication: PDFViewerApplication
         PDFJS_EventBus: EventBus
         setDefaultMode: () => void
         onWebSelectionSelected: (range: Range) => void
-        onStoreChange: (annotationStore: IAnnotationStore) => void
-        onAnnotationSelected: (annotationStore: IAnnotationStore) => void
+        onStoreAdd: (annotationStore: IAnnotationStore) => void
+        onAnnotationSelected: (annotationStore: IAnnotationStore, isClick: boolean) => void
+        onAnnotationChange: (annotationStore: IAnnotationStore) => void
     }) {
         this.pdfViewerApplication = PDFViewerApplication // 初始化 PDFViewerApplication
         this.pdfjsEventBus = PDFJS_EventBus // 初始化 PDF.js EventBus
         this.setDefaultMode = setDefaultMode // 设置默认模式的函数
         this.onWebSelectionSelected = onWebSelectionSelected
-        this.onStoreChange = onStoreChange
+        this.onStoreAdd = onStoreAdd
         this.onAnnotationSelected = onAnnotationSelected
+        this.onAnnotationChange = onAnnotationChange
         this.store = new Store({ PDFViewerApplication }) // 初始化存储实例
         this.selector = new Selector({
             // 初始化选择器实例
@@ -77,19 +81,21 @@ export class Painter {
             getAnnotationStore: (id: string) => {
                 return this.store.annotation(id)
             },
-            onSelected: (id) => {
-                this.onAnnotationSelected(this.store.annotation(id))
+            onSelected: (id, isClick) => {
+                this.onAnnotationSelected(this.store.annotation(id), isClick)
             },
             // eslint-disable-next-line prettier/prettier
-            onChange: async (id, groupString, rawAnnotationStore) => {
+            onChange: async (id, groupString, rawAnnotationStore, konvaClientRect) => {
+                console.log('%c [ konvaClientRect ]-89-「painter/index.ts」', 'font-size:13px; background:#bd37f5; color:#ff7bff;', konvaClientRect)
                 console.log('%c [ rawAnnotationStore ]-74-「painter/index.ts」', 'font-size:13px; background:#940946; color:#d84d8a;', rawAnnotationStore)
                 console.log('%c [ id ]-74-「painter/index.ts」', 'font-size:13px; background:#af1270; color:#f356b4;', id)
                 const editor = this.findEditorForGroupId(id)
                 console.log(editor)
                 if (editor) {
-                    this.store.update(id, {
-                        konvaString: groupString
-                    })
+                    this.onAnnotationChange(this.store.update(id, {
+                        konvaString: groupString,
+                        konvaClientRect
+                    }))
                 }
             },
             onDelete: id => {
@@ -270,7 +276,7 @@ export class Painter {
      * 保存到存储
      */
     private saveToStore(annotationStore: IAnnotationStore, isOriginal: boolean = false) {
-        this.onStoreChange(this.store.save(annotationStore, isOriginal))
+        this.onStoreAdd(this.store.save(annotationStore, isOriginal))
     }
 
     /**
@@ -609,6 +615,9 @@ export class Painter {
         this.webSelection.highlight(range)
     }
 
+    /**
+     * @description 将pdf 上原有 annotation 存入 store
+     */
     public async saveOriginalAnnotations() {
         const annotationMap = await this.transform.decodePdfAnnotation()
         annotationMap.forEach(annotation => {
@@ -627,7 +636,7 @@ export class Painter {
 
     /**
      * @description 删除 annotation
-     * @param id 
+     * @param id
      */
     public delete(id: string) {
         this.selector.delete()
@@ -636,7 +645,7 @@ export class Painter {
 
     /**
      * @description 高亮选中 annotation
-     * @param annotation 
+     * @param annotation
      */
     public async highlight(annotation: IAnnotationStore) {
         this.pdfViewerApplication.page = annotation.pageNumber
@@ -648,9 +657,9 @@ export class Painter {
             if (storeEditor) {
                 this.setDefaultMode()
                 this.selector.select(annotation.id)
-                if(this.currentAnnotation && this.currentAnnotation.type === AnnotationType.SELECT) {
+                if (this.currentAnnotation && this.currentAnnotation.type === AnnotationType.SELECT) {
                     this.selector.activate(annotation.pageNumber)
-                }                
+                }
             } else if (retries > 0) {
                 // 如果没有找到且还有重试次数，继续重试
                 setTimeout(() => {
