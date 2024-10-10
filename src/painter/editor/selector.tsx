@@ -155,7 +155,7 @@ export class Selector {
 
         shape.on('pointerclick', e => {
             if (e.evt.button === 0) {
-                this.handleShapeClick(shape, konvaStage)
+                this.handleShapeClick(shape, konvaStage, true)
             }
         })
         shape.on('mouseover', e => {
@@ -183,10 +183,12 @@ export class Selector {
      * @param shape - 被点击的形状。
      * @param konvaStage - 形状所在的 Konva Stage。
      */
-    private handleShapeClick(shape: Konva.Shape, konvaStage: Konva.Stage): void {
+    private handleShapeClick(shape: Konva.Shape, konvaStage: Konva.Stage, dispatchEvent: boolean = false): void {
         const group = shape.findAncestor(`.${SHAPE_GROUP_NAME}`) as Konva.Group
         if (!group) return
-        this.onSelected(group.id())
+        if (dispatchEvent) {
+            this.onSelected(group.id())
+        }
         this.clearTransformers() // 清除之前的变换器
         this.createTransformer(group, konvaStage)
         this.bindGlobalEvents() // 绑定全局事件

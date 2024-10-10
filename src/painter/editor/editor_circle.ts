@@ -114,7 +114,10 @@ export class EditorCircle extends Editor {
         const { x, y, radiusX, radiusY } = this.ellipse.attrs
         this.setShapeGroupDone({
             id: group.id(),
-            color: this.currentAnnotation.style.color
+            color: this.currentAnnotation.style.color,
+            contentsObj: {
+                text: ''
+            }
         }
             
             // this.calculateEllipseForStorage({

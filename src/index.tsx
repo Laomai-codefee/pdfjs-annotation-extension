@@ -49,6 +49,7 @@ class PdfjsAnnotationExtension {
                 this.customPopbarRef.current.open(range)
             },
             onStoreChange: annotation => {
+                console.log('%c [ annotation ]-52-「src/index.tsx」', 'font-size:13px; background:#50953d; color:#94d981;', annotation)
                 this.customCommentRef.current.addAnnotation(annotation)
             },
             onAnnotationSelected: annotation => {

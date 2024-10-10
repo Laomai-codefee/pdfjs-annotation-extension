@@ -1,5 +1,5 @@
 import './index.scss'
-import React, { forwardRef, useCallback, useImperativeHandle, useState } from 'react'
+import React, { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react'
 import { IAnnotationComment, IAnnotationStore, PdfjsAnnotationSubtype } from '../../const/definitions'
 import { useTranslation } from 'react-i18next'
 import { formatPDFDate, formatTimestamp, generateUUID } from '../../utils/utils'
@@ -74,6 +74,8 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
     const [editAnnotation, setEditAnnotation] = useState<IAnnotationStore | null>(null)
     const { t } = useTranslation()
 
+    const annotationRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
     useImperativeHandle(ref, () => ({
         addAnnotation,
         selectedAnnotation
@@ -84,7 +86,13 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
     }
 
     const selectedAnnotation = (annotation: IAnnotationStore) => {
+        console.log(123123)
         setCurrentAnnotation(annotation)
+        // 滚动到对应的注释
+        const element = annotationRefs.current[annotation.id];
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
     }
 
 
@@ -217,7 +225,7 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                 const commonProps = { className: isSelected ? 'comment selected' : 'comment' }
 
                 return (
-                    <div {...commonProps} key={annotation.id} onClick={() => handleAnnotationClick(annotation)}>
+                    <div {...commonProps} key={annotation.id} onClick={() => handleAnnotationClick(annotation)} ref={el => (annotationRefs.current[annotation.id] = el)} >
                         <div className='title'>
                             <AnnotationIcon subtype={annotation.subtype} />
                             {annotation.title}
