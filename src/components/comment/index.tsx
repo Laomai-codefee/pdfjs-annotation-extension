@@ -1,21 +1,66 @@
 import './index.scss'
 import React, { forwardRef, useCallback, useImperativeHandle, useState } from 'react'
-import { IAnnotationComment, IAnnotationStore } from '../../const/definitions'
+import { IAnnotationComment, IAnnotationStore, PdfjsAnnotationSubtype } from '../../const/definitions'
 import { useTranslation } from 'react-i18next'
-import { formatPDFDate } from '../../utils/utils'
+import { formatPDFDate, formatTimestamp, generateUUID } from '../../utils/utils'
 import { Button, Dropdown, Input } from 'antd'
 import {
     MoreOutlined
 } from '@ant-design/icons';
+import {
+    CircleIcon,
+    FreehandIcon,
+    FreeHighlightIcon,
+    FreetextIcon,
+    HighlightIcon,
+    RectangleIcon,
+    StampIcon,
+    StrikeoutIcon,
+    UnderlineIcon,
+    DownloadIcon
+} from '../../const/icon'
+
+const iconMapping: Record<PdfjsAnnotationSubtype, React.ReactNode> = {
+    Circle: <CircleIcon />,
+    FreeText: <FreetextIcon />,
+    Ink: <FreehandIcon />,
+    Highlight: <HighlightIcon />,
+    Underline: <UnderlineIcon />,
+    Squiggly: <FreeHighlightIcon />,
+    StrikeOut: <StrikeoutIcon />,
+    Stamp: <StampIcon />,
+    Line: <FreehandIcon />,
+    Square: <RectangleIcon />,
+    Polygon: <FreehandIcon />,
+    PolyLine: <FreehandIcon />,
+    Caret: <FreehandIcon />,
+    Link: <FreehandIcon />,
+    Text: <FreetextIcon />,
+    FileAttachment: <DownloadIcon />,
+    Popup: <FreehandIcon />,
+    Widget: <FreehandIcon />
+};
+
+const getIconBySubtype = (subtype: PdfjsAnnotationSubtype): React.ReactNode => {
+    return iconMapping[subtype] || null;
+};
+
+const AnnotationIcon: React.FC<{ subtype: PdfjsAnnotationSubtype }> = ({ subtype }) => {
+    const Icon = getIconBySubtype(subtype);
+    return Icon ? <span className="annotation-icon">{Icon}</span> : null;
+};
 
 const { TextArea } = Input
 
 interface CustomCommentProps {
-    onChange: () => void
+    onSelected: (annotation: IAnnotationStore) => void
+    onUpdate: (annotation: IAnnotationStore) => void
+    onDelete: (id: string) => void
 }
 
 export interface CustomCommentRef {
-    addAnnotation(annotationStore: IAnnotationStore): void
+    addAnnotation(annotation: IAnnotationStore): void
+    selectedAnnotation(annotation: IAnnotationStore): void
 }
 
 /**
@@ -30,12 +75,18 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
     const { t } = useTranslation()
 
     useImperativeHandle(ref, () => ({
-        addAnnotation
+        addAnnotation,
+        selectedAnnotation
     }))
 
-    const addAnnotation = (annotationStore: IAnnotationStore) => {
-        setAnnotations(prevAnnotations => [...prevAnnotations, annotationStore])
+    const addAnnotation = (annotation: IAnnotationStore) => {
+        setAnnotations(prevAnnotations => [...prevAnnotations, annotation])
     }
+
+    const selectedAnnotation = (annotation: IAnnotationStore) => {
+        setCurrentAnnotation(annotation)
+    }
+
 
     const groupedAnnotations = annotations.reduce((acc, annotation) => {
         if (!acc[annotation.pageNumber]) {
@@ -47,29 +98,95 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
 
     const handleAnnotationClick = (annotation: IAnnotationStore) => {
         setCurrentAnnotation(annotation)
+        props.onSelected(annotation)
     }
 
+    const updateComment = (annotation: IAnnotationStore, comment: string) => {
+        annotation.contentsObj.text = comment
+        props.onUpdate(annotation)
+    }
+
+    const addReply = (annotation: IAnnotationStore, comment: string) => {
+        annotation.comments.push({
+            id: generateUUID(),
+            title: 'username',
+            date: formatTimestamp(Date.now()),
+            content: comment
+        })
+        props.onUpdate(annotation)
+    }
+
+    const updateReply = (annotation: IAnnotationStore, reply: IAnnotationComment, comment: string) => {
+        reply.date = formatTimestamp(Date.now())
+        reply.content = comment
+        reply.title = 'username'
+        props.onUpdate(annotation)
+    }
+
+    const deleteAnnotation = (annotation: IAnnotationStore) => {
+        setAnnotations(prevAnnotations =>
+            prevAnnotations.filter(item => item.id !== annotation.id)
+        );
+        if (currentAnnotation?.id === annotation.id) {
+            setCurrentAnnotation(null);
+        }
+        if (replyAnnotation?.id === annotation.id) {
+            setReplyAnnotation(null);
+        }
+        setCurrentReply(null);
+        props.onDelete(annotation.id)
+    }
+
+    const deleteReply = (annotation: IAnnotationStore, reply: IAnnotationComment) => {
+        let updatedAnnotation: IAnnotationStore | null = null;
+
+        setAnnotations(prevAnnotations =>
+            prevAnnotations.map(item => {
+                if (item.id === annotation.id) {
+                    const updatedComments = item.comments.filter(comment => comment.id !== reply.id);
+                    updatedAnnotation = { ...item, comments: updatedComments };
+                    return updatedAnnotation;
+                }
+                return item;
+            })
+        );
+        if (currentReply?.id === reply.id) {
+            setCurrentReply(null);
+        }
+        if (updatedAnnotation) {
+            props.onUpdate(updatedAnnotation);
+        }
+    };
+
+
+
+
     // Comment 编辑框
-    const commentInput = useCallback((annotation: IAnnotationStore, value: string) => {
+    const commentInput = useCallback((annotation: IAnnotationStore) => {
+        let comment = ''
         if (editAnnotation && currentAnnotation?.id === annotation.id) {
             return (
                 <>
-                    <TextArea value={value} autoFocus rows={4} style={{ marginBottom: '8px' }} onBlur={() => setEditAnnotation(null)} />
-                    <Button type="primary" block>Confirm</Button>
+                    <TextArea defaultValue={annotation.contentsObj.text} autoFocus rows={4} style={{ marginBottom: '8px' }} onBlur={() => setEditAnnotation(null)} onChange={(e) => comment = e.target.value} />
+                    <Button type="primary" block onMouseDown={() => {
+                        updateComment(annotation, comment)
+                    }}>Confirm</Button>
                 </>
             )
         }
-        return value
+        return <p>{annotation.contentsObj.text}</p>
     }, [editAnnotation, currentAnnotation])
 
     // 回复框
     const replyInput = useCallback((annotation: IAnnotationStore) => {
-        console.log(replyAnnotation)
+        let comment = ''
         if (replyAnnotation && currentAnnotation?.id === annotation.id) {
             return (
                 <>
-                    <TextArea autoFocus rows={4} style={{ marginBottom: '8px' }} onBlur={() => setReplyAnnotation(null)} />
-                    <Button type="primary" block>Confirm</Button>
+                    <TextArea autoFocus rows={4} style={{ marginBottom: '8px' }} onBlur={() => setReplyAnnotation(null)} onChange={(e) => comment = e.target.value} />
+                    <Button type="primary" block onMouseDown={() => {
+                        addReply(annotation, comment)
+                    }}>Confirm</Button>
                 </>
             )
         }
@@ -78,15 +195,18 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
 
     // 编辑回复框
     const editReplyInput = useCallback((annotation: IAnnotationStore, reply: IAnnotationComment) => {
+        let comment = ''
         if (currentReply && currentReply?.id === reply.id) {
             return (
                 <>
-                    <TextArea value={currentReply.content} autoFocus rows={4} style={{ marginBottom: '8px' }} onBlur={() => setCurrentReply(null)} />
-                    <Button type="primary" block>Confirm</Button>
+                    <TextArea defaultValue={currentReply.content} autoFocus rows={4} style={{ marginBottom: '8px' }} onBlur={() => setCurrentReply(null)} onChange={(e) => comment = e.target.value} />
+                    <Button type="primary" block onMouseDown={() => {
+                        updateReply(annotation, reply, comment)
+                    }}>Confirm</Button>
                 </>
             )
         }
-        return reply.content
+        return <p>{reply.content}</p>
     }, [replyAnnotation, currentReply])
 
     const comments = Object.entries(groupedAnnotations).map(([pageNumber, annotationsForPage]) => (
@@ -99,24 +219,36 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                 return (
                     <div {...commonProps} key={annotation.id} onClick={() => handleAnnotationClick(annotation)}>
                         <div className='title'>
+                            <AnnotationIcon subtype={annotation.subtype} />
                             {annotation.title}
-                            <span>
+                            <span className='tool'>
                                 {formatPDFDate(annotation.date)}
                                 <Dropdown menu={{
                                     items: [
                                         {
                                             label: 'Reply',
                                             key: '0',
-                                            onClick: () => setReplyAnnotation(annotation)
+                                            onClick: (e) => {
+                                                e.domEvent.stopPropagation()
+                                                setReplyAnnotation(annotation)
+                                            }
                                         },
                                         {
                                             label: 'Edit',
                                             key: '1',
-                                            onClick: () => setEditAnnotation(annotation)
+                                            onClick: (e) => {
+                                                e.domEvent.stopPropagation()
+                                                setEditAnnotation(annotation)
+                                            }
+
                                         },
                                         {
                                             label: 'Delete',
                                             key: '3',
+                                            onClick: (e) => {
+                                                e.domEvent.stopPropagation()
+                                                deleteAnnotation(annotation)
+                                            }
                                         },
                                     ]
                                 }} trigger={['click']}>
@@ -126,24 +258,29 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                                 </Dropdown>
                             </span>
                         </div>
-                        {commentInput(annotation, annotation.contentsObj.text)}
+                        {commentInput(annotation)}
                         {annotation.comments?.map((reply, index) => (
                             <div className='reply' key={index}>
                                 <div className='title'>
                                     {reply.title}
-                                    <span>{formatPDFDate(reply.date)}
+                                    <span className='tool'>{formatPDFDate(reply.date)}
                                         <Dropdown menu={{
                                             items: [
                                                 {
                                                     label: 'Edit',
                                                     key: '1',
-                                                    onClick: () => {
+                                                    onClick: (e) => {
+                                                        e.domEvent.stopPropagation()
                                                         setCurrentReply(reply)
                                                     }
                                                 },
                                                 {
                                                     label: 'Delete',
-                                                    key: '3',
+                                                    key: '2',
+                                                    onClick: (e) => {
+                                                        e.domEvent.stopPropagation()
+                                                        deleteReply(annotation, reply)
+                                                    }
                                                 },
                                             ]
                                         }} trigger={['click']}>
@@ -172,7 +309,7 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
 
     return (
         <div className="CustomComment">
-            <div className='filters'>123123</div>
+            <div className='filters'>共 {annotations.length} 个注释</div>
             <div className='list'>{comments}</div>
         </div>
     )

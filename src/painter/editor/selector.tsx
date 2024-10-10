@@ -11,6 +11,7 @@ import i18n from 'i18next'
 export interface ISelectorOptions {
     konvaCanvasStore: Map<number, KonvaCanvas> // 存储各个页面的 Konva 画布实例
     getAnnotationStore: (id: string) => IAnnotationStore // 获取注解存储的方法
+    onSelected: (id: string) => void // 选中回调
     onChange: (id: string, konvaGroupString: string, rawAnnotationStore: IAnnotationStore) => void // 注解变化时的回调
     onDelete: (id: string) => void // 删除注解时的回调
 }
@@ -19,6 +20,7 @@ export interface ISelectorOptions {
  * 定义选择器类
  */
 export class Selector {
+    public readonly onSelected: (id: string) => void
     public readonly onChange: (id: string, konvaGroupString: string, rawAnnotationStore: IAnnotationStore) => void
     public readonly onDelete: (id: string) => void
     private transformerStore: Map<string, Konva.Transformer> = new Map() // 存储变换器实例
@@ -30,11 +32,12 @@ export class Selector {
     private selectedId: string | null = null
 
     // 构造函数，初始化选择器类
-    constructor({ konvaCanvasStore, getAnnotationStore, onChange, onDelete }: ISelectorOptions) {
+    constructor({ konvaCanvasStore, getAnnotationStore, onChange, onDelete, onSelected }: ISelectorOptions) {
         this.konvaCanvasStore = konvaCanvasStore
         this.getAnnotationStore = getAnnotationStore
         this.onChange = onChange
         this.onDelete = onDelete
+        this.onSelected = onSelected
     }
 
     // 获取当前激活的变换器ID
@@ -183,6 +186,7 @@ export class Selector {
     private handleShapeClick(shape: Konva.Shape, konvaStage: Konva.Stage): void {
         const group = shape.findAncestor(`.${SHAPE_GROUP_NAME}`) as Konva.Group
         if (!group) return
+        this.onSelected(group.id())
         this.clearTransformers() // 清除之前的变换器
         this.createTransformer(group, konvaStage)
         this.bindGlobalEvents() // 绑定全局事件
@@ -309,14 +313,14 @@ export class Selector {
      * 绑定全局事件。
      */
     private bindGlobalEvents(): void {
-        window.addEventListener('keyup', this.globalKeyUpHandler)
+        // window.addEventListener('keyup', this.globalKeyUpHandler)
     }
 
     /**
      * 移除全局事件。
      */
     private removeGlobalEvents(): void {
-        window.removeEventListener('keyup', this.globalKeyUpHandler)
+        // window.removeEventListener('keyup', this.globalKeyUpHandler)
     }
 
     /**
@@ -378,5 +382,9 @@ export class Selector {
      */
     public select(id: string): void {
         this.selectedId = id
+    }
+
+    public delete() {
+        this.clearTransformers()
     }
 }

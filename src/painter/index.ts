@@ -42,7 +42,8 @@ export class Painter {
     private tempDataTransfer: string | null // 临时数据传输
     public readonly setDefaultMode: () => void // 设置默认模式的函数引用
     public readonly onWebSelectionSelected: (range: Range) => void
-    public readonly onStoreChange: (annotationStore:IAnnotationStore) => void
+    public readonly onStoreChange: (annotationStore: IAnnotationStore) => void
+    public readonly onAnnotationSelected: (annotationStore: IAnnotationStore) => void
 
     /**
      * 构造函数，初始化 PDFViewerApplication, EventBus, 和 WebSelection
@@ -53,25 +54,31 @@ export class Painter {
         PDFJS_EventBus,
         setDefaultMode,
         onWebSelectionSelected,
-        onStoreChange
+        onStoreChange,
+        onAnnotationSelected
     }: {
         PDFViewerApplication: PDFViewerApplication
         PDFJS_EventBus: EventBus
         setDefaultMode: () => void
         onWebSelectionSelected: (range: Range) => void
         onStoreChange: (annotationStore: IAnnotationStore) => void
+        onAnnotationSelected: (annotationStore: IAnnotationStore) => void
     }) {
         this.pdfViewerApplication = PDFViewerApplication // 初始化 PDFViewerApplication
         this.pdfjsEventBus = PDFJS_EventBus // 初始化 PDF.js EventBus
         this.setDefaultMode = setDefaultMode // 设置默认模式的函数
         this.onWebSelectionSelected = onWebSelectionSelected
         this.onStoreChange = onStoreChange
+        this.onAnnotationSelected = onAnnotationSelected
         this.store = new Store({ PDFViewerApplication }) // 初始化存储实例
         this.selector = new Selector({
             // 初始化选择器实例
             konvaCanvasStore: this.konvaCanvasStore,
             getAnnotationStore: (id: string) => {
                 return this.store.annotation(id)
+            },
+            onSelected: (id) => {
+                this.onAnnotationSelected(this.store.annotation(id))
             },
             // eslint-disable-next-line prettier/prettier
             onChange: async (id, groupString, rawAnnotationStore) => {
@@ -597,7 +604,7 @@ export class Painter {
      * @param range
      * @param annotation
      */
-    public highlight(range: Range, annotation: IAnnotationType) {
+    public highlightRange(range: Range, annotation: IAnnotationType) {
         this.currentAnnotation = annotation
         this.webSelection.highlight(range)
     }
@@ -607,5 +614,53 @@ export class Painter {
         annotationMap.forEach(annotation => {
             this.saveToStore(annotation, true)
         })
+    }
+
+    /**
+     * @description 更新 store
+     * @param id
+     * @param updates
+     */
+    public update(id: string, updates: Partial<IAnnotationStore>) {
+        this.store.update(id, updates)
+    }
+
+    /**
+     * @description 删除 annotation
+     * @param id 
+     */
+    public delete(id: string) {
+        this.selector.delete()
+        this.deleteAnnotation(id)
+    }
+
+    /**
+     * @description 高亮选中 annotation
+     * @param annotation 
+     */
+    public async highlight(annotation: IAnnotationStore) {
+        this.pdfViewerApplication.page = annotation.pageNumber
+        const maxRetries = 5 // 最大重试次数
+        const retryInterval = 400 // 每次重试间隔
+        // 封装递归重试机制
+        const attemptHighlight = (retries: number): void => {
+            const storeEditor = this.findEditor(annotation.pageNumber, annotation.type)
+            if (storeEditor) {
+                this.setDefaultMode()
+                this.selector.select(annotation.id)
+                if(this.currentAnnotation && this.currentAnnotation.type === AnnotationType.SELECT) {
+                    this.selector.activate(annotation.pageNumber)
+                }                
+            } else if (retries > 0) {
+                // 如果没有找到且还有重试次数，继续重试
+                setTimeout(() => {
+                    attemptHighlight(retries - 1)
+                }, retryInterval)
+            } else {
+                console.error('Failed to find editor after maximum retries.')
+            }
+        }
+        // 初次尝试执行
+        attemptHighlight(maxRetries)
     }
 }

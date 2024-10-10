@@ -27,7 +27,6 @@ class PdfjsAnnotationExtension {
         // 初始化 PDF.js 对象和相关属性
         this.PDFJS_PDFViewerApplication = (window as any).PDFViewerApplication
         this.PDFJS_EventBus = this.PDFJS_PDFViewerApplication.eventBus
-        console.log(this.PDFJS_PDFViewerApplication.appConfig)
         this.$PDFJS_sidebarContainer = this.PDFJS_PDFViewerApplication.appConfig.sidebar.sidebarContainer
         this.$PDFJS_toolbar_container = this.PDFJS_PDFViewerApplication.appConfig.toolbar.container
         this.$PDFJS_viewerContainer = this.PDFJS_PDFViewerApplication.appConfig.viewerContainer
@@ -49,9 +48,11 @@ class PdfjsAnnotationExtension {
             onWebSelectionSelected: range => {
                 this.customPopbarRef.current.open(range)
             },
-            onStoreChange: annotationStore => {
-                this.customCommentRef.current.addAnnotation(annotationStore)
-                console.log(annotationStore)
+            onStoreChange: annotation => {
+                this.customCommentRef.current.addAnnotation(annotation)
+            },
+            onAnnotationSelected: annotation => {
+                this.customCommentRef.current.selectedAnnotation(annotation)
             }
         })
         // 初始化操作
@@ -108,7 +109,7 @@ class PdfjsAnnotationExtension {
             <CustomPopbar
                 ref={this.customPopbarRef}
                 onChange={(currentAnnotation, range) => {
-                    this.painter.highlight(range, currentAnnotation)
+                    this.painter.highlightRange(range, currentAnnotation)
                 }}
             />
         )
@@ -119,13 +120,22 @@ class PdfjsAnnotationExtension {
      */
     private renderComment(): void {
         const comment = document.createElement('div')
-        console.log(this.$PDFJS_mainContainer)
         this.$PDFJS_mainContainer.insertAdjacentElement('afterend', comment)
         createRoot(comment).render(
             <CustomComment
                 ref={this.customCommentRef}
-                onChange={() => {
-                    console.log(123123)
+                onSelected={async (annotation) => {
+                    await this.painter.highlight(annotation)
+                }}
+                onDelete={(id) => {
+                    this.painter.delete(id)
+                }}
+                onUpdate={(annotation) => {
+                    this.painter.update(annotation.id, {
+                        title: annotation.title,
+                        contentsObj: annotation.contentsObj,
+                        comments: annotation.comments
+                    })
                 }}
             />
         )

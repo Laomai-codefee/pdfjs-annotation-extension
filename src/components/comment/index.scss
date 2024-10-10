@@ -1,59 +1,74 @@
-.CustomComment{
+.CustomComment {
     width: 300px;
     position: absolute;
     top: 107px;
     right: 0;
     height: calc(100vh - 107px);
     color: var(--main-color);
+    border-left: 1px solid var(--toolbar-border-color);
     overflow: auto;
     font: message-box;
     font-size: 14px;
-    .filters{
+    .filters {
         padding: 5px;
     }
-    .list{
-        padding: 5px;
-        h3{
+    .list {
+        padding: 5px 5px 25px 5px;
+        h3 {
             font-weight: normal;
             font-size: 14px;
         }
-        .comment{
+        .comment {
             border: 1px solid var(--toolbar-border-color);
             background-color: var(--toolbar-bg-color);
             border-radius: 8px;
             padding: 10px;
             line-height: 200%;
-            .title{
-                span{
-                    float: right;
+            p {
+                white-space: pre-wrap;
+                line-height: 150%;
+                padding: 0 5px;
+            }
+            .title {
+                display: flex;
+                align-items: flex-start; 
+                .annotation-icon{
+                    margin-right: 5px;
+                }
+                .tool {
+                    margin-left: auto; 
                     display: flex;
-                    .icon{
-                        float: right;
+                    align-items: center; 
+                    .icon {
                         margin-left: 5px;
                         border-radius: 8px;
                     }
-                    .icon:hover{
+                    .icon:hover {
                         background-color: var(--dropdown-btn-bg-color);
                     }
                 }
             }
-            .reply{
-                border-left: 4px solid var(--dropdown-btn-bg-color);
+            
+            
+            .reply {
                 background-color: var(--dropdown-btn-bg-color);
-                // border-radius: 8px;
-                padding:3px 10px;
+                border-radius: 5px;
+                padding: 3px 10px;
                 margin-top: 8px;
+                .icon:hover {
+                    background-color: var(--toggled-btn-bg-color) !important;
+                }
             }
-            .reply-input{
+            .reply-input {
                 margin-top: 8px;
             }
         }
-        .selected{
+        .selected {
             border-color: red;
         }
-        h3,.comment{
+        h3,
+        .comment {
             margin-bottom: 8px;
         }
     }
-    
 }

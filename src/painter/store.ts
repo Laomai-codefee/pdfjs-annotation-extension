@@ -62,9 +62,11 @@ export class Store {
                     ...existingAnnotation,
                     ...updates,
                     date: formatTimestamp(Date.now())
-
                 }
                 this.annotationStore.set(id, updatedAnnotation)
+                console.log('%c [ this.annotationStore ]-67-「painter/store.ts」', 'font-size:13px; background:#f57a85; color:#ffbec9;', this.annotationStore)
+
+
 
                 // const storage = this.pdfViewerApplication.pdfDocument.annotationStorage
                 // if (updates.content?.batchPdfjsAnnotationStorage?.length) {
