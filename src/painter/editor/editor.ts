@@ -10,6 +10,7 @@ import { SHAPE_GROUP_NAME } from '../const'
  * IEditorOptions 接口定义了编辑器的初始化选项。
  */
 export interface IEditorOptions {
+    userName: string
     pdfViewerApplication: PDFViewerApplication
     konvaStage: Konva.Stage // Konva Stage对象
     pageNumber: number // 页面编号
@@ -38,6 +39,7 @@ export interface IShapeGroup {
  * Editor 是一个抽象类，定义了编辑器的基本行为和属性。
  */
 export abstract class Editor {
+    protected userName: string
     protected pdfViewerApplication: PDFViewerApplication
     public readonly id: string // 编辑器实例的唯一标识符
     public readonly onAdd: (annotationStore: IAnnotationStore) => void // 添加形状组的回调函数
@@ -54,7 +56,8 @@ export abstract class Editor {
      * Editor 类的构造函数。
      * @param options 初始化编辑器的选项
      */
-    constructor({ konvaStage, pageNumber, annotation, onAdd, editorType, pdfViewerApplication }: IEditorOptions & { editorType: AnnotationType }) {
+    constructor({ userName, konvaStage, pageNumber, annotation, onAdd, editorType, pdfViewerApplication }: IEditorOptions & { editorType: AnnotationType }) {
+        this.userName = userName
         this.pdfViewerApplication = pdfViewerApplication
         this.id = `${pageNumber}_${editorType}` // 构造唯一标识符
         this.konvaStage = konvaStage // 初始化 Konva Stage对象
@@ -92,7 +95,7 @@ export abstract class Editor {
             pageRanges,
             konvaString: konvaGroup.toJSON(),
             konvaClientRect: Konva.Node.create(konvaGroup.toJSON()).getClientRect(),
-            title: '不具名用户',
+            title: this.userName,
             type: annotation.type,
             pdfjsType: annotation.pdfjsAnnotationType,
             pdfjsEditorType: annotation.pdfjsEditorType,

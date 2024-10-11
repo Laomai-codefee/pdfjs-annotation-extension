@@ -4,11 +4,17 @@ import { EventBus, PDFPageView, PDFViewerApplication } from 'pdfjs'
 import { createRef } from 'react'
 import { createRoot } from 'react-dom/client'
 import { initializeI18n } from './locale/index'
+import i18n from 'i18next'
 import { CustomPopbar, CustomPopbarRef } from './components/popbar'
 import { CustomToolbar, CustomToolbarRef } from './components/toolbar'
-import { annotationDefinitions, DefaultSettings } from './const/definitions'
+import { annotationDefinitions, DefaultSettings, HASH_PARAMS_GET_URL, HASH_PARAMS_POST_URL, HASH_PARAMS_USERNAME } from './const/definitions'
 import { Painter } from './painter'
 import { CustomComment, CustomCommentRef } from './components/comment'
+import { parseQueryString } from './utils/utils'
+
+interface AppOptions {
+    [key: string]: string;
+}
 
 class PdfjsAnnotationExtension {
     PDFJS_PDFViewerApplication: PDFViewerApplication // PDF.js 的 PDFViewerApplication 对象
@@ -21,9 +27,9 @@ class PdfjsAnnotationExtension {
     customPopbarRef: React.RefObject<CustomPopbarRef>
     customCommentRef: React.RefObject<CustomCommentRef>
     painter: Painter // 画笔实例
+    appOptions: AppOptions
 
     constructor() {
-
         // 初始化 PDF.js 对象和相关属性
         this.PDFJS_PDFViewerApplication = (window as any).PDFViewerApplication
         this.PDFJS_EventBus = this.PDFJS_PDFViewerApplication.eventBus
@@ -38,8 +44,18 @@ class PdfjsAnnotationExtension {
         // 加载多语言
         initializeI18n(this.PDFJS_PDFViewerApplication.l10n.getLanguage())
 
+        // 设置 appOptions 的默认值
+        this.appOptions = {
+            [HASH_PARAMS_USERNAME]: i18n.t('normal.unknownUser'), // 默认用户名
+            [HASH_PARAMS_GET_URL]: '../pdfjs-annotation-extension-testdata.json', // 默认 GET URL
+            [HASH_PARAMS_POST_URL]: '', // 默认 POST URL
+        };
+
+        // 处理地址栏参数
+        this.parseHashParams()
         // 创建画笔实例
         this.painter = new Painter({
+            userName: this.getOption(HASH_PARAMS_USERNAME),
             PDFViewerApplication: this.PDFJS_PDFViewerApplication,
             PDFJS_EventBus: this.PDFJS_EventBus,
             setDefaultMode: () => {
@@ -75,6 +91,36 @@ class PdfjsAnnotationExtension {
     }
 
     /**
+     * @description 处理地址栏参数
+     * @returns 
+     */
+    private parseHashParams() {
+        const hash = document.location.hash.substring(1);
+        if (!hash) {
+            return;
+        }
+        const params = parseQueryString(hash);
+        if (params.has(HASH_PARAMS_USERNAME)) {
+            this.setOption(HASH_PARAMS_USERNAME, params.get(HASH_PARAMS_USERNAME))
+        }
+        if (params.has(HASH_PARAMS_GET_URL)) {
+            this.setOption(HASH_PARAMS_GET_URL, params.get(HASH_PARAMS_GET_URL))
+        }
+        if (params.has(HASH_PARAMS_POST_URL)) {
+            this.setOption(HASH_PARAMS_POST_URL, params.get(HASH_PARAMS_POST_URL))
+        }
+
+    }
+
+    private setOption(name: string, value: string) {
+        this.appOptions[name] = value
+    }
+
+    private getOption(name: string) {
+        return this.appOptions[name]
+    }
+
+    /**
      * @description 添加自定义样式
      */
     private addCustomStyle(): void {
@@ -97,7 +143,7 @@ class PdfjsAnnotationExtension {
                     this.downLoadPdf()
                 }}
                 onSave={() => {
-                    this.savePdf()
+                    this.saveData()
                 }}
             />
         )
@@ -191,14 +237,14 @@ class PdfjsAnnotationExtension {
         )
         // 缩放页面时隐藏绘图层
         this.PDFJS_EventBus._on('scalechanging', () => {
+            console.log('%c [ "scalechanging" ]-240-「src/index.tsx」', 'font-size:13px; background:#fab5f1; color:#fff9ff;', 'scalechanging')
             this.hidePainter()
         })
         // 监听文档加载完成事件
         this.PDFJS_EventBus._on('documentloaded', async (source) => {
-            console.log('%c [ documentloaded ]-197-「src/index.tsx」', 'font-size:13px; background:#1422d9; color:#5866ff;', 'documentloaded')
-
+            console.log('%c [ documentloaded ]-244-「src/index.tsx」', 'font-size:13px; background:#d33e5e; color:#ff82a2;', 'documentloaded')
             this.painter.initWebSelection(this.$PDFJS_viewerContainer)
-            await this.painter.saveOriginalAnnotations()
+            await this.painter.initAnnotations(await this.getData())
         })
         // 重置 Pdfjs AnnotationStorage 解决有嵌入图片打印、下载会ImageBitmap报错的问题
         this.PDFJS_EventBus._on('beforeprint', () => {
@@ -209,19 +255,49 @@ class PdfjsAnnotationExtension {
         })
     }
 
-    private async savePdf() {
-        this.painter.resetPdfjsAnnotationStorage()
-        const fileName = this.PDFJS_PDFViewerApplication._title || '未命名.pdf'
-        // 保存到远程地址
-        const data = await this.PDFJS_PDFViewerApplication?.pdfDocument?.saveDocument()
-        const blob = new Blob([data], { type: 'application/pdf' })
-        const formData = new FormData()
-        formData.append('file', blob, fileName)
-        fetch('save.action', {
-            method: 'POST',
-            body: formData
-        })
+    private async getData(): Promise<any[]> {
+        try {
+            const response = await fetch(this.getOption(HASH_PARAMS_GET_URL), {
+                method: 'GET',
+            });
+            if (!response.ok) {
+                console.error(`Error: ${response.status} ${response.statusText}`);
+                return [];
+            }
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Fetch error:', error);
+            return [];
+        }
     }
+
+
+    private async saveData() {
+        const postUrl = this.getOption(HASH_PARAMS_POST_URL);
+        if (postUrl === '') {
+            throw new Error(`${HASH_PARAMS_POST_URL} is undefined`);
+        }
+        try {
+            const response = await fetch(postUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(this.painter.getData()),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to save PDF. Status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log('PDF saved successfully:', result);
+        } catch (error) {
+            console.error('Error while saving PDF:', error);
+        }
+    }
+
 
     private async downLoadPdf() {
         this.PDFJS_EventBus.dispatch("download")

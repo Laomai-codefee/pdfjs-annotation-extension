@@ -255,6 +255,7 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                             <div className='title'>
                                 <AnnotationIcon subtype={annotation.subtype} />
                                 {annotation.title}
+                                {annotation.id}
                                 <span className='tool'>
                                     {formatPDFDate(annotation.date)}
                                     <Dropdown menu={{

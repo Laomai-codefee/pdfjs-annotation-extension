@@ -12,6 +12,7 @@ export class CircleDecoder extends Decoder {
 
     public decodePdfAnnotation(annotation: CircleAnnotation, allAnnotations: Annotation[]) {        
         const color = convertToRGB(annotation.color)
+        const borderWidth = annotation.borderStyle.width === 1 ? annotation.borderStyle.width + 1 : annotation.borderStyle.width
         const { x, y, width, height } = this.convertRect(
             annotation.rect,
             annotation.pageViewer.viewport.scale,
@@ -28,7 +29,7 @@ export class CircleDecoder extends Decoder {
             x: x + width /2,
             y: y + height /2,
             strokeScaleEnabled: false,
-            strokeWidth: annotation.borderStyle.width,
+            strokeWidth: borderWidth,
             stroke: color,
             dash: annotation.borderStyle.style === 2 ? annotation.borderStyle.dashArray : [],
         })

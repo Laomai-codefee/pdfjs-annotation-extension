@@ -45,7 +45,8 @@
         "reply": "回复",
         "edit": "编辑",
         "delete": "删除",
-        "confirm": "确认"
+        "confirm": "确认",
+        "unknownUser": "不具名用户"
     },
     "comment": {
         "total": "共 {{value}} 个注释",

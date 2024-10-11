@@ -25,6 +25,10 @@ export class Store {
         return (id: string) => this.annotationStore.get(id)
     }
 
+    get annotaions() {
+        return Array.from(this.annotationStore.values());
+    }
+
     /**
      * 保存注释
      * @param store  
@@ -145,4 +149,5 @@ export class Store {
             }
         }
     }
+
 }

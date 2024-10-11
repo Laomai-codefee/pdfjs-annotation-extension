@@ -45,7 +45,8 @@
         "reply": "Reply",
         "edit": "Edit",
         "delete": "Delete",
-        "confirm": "Confirm"
+        "confirm": "Confirm",
+        "unknownUser": "Unknown User"
     },
     "comment": {
         "total": "Comment {{value}}",

@@ -261,6 +261,17 @@ function formatPDFDate(dateString) {
     return `${year}/${month}/${day}`
 }
 
+function parseQueryString(query: string): Map<string, string> {
+    const params = new Map<string, string>();
+    const searchParams = new URLSearchParams(query);
+
+    searchParams.forEach((value, key) => {
+        params.set(key.toLowerCase(), value);
+    });
+    return params;
+}
+
+
 export {
     base64ToImageBitmap,
     formatFileSize,
@@ -274,5 +285,6 @@ export {
     setCssCustomProperty,
     convertToRGB,
     formatTimestamp,
-    formatPDFDate
+    formatPDFDate,
+    parseQueryString
 }

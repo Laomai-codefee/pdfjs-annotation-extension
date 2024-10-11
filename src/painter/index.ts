@@ -6,7 +6,7 @@ import { EventBus, PageViewport, PDFPageView, PDFViewerApplication } from 'pdfjs
 import { annotationDefinitions, AnnotationType, IAnnotationStore, IAnnotationType } from '../const/definitions'
 import { isElementInDOM, removeCssCustomProperty } from '../utils/utils'
 import { CURSOR_CSS_PROPERTY, PAINTER_IS_PAINTING_STYLE, PAINTER_PAINTING_TYPE, PAINTER_WRAPPER_PREFIX } from './const'
-import { Editor, IShapeGroup } from './editor/editor'
+import { Editor } from './editor/editor'
 import { EditorCircle } from './editor/editor_circle'
 import { EditorFreeHand } from './editor/editor_free_hand'
 import { EditorFreeHighlight } from './editor/editor_free_highlight'
@@ -30,6 +30,7 @@ export interface KonvaCanvas {
 
 // Painter 类定义
 export class Painter {
+    private userName: string
     private konvaCanvasStore: Map<number, KonvaCanvas> = new Map() // 存储 KonvaCanvas 实例
     private editorStore: Map<string, Editor> = new Map() // 存储编辑器实例
     private pdfViewerApplication: PDFViewerApplication // PDFViewerApplication 实例
@@ -51,6 +52,7 @@ export class Painter {
      * @param params - 包含 PDFViewerApplication 和 EventBus 的对象
      */
     constructor({
+        userName,
         PDFViewerApplication,
         PDFJS_EventBus,
         setDefaultMode,
@@ -59,6 +61,7 @@ export class Painter {
         onAnnotationSelected,
         onAnnotationChange
     }: {
+        userName: string,
         PDFViewerApplication: PDFViewerApplication
         PDFJS_EventBus: EventBus
         setDefaultMode: () => void
@@ -67,6 +70,7 @@ export class Painter {
         onAnnotationSelected: (annotationStore: IAnnotationStore, isClick: boolean) => void
         onAnnotationChange: (annotationStore: IAnnotationStore) => void
     }) {
+        this.userName = userName
         this.pdfViewerApplication = PDFViewerApplication // 初始化 PDFViewerApplication
         this.pdfjsEventBus = PDFJS_EventBus // 初始化 PDF.js EventBus
         this.setDefaultMode = setDefaultMode // 设置默认模式的函数
@@ -86,16 +90,12 @@ export class Painter {
             },
             // eslint-disable-next-line prettier/prettier
             onChange: async (id, groupString, rawAnnotationStore, konvaClientRect) => {
-                console.log('%c [ konvaClientRect ]-89-「painter/index.ts」', 'font-size:13px; background:#bd37f5; color:#ff7bff;', konvaClientRect)
-                console.log('%c [ rawAnnotationStore ]-74-「painter/index.ts」', 'font-size:13px; background:#940946; color:#d84d8a;', rawAnnotationStore)
-                console.log('%c [ id ]-74-「painter/index.ts」', 'font-size:13px; background:#af1270; color:#f356b4;', id)
                 const editor = this.findEditorForGroupId(id)
-                console.log(editor)
                 if (editor) {
-                    this.onAnnotationChange(this.store.update(id, {
+                    this.updateStore(id, {
                         konvaString: groupString,
                         konvaClientRect
-                    }))
+                    })
                 }
             },
             onDelete: id => {
@@ -116,6 +116,7 @@ export class Painter {
                         const { konvaStage, wrapper } = canvas
                         const editor = new EditorHighLight(
                             {
+                                userName: this.userName,
                                 pdfViewerApplication: this.pdfViewerApplication,
                                 konvaStage,
                                 pageNumber,
@@ -280,6 +281,13 @@ export class Painter {
     }
 
     /**
+     * 更新存储
+     */
+    private updateStore(id: string, updates: Partial<IAnnotationStore>) {
+        this.onAnnotationChange(this.store.update(id, updates))
+    }
+
+    /**
      * 根据组 ID 查找编辑器
      * @param groupId - 组 ID
      * @returns 编辑器实例
@@ -328,6 +336,7 @@ export class Painter {
         switch (annotation.type) {
             case AnnotationType.FREETEXT:
                 editor = new EditorFreeText({
+                    userName: this.userName,
                     pdfViewerApplication: this.pdfViewerApplication,
                     konvaStage,
                     pageNumber,
@@ -343,6 +352,7 @@ export class Painter {
                 break
             case AnnotationType.RECTANGLE:
                 editor = new EditorRectangle({
+                    userName: this.userName,
                     pdfViewerApplication: this.pdfViewerApplication,
                     konvaStage,
                     pageNumber,
@@ -355,6 +365,7 @@ export class Painter {
 
             case AnnotationType.CIRCLE:
                 editor = new EditorCircle({
+                    userName: this.userName,
                     pdfViewerApplication: this.pdfViewerApplication,
                     konvaStage,
                     pageNumber,
@@ -366,6 +377,7 @@ export class Painter {
                 break
             case AnnotationType.FREEHAND:
                 editor = new EditorFreeHand({
+                    userName: this.userName,
                     pdfViewerApplication: this.pdfViewerApplication,
                     konvaStage,
                     pageNumber,
@@ -377,6 +389,7 @@ export class Painter {
                 break
             case AnnotationType.FREE_HIGHLIGHT:
                 editor = new EditorFreeHighlight({
+                    userName: this.userName,
                     pdfViewerApplication: this.pdfViewerApplication,
                     konvaStage,
                     pageNumber,
@@ -389,6 +402,7 @@ export class Painter {
             case AnnotationType.SIGNATURE:
                 editor = new EditorSignature(
                     {
+                        userName: this.userName,
                         pdfViewerApplication: this.pdfViewerApplication,
                         konvaStage,
                         pageNumber,
@@ -407,6 +421,7 @@ export class Painter {
             case AnnotationType.STAMP:
                 editor = new EditorStamp(
                     {
+                        userName: this.userName,
                         pdfViewerApplication: this.pdfViewerApplication,
                         konvaStage,
                         pageNumber,
@@ -427,6 +442,7 @@ export class Painter {
             case AnnotationType.STRIKEOUT:
                 editor = new EditorHighLight(
                     {
+                        userName: this.userName,
                         pdfViewerApplication: this.pdfViewerApplication,
                         konvaStage,
                         pageNumber,
@@ -616,14 +632,21 @@ export class Painter {
     }
 
     /**
-     * @description 将pdf 上原有 annotation 存入 store
+     * @description 将annotation 存入 store, 包含外部 annotation 和 pdf 文件上的 annotation
      */
-    public async saveOriginalAnnotations() {
+    public async initAnnotations(annotations: IAnnotationStore[]) {
+        // 先将 pdf 文件中的存入
         const annotationMap = await this.transform.decodePdfAnnotation()
-        console.log('%c [ annotationMap ]-623-「painter/index.ts」', 'font-size:13px; background:#a1633b; color:#e5a77f;', annotationMap)
-
         annotationMap.forEach(annotation => {
             this.saveToStore(annotation, true)
+        })
+        // 再用外部数据覆盖
+        annotations.forEach(annotation => {
+            if(annotationMap.has(annotation.id)) {
+                this.updateStore(annotation.id, annotation)
+            } else {
+                this.saveToStore(annotation, false)
+            }
         })
     }
 
@@ -674,4 +697,10 @@ export class Painter {
         // 初次尝试执行
         attemptHighlight(maxRetries)
     }
+
+    public getData() {
+        return this.store.annotaions
+    }
+
+
 }

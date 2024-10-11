@@ -11,6 +11,11 @@ export class InkDecoder extends Decoder {
     }
 
     public decodePdfAnnotation(annotation: InkAnnotation, allAnnotations: Annotation[]) {
+
+        if(annotation.inkLists.length === 0) {
+            return null
+        }
+
         const color = convertToRGB(annotation.color)
         const ghostGroup = new Konva.Group({
             draggable: false,

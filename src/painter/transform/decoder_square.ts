@@ -12,6 +12,7 @@ export class SquareDecoder extends Decoder {
 
     public decodePdfAnnotation(annotation: SquareAnnotation, allAnnotations: Annotation[]) {
         const color = convertToRGB(annotation.color)
+        const borderWidth = annotation.borderStyle.width === 1 ? annotation.borderStyle.width + 1 : annotation.borderStyle.width
         const { x, y, width, height } = this.convertRect(
             annotation.rect,
             annotation.pageViewer.viewport.scale,
@@ -29,7 +30,7 @@ export class SquareDecoder extends Decoder {
             height,
             strokeScaleEnabled: false,
             stroke: color,
-            strokeWidth: annotation.borderStyle.width,
+            strokeWidth: borderWidth,
             fill: annotation.borderStyle.width === 0 ? color : null,
             opacity: annotation.borderStyle.width === 0 ? 0.5 : 1
         })

@@ -253,7 +253,7 @@ export const DefaultSettings = {
     OPACITY: 1, // 默认不透明度
     MAX_CURSOR_SIZE: 96, // 鼠标指针图片最大宽度/高度
     DOWNLOAD_BUTTON: true, // 下载按钮
-    SAVE_BUTTON: false, // 保存按钮
+    SAVE_BUTTON: true, // 保存按钮
     HIDE_PDFJS_ELEMENT: [ // 需要隐藏的 pdfjs 按钮
         '#editorModeButtons',
         '#editorModeSeparator',
@@ -475,3 +475,13 @@ export const annotationDefinitions: IAnnotationType[] = [
         icon: <StampIcon />
     }
 ]
+
+
+export const HASH_PARAMS_PREFIX = 'ae'
+
+export const HASH_PARAMS_USERNAME = `${HASH_PARAMS_PREFIX}_username`
+
+export const HASH_PARAMS_GET_URL = `${HASH_PARAMS_PREFIX}_get_url`
+
+export const HASH_PARAMS_POST_URL = `${HASH_PARAMS_PREFIX}_post_url`
+
