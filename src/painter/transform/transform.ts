@@ -67,7 +67,6 @@ export class Transform {
 
     public async decodePdfAnnotation(): Promise<Map<string, IAnnotationStore>> {
         const allAnnotations = await this.getAnnotations()
-        console.log(allAnnotations)
         const annotationStoreMap = new Map<string, IAnnotationStore>()
         allAnnotations.forEach(annotation => {
             const decodedAnnotation = this.decodeAnnotation(annotation, allAnnotations)

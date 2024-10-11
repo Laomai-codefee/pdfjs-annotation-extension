@@ -294,7 +294,6 @@ export class Painter {
      */
     private findEditorForGroupId(groupId: string): Editor {
         let editor: Editor = null
-        console.log('%c [ this.editorStore ]-277-「painter/index.ts」', 'font-size:13px; background:#ef9098; color:#ffd4dc;', this.editorStore)
         this.editorStore.forEach(_editor => {
             if (_editor.shapeGroupStore?.has(groupId)) {
                 editor = _editor
@@ -491,7 +490,6 @@ export class Painter {
     private reDrawAnnotation(pageNumber: number): void {
         const konvaCanvasStore = this.konvaCanvasStore.get(pageNumber) // 获取 KonvaCanvas 实例
         const annotationStores = this.store.getByPage(pageNumber) // 获取指定页码的批注存储
-        console.log('%c [ annotationStores ]-465-「painter/index.ts」', 'font-size:13px; background:#b6a8ba; color:#faecfe;', annotationStores)
         annotationStores.forEach(annotationStore => {
             let storeEditor = this.findEditor(pageNumber, annotationStore.type) // 查找编辑器实例
 

@@ -10,7 +10,7 @@ import { CustomToolbar, CustomToolbarRef } from './components/toolbar'
 import { annotationDefinitions, DefaultSettings, HASH_PARAMS_GET_URL, HASH_PARAMS_POST_URL, HASH_PARAMS_USERNAME } from './const/definitions'
 import { Painter } from './painter'
 import { CustomComment, CustomCommentRef } from './components/comment'
-import { parseQueryString } from './utils/utils'
+import { once, parseQueryString } from './utils/utils'
 
 interface AppOptions {
     [key: string]: string;
@@ -28,8 +28,10 @@ class PdfjsAnnotationExtension {
     customCommentRef: React.RefObject<CustomCommentRef>
     painter: Painter // 画笔实例
     appOptions: AppOptions
+    loadEnd: Boolean
 
     constructor() {
+        this.loadEnd = false
         // 初始化 PDF.js 对象和相关属性
         this.PDFJS_PDFViewerApplication = (window as any).PDFViewerApplication
         this.PDFJS_EventBus = this.PDFJS_PDFViewerApplication.eventBus
@@ -47,7 +49,7 @@ class PdfjsAnnotationExtension {
         // 设置 appOptions 的默认值
         this.appOptions = {
             [HASH_PARAMS_USERNAME]: i18n.t('normal.unknownUser'), // 默认用户名
-            [HASH_PARAMS_GET_URL]: '../pdfjs-annotation-extension-testdata.json', // 默认 GET URL
+            [HASH_PARAMS_GET_URL]: '', // 默认 GET URL
             [HASH_PARAMS_POST_URL]: '', // 默认 POST URL
         };
 
@@ -65,7 +67,6 @@ class PdfjsAnnotationExtension {
                 this.customPopbarRef.current.open(range)
             },
             onStoreAdd: annotation => {
-                console.log('%c [ annotation ]-52-「src/index.tsx」', 'font-size:13px; background:#50953d; color:#94d981;', annotation)
                 this.customCommentRef.current.addAnnotation(annotation)
             },
             onAnnotationSelected: (annotation, isClick) => {
@@ -97,17 +98,24 @@ class PdfjsAnnotationExtension {
     private parseHashParams() {
         const hash = document.location.hash.substring(1);
         if (!hash) {
+            console.warn(`HASH_PARAMS is undefined`);
             return;
         }
         const params = parseQueryString(hash);
         if (params.has(HASH_PARAMS_USERNAME)) {
             this.setOption(HASH_PARAMS_USERNAME, params.get(HASH_PARAMS_USERNAME))
+        } else {
+            console.warn(`${HASH_PARAMS_USERNAME} is undefined`);
         }
         if (params.has(HASH_PARAMS_GET_URL)) {
             this.setOption(HASH_PARAMS_GET_URL, params.get(HASH_PARAMS_GET_URL))
+        }else {
+            console.warn(`${HASH_PARAMS_GET_URL} is undefined`);
         }
         if (params.has(HASH_PARAMS_POST_URL)) {
             this.setOption(HASH_PARAMS_POST_URL, params.get(HASH_PARAMS_POST_URL))
+        }else {
+            console.warn(`${HASH_PARAMS_POST_URL} is undefined`);
         }
 
     }
@@ -207,18 +215,21 @@ class PdfjsAnnotationExtension {
         });
     }
 
-    /**
-     * @description 隐藏绘图层
-     */
-    private hidePainter() {
-        document.body.classList.add('PdfjsAnnotationExtension_scalechanging')
-    }
-
-    /**
-     * @description 显示绘图层
-     */
-    private showPainter() {
-        document.body.classList.remove('PdfjsAnnotationExtension_scalechanging')
+    private updatePdfjs() {
+        const currentScaleValue = this.PDFJS_PDFViewerApplication.pdfViewer.currentScaleValue
+        if (
+            currentScaleValue === 'auto' ||
+            currentScaleValue === 'page-fit' ||
+            currentScaleValue === 'page-width'
+        ) {
+            this.PDFJS_PDFViewerApplication.pdfViewer.currentScaleValue = '0.8'
+            this.PDFJS_PDFViewerApplication.pdfViewer.update()
+        } else {
+            this.PDFJS_PDFViewerApplication.pdfViewer.currentScaleValue = 'auto'
+            this.PDFJS_PDFViewerApplication.pdfViewer.update()
+        }
+        this.PDFJS_PDFViewerApplication.pdfViewer.currentScaleValue = currentScaleValue
+        this.PDFJS_PDFViewerApplication.pdfViewer.update()
     }
 
     /**
@@ -226,25 +237,25 @@ class PdfjsAnnotationExtension {
      */
     private bindPdfjsEvents(): void {
         this.hidePdfjsEditorModeButtons()
+        const setLoadEnd = once(() => {
+            this.loadEnd = true
+        })
         // 监听页面渲染完成事件
         this.PDFJS_EventBus._on(
             'pagerendered',
             async ({ source, cssTransform, pageNumber }: { source: PDFPageView; cssTransform: boolean; pageNumber: number }) => {
-                console.log('%c [ documentloaded ]-197-「src/index.tsx」', 'font-size:13px; background:#1422d9; color:#5866ff;', 'pagerendered')
-                this.showPainter()
+                setLoadEnd()
                 this.painter.initCanvas({ pageView: source, cssTransform, pageNumber })
             }
         )
-        // 缩放页面时隐藏绘图层
-        this.PDFJS_EventBus._on('scalechanging', () => {
-            console.log('%c [ "scalechanging" ]-240-「src/index.tsx」', 'font-size:13px; background:#fab5f1; color:#fff9ff;', 'scalechanging')
-            this.hidePainter()
-        })
+
         // 监听文档加载完成事件
         this.PDFJS_EventBus._on('documentloaded', async (source) => {
-            console.log('%c [ documentloaded ]-244-「src/index.tsx」', 'font-size:13px; background:#d33e5e; color:#ff82a2;', 'documentloaded')
             this.painter.initWebSelection(this.$PDFJS_viewerContainer)
             await this.painter.initAnnotations(await this.getData())
+            if (this.loadEnd) {
+                this.updatePdfjs()
+            }
         })
         // 重置 Pdfjs AnnotationStorage 解决有嵌入图片打印、下载会ImageBitmap报错的问题
         this.PDFJS_EventBus._on('beforeprint', () => {
@@ -255,49 +266,58 @@ class PdfjsAnnotationExtension {
         })
     }
 
+    /**
+     * @description 获取外部批注数据
+     * @returns 
+     */
     private async getData(): Promise<any[]> {
+        const getUrl = this.getOption(HASH_PARAMS_GET_URL);
+        if (!getUrl) {
+            return [];
+        }
         try {
-            const response = await fetch(this.getOption(HASH_PARAMS_GET_URL), {
-                method: 'GET',
-            });
+            const response = await fetch(getUrl, { method: 'GET' });
+
             if (!response.ok) {
-                console.error(`Error: ${response.status} ${response.statusText}`);
+                console.error(`Fetch failed: ${response.status} ${response.statusText}`);
                 return [];
             }
-            const data = await response.json();
-            return data;
+
+            return await response.json();
         } catch (error) {
             console.error('Fetch error:', error);
             return [];
         }
     }
 
-
-    private async saveData() {
+    /**
+     * @description 保存批注数据
+     * @returns 
+     */
+    private async saveData(): Promise<void> {
+        const dataToSave = this.painter.getData();
         const postUrl = this.getOption(HASH_PARAMS_POST_URL);
-        if (postUrl === '') {
-            throw new Error(`${HASH_PARAMS_POST_URL} is undefined`);
+        if (!postUrl) {
+            return;
         }
+
         try {
             const response = await fetch(postUrl, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(this.painter.getData()),
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dataToSave),
             });
 
             if (!response.ok) {
-                throw new Error(`Failed to save PDF. Status: ${response.status}`);
+                throw new Error(`Failed to save PDF. Status: ${response.status} ${response.statusText}`);
             }
 
             const result = await response.json();
-            console.log('PDF saved successfully:', result);
+            console.log('Saved successfully:', result);
         } catch (error) {
-            console.error('Error while saving PDF:', error);
+            console.error('Error while saving data:', error);
         }
     }
-
 
     private async downLoadPdf() {
         this.PDFJS_EventBus.dispatch("download")

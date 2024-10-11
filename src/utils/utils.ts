@@ -262,15 +262,33 @@ function formatPDFDate(dateString) {
 }
 
 function parseQueryString(query: string): Map<string, string> {
-    const params = new Map<string, string>();
-    const searchParams = new URLSearchParams(query);
+    const params = new Map<string, string>()
+    const searchParams = new URLSearchParams(query)
 
     searchParams.forEach((value, key) => {
-        params.set(key.toLowerCase(), value);
-    });
-    return params;
+        params.set(key.toLowerCase(), value)
+    })
+    return params
 }
 
+function debounce(fn: Function, delay: number) {
+    let timeout: ReturnType<typeof setTimeout>
+    return (...args: any[]) => {
+        if (timeout) clearTimeout(timeout)
+        timeout = setTimeout(() => fn(...args), delay)
+    }
+}
+function once<T extends (...args: any[]) => any>(fn: T): (...args: Parameters<T>) => ReturnType<T> {
+    let called = false
+    let result: ReturnType<T>
+    return function (...args: Parameters<T>): ReturnType<T> {
+        if (!called) {
+            called = true 
+            result = fn.apply(this, args)
+        }
+        return result
+    }
+}
 
 export {
     base64ToImageBitmap,
@@ -286,5 +304,7 @@ export {
     convertToRGB,
     formatTimestamp,
     formatPDFDate,
-    parseQueryString
+    parseQueryString,
+    debounce,
+    once
 }

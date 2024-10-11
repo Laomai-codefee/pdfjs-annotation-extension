@@ -32,6 +32,7 @@
             .title {
                 display: flex;
                 align-items: flex-start;
+                cursor: default;
                 .annotation-icon {
                     margin-right: 5px;
                 }
@@ -57,6 +58,9 @@
                     background-color: var(--toggled-btn-bg-color) !important;
                 }
             }
+        }
+        .comment:hover{
+            background-color: var(--doorhanger-hover-bg-color);
         }
         .selected {
             border-color: red;
