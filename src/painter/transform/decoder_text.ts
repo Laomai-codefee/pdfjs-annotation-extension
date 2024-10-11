@@ -1,39 +1,48 @@
-import { Annotation, SquareAnnotation } from 'pdfjs'
+import { Annotation, TextAnnotation } from 'pdfjs'
 import { Decoder } from './decoder'
 import Konva from 'konva'
 import { SHAPE_GROUP_NAME } from '../const'
 import { convertToRGB } from '../../utils/utils'
 import { AnnotationType, IAnnotationStore, PdfjsAnnotationEditorType } from '../../const/definitions'
 
-export class SquareDecoder extends Decoder {
+export class TextDecoder extends Decoder {
     constructor(options) {
         super(options)
     }
 
-    public decodePdfAnnotation(annotation: SquareAnnotation, allAnnotations: Annotation[]) {
+    public decodePdfAnnotation(annotation: TextAnnotation, allAnnotations: Annotation[]) {
+        if (annotation.inReplyTo) return null
+        console.log('%c [ annotation ]-14-「transform/decoder_text.ts」', 'font-size:13px; background:#30a495; color:#74e8d9;', annotation)
+
         const color = convertToRGB(annotation.color)
-        const { x, y, width, height } = this.convertRect(
-            annotation.rect,
-            annotation.pageViewer.viewport.scale,
-            annotation.pageViewer.viewport.height
-        )
+        const { x, y, width, height } = this.convertRect(annotation.rect, annotation.pageViewer.viewport.scale, annotation.pageViewer.viewport.height)
+        console.log('%c [  x, y, width, height ]-19-「transform/decoder_text.ts」', 'font-size:13px; background:#47a357; color:#8be79b;', x, y, width, height)
         const ghostGroup = new Konva.Group({
             draggable: false,
             name: SHAPE_GROUP_NAME,
             id: annotation.id
         })
-        const rect = new Konva.Rect({
-            x,
-            y,
-            width,
-            height,
-            strokeScaleEnabled: false,
-            stroke: color,
-            strokeWidth: annotation.borderStyle.width,
-            fill: annotation.borderStyle.width === 0 ? color : null,
-            opacity: annotation.borderStyle.width === 0 ? 0.5 : 1
+        const star = new Konva.Star({
+            x: x + width / 2,
+            y: y + height / 2,
+            numPoints: 5,
+            innerRadius: width/4,
+            outerRadius: width/ 2,
+            fill: 'yellow',
+            stroke: 'black',
+            strokeWidth: 1
         })
-        ghostGroup.add(rect)
+        const circle = new Konva.Ellipse({
+            radiusX: width / 2,
+            radiusY: height / 2,
+            x: x + width / 2,
+            y: y + height / 2,
+            strokeScaleEnabled: false,
+            strokeWidth: annotation.borderStyle.width,
+            stroke: color,
+            dash: annotation.borderStyle.style === 2 ? annotation.borderStyle.dashArray : []
+        })
+        ghostGroup.add(star)
         const annotationStore: IAnnotationStore = {
             id: annotation.id,
             pageNumber: annotation.pageNumber,
@@ -41,7 +50,7 @@ export class SquareDecoder extends Decoder {
             konvaString: ghostGroup.toJSON(),
             konvaClientRect: ghostGroup.getClientRect(),
             title: annotation.titleObj.str,
-            type: AnnotationType.RECTANGLE,
+            type: AnnotationType.FREE_HIGHLIGHT,
             color,
             pdfjsType: annotation.annotationType,
             pdfjsEditorType: PdfjsAnnotationEditorType.INK,

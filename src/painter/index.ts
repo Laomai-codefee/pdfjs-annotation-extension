@@ -620,6 +620,8 @@ export class Painter {
      */
     public async saveOriginalAnnotations() {
         const annotationMap = await this.transform.decodePdfAnnotation()
+        console.log('%c [ annotationMap ]-623-「painter/index.ts」', 'font-size:13px; background:#a1633b; color:#e5a77f;', annotationMap)
+
         annotationMap.forEach(annotation => {
             this.saveToStore(annotation, true)
         })
@@ -650,7 +652,7 @@ export class Painter {
     public async highlight(annotation: IAnnotationStore) {
         this.pdfViewerApplication.page = annotation.pageNumber
         const maxRetries = 5 // 最大重试次数
-        const retryInterval = 400 // 每次重试间隔
+        const retryInterval = 200 // 每次重试间隔
         // 封装递归重试机制
         const attemptHighlight = (retries: number): void => {
             const storeEditor = this.findEditor(annotation.pageNumber, annotation.type)

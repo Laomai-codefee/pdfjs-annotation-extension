@@ -50,7 +50,7 @@ export class InkDecoder extends Decoder {
             konvaString: ghostGroup.toJSON(),
             konvaClientRect: ghostGroup.getClientRect(),
             title: annotation.titleObj.str,
-            type: AnnotationType.FREEHAND,
+            type: AnnotationType.FREE_HIGHLIGHT,
             color,
             pdfjsType: annotation.annotationType,
             pdfjsEditorType: PdfjsAnnotationEditorType.INK,

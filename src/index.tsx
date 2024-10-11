@@ -184,6 +184,7 @@ class PdfjsAnnotationExtension {
         this.PDFJS_EventBus._on(
             'pagerendered',
             async ({ source, cssTransform, pageNumber }: { source: PDFPageView; cssTransform: boolean; pageNumber: number }) => {
+                console.log('%c [ documentloaded ]-197-「src/index.tsx」', 'font-size:13px; background:#1422d9; color:#5866ff;', 'pagerendered')
                 this.showPainter()
                 this.painter.initCanvas({ pageView: source, cssTransform, pageNumber })
             }
@@ -194,6 +195,8 @@ class PdfjsAnnotationExtension {
         })
         // 监听文档加载完成事件
         this.PDFJS_EventBus._on('documentloaded', async (source) => {
+            console.log('%c [ documentloaded ]-197-「src/index.tsx」', 'font-size:13px; background:#1422d9; color:#5866ff;', 'documentloaded')
+
             this.painter.initWebSelection(this.$PDFJS_viewerContainer)
             await this.painter.saveOriginalAnnotations()
         })
