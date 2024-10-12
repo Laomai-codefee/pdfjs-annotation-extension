@@ -62,6 +62,7 @@ interface CustomCommentProps {
 
 export interface CustomCommentRef {
     addAnnotation(annotation: IAnnotationStore): void
+    delAnnotation(id: string): void
     updateAnnotation(annotation: IAnnotationStore): void
     selectedAnnotation(annotation: IAnnotationStore, isClick: boolean): void
 }
@@ -81,6 +82,7 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
 
     useImperativeHandle(ref, () => ({
         addAnnotation,
+        delAnnotation,
         selectedAnnotation,
         updateAnnotation,
     }))
@@ -89,6 +91,17 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
         setAnnotations(prevAnnotations => [...prevAnnotations, annotation])
         setCurrentAnnotation(null)
     }
+
+    const delAnnotation = (id: string) => {
+        setAnnotations(prevAnnotations => prevAnnotations.filter(annotation => annotation.id !== id));
+        if (currentAnnotation?.id === id) {
+            setCurrentAnnotation(null);
+        }
+        if (replyAnnotation?.id === id) {
+            setReplyAnnotation(null);
+        }
+        setCurrentReply(null);
+    };
 
     const selectedAnnotation = (annotation: IAnnotationStore, isClick: boolean) => {
         setCurrentAnnotation(annotation)
@@ -256,7 +269,7 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                         <div {...commonProps} key={annotation.id} onClick={() => handleAnnotationClick(annotation)} ref={el => (annotationRefs.current[annotation.id] = el)} >
                             <div className='title'>
                                 <AnnotationIcon subtype={annotation.subtype} />
-                                {annotation.title}
+                                <div className='username'>{annotation.title}</div>
                                 <span className='tool'>
                                     {formatPDFDate(annotation.date)}
                                     <Dropdown menu={{
@@ -297,7 +310,7 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                             {annotation.comments?.map((reply, index) => (
                                 <div className='reply' key={index}>
                                     <div className='title'>
-                                        {reply.title}
+                                    <div className='username'> {reply.title}</div>
                                         <span className='tool'>{formatPDFDate(reply.date)}
                                             <Dropdown menu={{
                                                 items: [

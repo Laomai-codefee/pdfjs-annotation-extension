@@ -44,6 +44,7 @@ export class Painter {
     public readonly setDefaultMode: () => void // 设置默认模式的函数引用
     public readonly onWebSelectionSelected: (range: Range) => void
     public readonly onStoreAdd: (annotationStore: IAnnotationStore) => void
+    public readonly onStoreDelete: (id: string) => void
     public readonly onAnnotationSelected: (annotationStore: IAnnotationStore, isClick: boolean) => void
     public readonly onAnnotationChange: (annotationStore: IAnnotationStore) => void
 
@@ -58,6 +59,7 @@ export class Painter {
         setDefaultMode,
         onWebSelectionSelected,
         onStoreAdd,
+        onStoreDelete,
         onAnnotationSelected,
         onAnnotationChange
     }: {
@@ -67,6 +69,7 @@ export class Painter {
         setDefaultMode: () => void
         onWebSelectionSelected: (range: Range) => void
         onStoreAdd: (annotationStore: IAnnotationStore) => void
+        onStoreDelete: (id: string) => void
         onAnnotationSelected: (annotationStore: IAnnotationStore, isClick: boolean) => void
         onAnnotationChange: (annotationStore: IAnnotationStore) => void
     }) {
@@ -76,6 +79,7 @@ export class Painter {
         this.setDefaultMode = setDefaultMode // 设置默认模式的函数
         this.onWebSelectionSelected = onWebSelectionSelected
         this.onStoreAdd = onStoreAdd
+        this.onStoreDelete = onStoreDelete
         this.onAnnotationSelected = onAnnotationSelected
         this.onAnnotationChange = onAnnotationChange
         this.store = new Store({ PDFViewerApplication }) // 初始化存储实例
@@ -99,7 +103,7 @@ export class Painter {
                 }
             },
             onDelete: id => {
-                this.deleteAnnotation(id)
+                this.deleteAnnotation(id, true)
             }
         })
         this.webSelection = new WebSelection({
@@ -523,7 +527,7 @@ export class Painter {
      * 删除批注
      * @param id - 批注 ID
      */
-    private deleteAnnotation(id): void {
+    private deleteAnnotation(id, emit: boolean = false): void {
         const annotationStore = this.store.annotation(id)
         const konvaCanvasStore = this.konvaCanvasStore.get(annotationStore.pageNumber) // 获取 KonvaCanvas 实例
         if (!annotationStore) {
@@ -533,6 +537,9 @@ export class Painter {
         const storeEditor = this.findEditor(annotationStore.pageNumber, annotationStore.type)
         if (storeEditor) {
             storeEditor.deleteGroup(id, konvaCanvasStore.konvaStage)
+        }
+        if(emit) {
+            this.onStoreDelete(id)
         }
     }
 

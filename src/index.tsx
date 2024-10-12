@@ -70,6 +70,10 @@ class PdfjsAnnotationExtension {
             onStoreAdd: annotation => {
                 this.customCommentRef.current.addAnnotation(annotation)
             },
+            onStoreDelete:(id) => {
+                this.customCommentRef.current.delAnnotation(id)
+                console.log('%c [ id ]-74-「src/index.tsx」', 'font-size:13px; background:#6bd1fc; color:#afffff;', id)
+            },
             onAnnotationSelected: (annotation, isClick) => {
                 this.customCommentRef.current.selectedAnnotation(annotation, isClick)
             },

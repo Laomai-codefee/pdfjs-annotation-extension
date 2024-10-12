@@ -33,6 +33,12 @@
                 display: flex;
                 align-items: flex-start;
                 cursor: default;
+                .username {
+                    min-width: 30px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
                 .annotation-icon {
                     margin-right: 5px;
                 }
@@ -59,7 +65,7 @@
                 }
             }
         }
-        .comment:hover{
+        .comment:hover {
             background-color: var(--doorhanger-hover-bg-color);
         }
         .selected {
@@ -70,4 +76,30 @@
             margin-bottom: 8px;
         }
     }
+}
+
+@media all and (max-width: 780px) {
+    .CustomComment {
+        width: 250px;
+    }
+    .PdfjsAnnotationExtension {
+        #viewerContainer {
+            right: 250px;
+        }
+    }
+}
+@media all and (max-width: 690px) {
+    .CustomComment {
+        width: 150px;
+    }
+    .PdfjsAnnotationExtension {
+        #viewerContainer {
+            right: 150px;
+        }
+    }
+}
+
+@media (hover: hover) {
+}
+@media (hover: none) {
 }
