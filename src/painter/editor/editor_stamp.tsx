@@ -1,87 +1,11 @@
-import { Input, Modal } from 'antd'
-import type { InputRef } from 'antd/es/input'
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
-import React from 'react'
 
-import { AnnotationType, IAnnotationStore, IAnnotationType, IPdfjsAnnotationStorage, PdfjsAnnotationEditorType } from '../../const/definitions'
-import { base64ToImageBitmap, parsePageRanges, resizeImage, setCssCustomProperty } from '../../utils/utils'
+import { AnnotationType, IAnnotationType } from '../../const/definitions'
+import { resizeImage, setCssCustomProperty } from '../../utils/utils'
 import { CURSOR_CSS_PROPERTY } from '../const'
 import { Editor, IEditorOptions } from './editor'
-import i18n from 'i18next'
 import { defaultOptions } from '../../const/default_options'
-
-/**
- * 批量设置盖章位置
- * @returns {Promise<{ pageRanges: number[], inputValue: string }>}
- */
-async function setBatchStampPageNumbers(): Promise<{ pageRanges: number[]; inputValue: string }> {
-    return new Promise(resolve => {
-        const placeholder = `${i18n.t('normal.example')}1,1-2,3-4`
-        let inputValue = '' // 临时变量来存储输入值
-        let status: '' | 'error' | 'warning' = 'error' // 初始状态设置为错误，确保初始时提交按钮禁用
-        let pageRanges: number[] = [] // 用于存储解析后的页码数组
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, prefer-const
-        let modal: any
-        const inputRef = React.createRef<InputRef>() // 使用 React.createRef 以确保类型正确
-
-        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            inputValue = e.target.value // 更新输入值
-            try {
-                pageRanges = parsePageRanges(inputValue)
-                if (pageRanges.length > 0) {
-                    status = '' // 清除错误状态
-                } else {
-                    status = 'error'
-                }
-            } catch (error) {
-                status = 'error'
-                pageRanges = [] // 清空解析结果
-            }
-            // 强制重新渲染 Modal
-            modal.update({
-                content: (
-                    <div>
-                        <div> {i18n.t('editor.stamp.stampRange')} {status === 'error' && placeholder}</div>
-                        <Input ref={inputRef} status={status} placeholder={placeholder} onChange={handleChange} />
-                    </div>
-                ),
-                okButtonProps: {
-                    disabled: status === 'error'
-                }
-            })
-        }
-
-        modal = Modal.confirm({
-            title: i18n.t('editor.stamp.multiPageStamping'),
-            icon: null,
-            content: (
-                <div>
-                    <div> {i18n.t('editor.stamp.stampRange')}</div>
-                    <Input ref={inputRef} status={status} placeholder={placeholder} onChange={handleChange} />
-                </div>
-            ),
-            okText: i18n.t('normal.ok'),
-            cancelText: i18n.t('normal.cancel'),
-            okButtonProps: {
-                disabled: status === 'error'
-            },
-            onOk: () => {
-                resolve({ pageRanges, inputValue }) // 解析 Promise 并返回输入值和解析后的页码数组
-            },
-            onCancel: () => {
-                resolve({ pageRanges: [], inputValue: '' }) // 如果用户取消，则解析 Promise 并返回空数组和空字符串
-            }
-        })
-
-        // 使用 setTimeout 确保在 Modal 完全渲染后设置焦点
-        setTimeout(() => {
-            if (inputRef.current) {
-                inputRef.current.focus()
-            }
-        }, 100)
-    })
-}
 
 /**
  * EditorStamp 是继承自 Editor 的签章编辑器类。
@@ -191,174 +115,19 @@ export class EditorStamp extends Editor {
                 base64: this.stampUrl
             })
             this.currentShapeGroup.konvaGroup.add(this.stampImage)
-            const { pageRanges, inputValue } = await setBatchStampPageNumbers()
-            if (pageRanges.length > 0) {
-                const text = new Konva.Text({
-                    x: pos.x - crosshair.x,
-                    y: pos.y - crosshair.y,
-                    text: `${i18n.t('editor.stamp.stampRange')}: ${inputValue}`,
-                    fontSize: 10,
-                    fill: 'red'
-                })
-                this.currentShapeGroup.konvaGroup.add(text)
-            }
-            // 调整图片坐标并更新 PDF.js 注解存储
-            const { x, y, width, height } = this.fixImageCoordinateForGroup(this.stampImage, this.currentShapeGroup.konvaGroup)
             const id = this.currentShapeGroup.konvaGroup.id()
             this.setShapeGroupDone(
                 {
                     id,
                     contentsObj: {
-                        text: inputValue,
+                        text: '',
                         image: this.stampUrl
                     },
-                    pageRanges
                 }
-                // await this.calculateImageForStorage({
-                //     x,
-                //     y,
-                //     width,
-                //     height,
-                //     annotationType: this.currentAnnotation.pdfjsType,
-                //     pageIndex: this.pageNumber - 1,
-                //     stampUrl: this.stampUrl,
-                //     id
-                // }),
-                // {
-                //     image: this.stampUrl,
-                //     text: inputValue || '',
-                //     batchPdfjsAnnotationStorage: batchPdfjsAnnotationStorage
-                // }
             )
 
             this.stampImage = null
         })
-    }
-
-    /**
-     * 刷新 PDF.js 注解存储，从序列化的组字符串中恢复签章图片的信息。
-     * @param groupId 形状组的 ID
-     * @param groupString 序列化的组字符串
-     * @param rawAnnotationStore 原始注解存储对象
-     * @returns 返回更新后的 PDF.js 注解存储对象的 Promise
-     */
-    public async refreshPdfjsAnnotationStorage(
-        groupId: string,
-        groupString: string,
-        rawAnnotationStore: IAnnotationStore
-    ): Promise<{ annotationStorage: IPdfjsAnnotationStorage; batchPdfjsAnnotationStorage?: IPdfjsAnnotationStorage[] }> {
-        return null
-        // const ghostGroup = Konva.Node.create(groupString)
-        // const image = this.getGroupNodesByClassName(ghostGroup, 'Image')[0] as Konva.Image
-        // const { x, y, width, height } = this.fixImageCoordinateForGroup(image, ghostGroup)
-        // const stampUrl = image.getAttr('base64')
-
-        // // 计算并返回更新后的 PDF.js 注解存储对象
-        // const annotationStorage = await this.calculateImageForStorage({
-        //     x,
-        //     y,
-        //     width,
-        //     height,
-        //     annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
-        //     pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex,
-        //     stampUrl: stampUrl,
-        //     id: groupId
-        // })
-
-        // // 处理批量 PDF.js 注解存储
-        // const batchPdfjsAnnotationStorage: IPdfjsAnnotationStorage[] = []
-        // const batchStores = rawAnnotationStore.content?.batchPdfjsAnnotationStorage
-
-        // if (batchStores?.length > 0) {
-        //     for (const store of batchStores) {
-        //         const newStore = await this.calculateImageForStorage({
-        //             x,
-        //             y,
-        //             width,
-        //             height,
-        //             annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
-        //             pageIndex: store.pageIndex,
-        //             stampUrl: stampUrl,
-        //             id: `${groupId}-${store.pageIndex}`
-        //         })
-        //         batchPdfjsAnnotationStorage.push(newStore)
-        //     }
-        // }
-
-        // return { annotationStorage, batchPdfjsAnnotationStorage }
-    }
-
-    /**
-     * 调整签章图片在组内的坐标。
-     * @param image Konva.Image 对象
-     * @param group Konva.Group 对象
-     * @returns 返回调整后的坐标信息
-     */
-    private fixImageCoordinateForGroup(image: Konva.Image, group: Konva.Group) {
-        const imageLocalRect = image.getClientRect({ relativeTo: group })
-
-        // 获取组的全局变换
-        const groupTransform = group.getTransform()
-
-        // 使用组的变换将局部坐标转换为全局坐标
-        const imageGlobalPos = groupTransform.point({
-            x: imageLocalRect.x,
-            y: imageLocalRect.y
-        })
-
-        // 计算形状的全局宽度和高度
-        const globalWidth = imageLocalRect.width * (group.attrs.scaleX || 1)
-        const globalHeight = imageLocalRect.height * (group.attrs.scaleY || 1)
-
-        return {
-            x: imageGlobalPos.x,
-            y: imageGlobalPos.y,
-            width: globalWidth,
-            height: globalHeight
-        }
-    }
-
-    /**
-     * 将签章图片数据转换为 PDF.js 注解存储所需的数据格式。
-     * @param param0 包含签章图片和相关信息的参数
-     * @returns 返回处理后的 PDF.js 注解存储对象的 Promise
-     */
-    private async calculateImageForStorage({
-        x,
-        y,
-        width,
-        height,
-        annotationType,
-        pageIndex,
-        stampUrl,
-        id
-    }: {
-        x: number
-        y: number
-        width: number
-        height: number
-        annotationType: PdfjsAnnotationEditorType
-        pageIndex: number
-        stampUrl: string
-        id: string
-    }): Promise<IPdfjsAnnotationStorage> {
-        const canvasHeight = this.konvaStage.size().height / this.konvaStage.scale().y
-        const rectBottomRightX: number = x + width
-        const rectBottomRightY: number = y + height
-        const rect: [number, number, number, number] = [x, canvasHeight - y, rectBottomRightX, canvasHeight - rectBottomRightY]
-
-        // 构造 PDF.js 注解存储对象
-        const annotationStorage: IPdfjsAnnotationStorage = {
-            annotationType,
-            isSvg: false,
-            bitmap: await base64ToImageBitmap(stampUrl),
-            bitmapId: `image_${id}`,
-            pageIndex,
-            rect,
-            rotation: 0
-        }
-
-        return annotationStorage
     }
 
     /**

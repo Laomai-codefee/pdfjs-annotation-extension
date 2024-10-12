@@ -2,7 +2,6 @@
     {
         "id": "1529R",
         "pageNumber": 1,
-        "pageRanges": null,
         "konvaString": "{\"attrs\":{\"name\":\"PdfjsAnnotationExtension_shape_group\",\"id\":\"1529R\"},\"className\":\"Group\",\"children\":[{\"attrs\":{\"x\":235.204,\"y\":163.5329999999999,\"width\":173.51999999999998,\"height\":11.867999999999938,\"opacity\":0.5,\"fill\":\"rgb(87, 184, 253)\"},\"className\":\"Rect\"}]}",
         "konvaClientRect": {
             "x": 235.204,
@@ -33,7 +32,6 @@
     {
         "id": "1533R",
         "pageNumber": 1,
-        "pageRanges": null,
         "konvaString": "{\"attrs\":{\"name\":\"PdfjsAnnotationExtension_shape_group\",\"id\":\"1533R\"},\"className\":\"Group\",\"children\":[{\"attrs\":{\"x\":115.139,\"y\":408.3089999999999,\"width\":178.06399999999996,\"stroke\":\"rgb(155, 187, 89)\",\"strokeWidth\":0.5,\"hitStrokeWidth\":10,\"height\":0.5},\"className\":\"Rect\"},{\"attrs\":{\"x\":53.9999,\"y\":418.2709999999999,\"width\":239.20309999999998,\"stroke\":\"rgb(155, 187, 89)\",\"strokeWidth\":0.5,\"hitStrokeWidth\":10,\"height\":0.5},\"className\":\"Rect\"},{\"attrs\":{\"x\":53.9999,\"y\":428.23399999999987,\"width\":239.20309999999998,\"stroke\":\"rgb(155, 187, 89)\",\"strokeWidth\":0.5,\"hitStrokeWidth\":10,\"height\":0.5},\"className\":\"Rect\"},{\"attrs\":{\"x\":53.9999,\"y\":438.1969999999999,\"width\":239.20309999999998,\"stroke\":\"rgb(155, 187, 89)\",\"strokeWidth\":0.5,\"hitStrokeWidth\":10,\"height\":0.5},\"className\":\"Rect\"},{\"attrs\":{\"x\":53.9999,\"y\":448.1589999999999,\"width\":239.20309999999998,\"stroke\":\"rgb(155, 187, 89)\",\"strokeWidth\":0.5,\"hitStrokeWidth\":10,\"height\":0.5},\"className\":\"Rect\"},{\"attrs\":{\"x\":53.9999,\"y\":458.1219999999999,\"width\":239.20309999999998,\"stroke\":\"rgb(155, 187, 89)\",\"strokeWidth\":0.5,\"hitStrokeWidth\":10,\"height\":0.5},\"className\":\"Rect\"},{\"attrs\":{\"x\":53.9999,\"y\":468.0839999999999,\"width\":190.7831,\"stroke\":\"rgb(155, 187, 89)\",\"strokeWidth\":0.5,\"hitStrokeWidth\":10,\"height\":0.5},\"className\":\"Rect\"}]}",
         "konvaClientRect": {
             "x": 53.7499,
@@ -64,7 +62,6 @@
     {
         "id": "1539R",
         "pageNumber": 1,
-        "pageRanges": null,
         "konvaString": "{\"attrs\":{\"name\":\"PdfjsAnnotationExtension_shape_group\",\"id\":\"1539R\",\"draggable\":true,\"x\":24.6,\"y\":220.8},\"className\":\"Group\",\"children\":[{\"attrs\":{\"strokeScaleEnabled\":false,\"stroke\":\"rgb(255, 189, 9)\",\"strokeWidth\":10,\"opacity\":0.5,\"lineCap\":\"round\",\"lineJoin\":\"round\",\"hitStrokeWidth\":20,\"points\":[358,405.9999999999999,358.667,405.9999999999999,359.333,405.9999999999999,362.667,405.3329999999999,368.667,403.3329999999999,377.333,400.66699999999986,388,397.9999999999999,399.333,395.3329999999999,412,392.66699999999986,423.333,389.9999999999999,434,388.66699999999986,444,387.9999999999999,452.667,387.9999999999999,460.667,387.9999999999999,468,387.9999999999999,475.333,387.9999999999999,481.333,387.9999999999999,485.333,388.66699999999986,488.667,389.9999999999999,491.333,390.66699999999986,494,391.3329999999999,496,391.9999999999999,498,392.66699999999986,500,393.3329999999999,501.333,393.3329999999999,502,393.3329999999999,502.667,393.3329999999999,503.333,393.3329999999999]},\"className\":\"Line\"}]}",
         "konvaClientRect": {
             "x": 377.6,

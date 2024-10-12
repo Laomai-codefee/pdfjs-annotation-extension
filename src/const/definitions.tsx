@@ -1,4 +1,3 @@
-import { Annotation } from 'pdfjs'
 import {
     CircleIcon,
     FreehandIcon,
@@ -14,128 +13,6 @@ import {
 } from './icon'
 import { IRect } from 'konva/lib/types'
 import { defaultOptions } from './default_options'
-
-/**
- * 描述批注路径数据的接口
- */
-interface IPathData {
-    /**
-     * 贝塞尔曲线的控制点数组
-     * 通常是 4 个或 8 个数值表示控制点坐标
-     */
-    bezier?: number[]
-
-    /**
-     * 路径上的关键点数组
-     * 表示绘制路径上的一些关键坐标点
-     */
-    points?: number[]
-}
-
-/**
- * PDF.js 批注存储接口定义
- * 描述了存储在 PDF.js 中的批注的各种属性
- */
-export interface IPdfjsAnnotationStorage {
-    /**
-     * 批注的类型
-     * 对应 PDF.js 内部定义的批注类型枚举
-     */
-    annotationType: PdfjsAnnotationEditorType
-
-    /**
-     * 批注颜色，使用 [R, G, B] 数组表示
-     * 表示批注的颜色，范围从 0 到 255
-     */
-    color?: number[]
-
-    /**
-     * 批注的线条粗细
-     * 表示批注线条的宽度
-     */
-    thickness?: number
-
-    /**
-     * 批注的不透明度 (0.0 - 1.0)
-     * 表示批注的透明度，0.0 为完全透明，1.0 为完全不透明
-     */
-    opacity?: number
-
-    /**
-     * 描述批注的路径数据数组
-     * 用于存储批注的路径信息，例如手绘的路径
-     */
-    paths?: IPathData[]
-
-    /**
-     * 批注所在的页面索引（从0开始）
-     * 表示批注位于 PDF 的第几页
-     */
-    pageIndex: number
-
-    /**
-     * 批注的边界矩形，以 [x, y, width, height] 表示
-     * 可选，因为并非所有批注类型都需要这个属性
-     * 用于描述批注在页面上的位置和尺寸
-     */
-    rect?: [number, number, number, number]
-
-    /**
-     * 路径的四边形点数组
-     * 用于表示四边形批注的各个顶点
-     */
-    quadPoints?: number[]
-
-    /**
-     * 批注的轮廓点数组
-     * 用于描述批注的轮廓形状
-     */
-    outlines?: number[][]
-
-    /**
-     * 批注的旋转角度（度数）
-     * 可选，因为并非所有批注类型都需要旋转属性
-     */
-    rotation?: number
-
-    /**
-     * 图片标识
-     * 用于存储签名或图章的标识符
-     */
-    bitmapId?: string
-
-    /**
-     * 图片数据
-     * 用于存储签名或图章的图像数据
-     */
-    bitmap?: ImageBitmap
-
-    /**
-     * 图片名称
-     * 用于存储图章的名称
-     */
-    bitmapName?: string
-
-    /**
-     * 图片 URL
-     * 用于存储图章的 URL 地址
-     */
-    bitmapUrl?: string
-
-    /**
-     * 是否为 SVG 图像
-     * 用于指示图像是否为 SVG 格式
-     */
-    isSvg?: boolean
-
-    /**
-     * 结构树父节点 ID
-     * 用于标识批注在结构树中的父节点
-     */
-    structTreeParentId?: string
-
-    user?: string
-}
 
 export type PdfjsAnnotationSubtype =
     | 'Link'
@@ -216,54 +93,6 @@ export enum AnnotationType {
     STAMP = 10 // 盖章批注
 }
 
-// // 配置默认颜色
-// // 提供一组默认的颜色选项
-// export const DefaultColors = ['#ff0000', '#ffbe00', '#ffff00', '#83d33c', '#00b445', '#00b2f4', '#0071c4', '#001f63', '#7828a4']
-
-// // 配置默认字体大小
-// // 提供一组默认的字体大小选项
-// export const DefaultFontSize = [14, 16, 18, 20, 22, 24]
-
-// // 配置默认的签名设置
-// export const DefaultSignatureSetting = {
-//     COLORS: ['#000000', '#ff0000'], // 签名的默认颜色选项
-//     WIDTH: 366, // 签名框的宽度
-//     HEIGHT: 200 // 签名框的高度
-// }
-
-// export const DefaultStampSetting = {
-//     MAX_SIZE: 1024 * 1024 * 5 // 最大文件大小为 5MB
-// }
-
-// // 配置默认的选择设置
-// // 提供默认的选择工具的颜色和线条宽度
-// export const DefaultChooseSetting = {
-//     COLOR: '#000', // 选择工具的颜色
-//     STROKEWIDTH: 1 // 选择工具的线条宽度
-// }
-
-// // 默认配置对象
-// // 提供一组默认的批注设置
-// export const setting = {
-//     COLOR: DefaultColors[0], // 默认颜色
-//     FONT_SIZE: DefaultFontSize[2], // 默认字体大小
-//     HIGHLIGHT_COLOR: DefaultColors[2], // 默认高亮颜色
-//     STRIKEOUT_COLOR: DefaultColors[0], // 默认删除线颜色
-//     UNDERLINE_COLOR: DefaultColors[6], // 默认下划线颜色
-//     STROKE_WIDTH: 2, // 默认线条宽度
-//     OPACITY: 1, // 默认不透明度
-//     MAX_CURSOR_SIZE: 96, // 鼠标指针图片最大宽度/高度
-//     DOWNLOAD_BUTTON: true, // 下载按钮
-//     SAVE_BUTTON: true, // 保存按钮
-//     HIDE_PDFJS_ELEMENT: [ // 需要隐藏的 pdfjs 按钮
-//         '#editorModeButtons',
-//         '#editorModeSeparator',
-//         '#pageRotateCw',
-//         '#pageRotateCcw',
-//         '#download'
-//     ]
-// }
-
 // 定义批注类型的接口
 // 用于描述应用中支持的批注类型
 export interface IAnnotationType {
@@ -306,9 +135,8 @@ export interface IAnnotationContentsObj {
 export interface IAnnotationStore {
     id: string; // 批注的唯一标识符
     pageNumber: number; // 批注所在的页码
-    pageRanges?: number[] | null; // 可选的页码范围数组
     konvaString: string; // Konva 的序列化表示
-    konvaClientRect: IRect
+    konvaClientRect: IRect; // 批注在 stage 中的位置
     title: string; // 批注标题
     type: AnnotationType; // 批注类型
     color?: string | null; // 可选颜色，可以是 undefined 或 null
@@ -319,7 +147,7 @@ export interface IAnnotationStore {
     date: string; // 创建或修改日期
     contentsObj?: IAnnotationContentsObj | null; // 可选的内容对象
     comments: IAnnotationComment[]; // 与批注相关的评论数组
-    readonly: boolean; // 表示批注是否只读
+    readonly: boolean; // 表示批注是否只读，不可移动
 }
 
 // 批注类型定义数组

@@ -1,8 +1,7 @@
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 
-import { AnnotationType, IAnnotationStore, IPdfjsAnnotationStorage, PdfjsAnnotationEditorType } from '../../const/definitions'
-import { getRGB } from '../../utils/utils'
+import { AnnotationType } from '../../const/definitions'
 import { Editor, IEditorOptions } from './editor'
 
 /**
@@ -100,14 +99,6 @@ export class EditorFreeHand extends Editor {
                             text: ''
                         }
                     }
-                    // this.calculateLinesForStorage({
-                    //     group: this.currentShapeGroup.konvaGroup,
-                    //     annotationType: this.currentAnnotation.pdfjsType,
-                    //     color: getRGB(this.currentAnnotation.style.color),
-                    //     thickness: this.currentAnnotation.style.strokeWidth || 2,
-                    //     opacity: this.currentAnnotation.style.opacity || 1,
-                    //     pageIndex: this.pageNumber - 1
-                    // })
                 )
                 this.currentShapeGroup = null
             })
@@ -124,14 +115,6 @@ export class EditorFreeHand extends Editor {
                         text: ''
                     }
                 }
-                // this.calculateLinesForStorage({
-                //     group: this.currentShapeGroup.konvaGroup,
-                //     annotationType: this.currentAnnotation.pdfjsType,
-                //     color: getRGB(this.currentAnnotation.style.color),
-                //     thickness: this.currentAnnotation.style.strokeWidth || 2,
-                //     opacity: this.currentAnnotation.style.opacity || 1,
-                //     pageIndex: this.pageNumber - 1
-                // })
             )
             this.currentShapeGroup = null
         })
@@ -147,122 +130,6 @@ export class EditorFreeHand extends Editor {
         if (e.button !== 0) return // 只处理左键释放事件
         this.mouseUpHandler() // 调用指针释放处理方法
         window.removeEventListener('mouseup', this.globalPointerUpHandler) // 移除全局鼠标释放事件监听器
-    }
-
-    /**
-     * 刷新 Pdfjs 注释存储，用于更新或修正注释组。
-     * @param groupId 注释组 ID
-     * @param groupString 注释组的序列化字符串
-     * @param rawAnnotationStore 原始注释存储数据
-     * @returns 更新后的 Pdfjs 注释存储对象
-     */
-    public async refreshPdfjsAnnotationStorage(groupId: string, groupString: string, rawAnnotationStore: IAnnotationStore) {
-        return null
-        // const ghostGroup = Konva.Node.create(groupString) // 通过序列化字符串创建临时组
-        // return {
-        //     annotationStorage: this.calculateLinesForStorage({
-        //         group: ghostGroup,
-        //         annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
-        //         color: rawAnnotationStore.pdfjsAnnotationStorage.color,
-        //         thickness: rawAnnotationStore.pdfjsAnnotationStorage.thickness,
-        //         opacity: rawAnnotationStore.pdfjsAnnotationStorage.opacity,
-        //         pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex
-        //     })
-        // }
-    }
-
-    /**
-     * 修正线条在组内的坐标。
-     * @param line Konva.Line 对象
-     * @param group Konva.Group 对象
-     * @returns 修正后的点集
-     */
-    private fixLineCoordinateForGroup(line: Konva.Line, group: Konva.Group) {
-        const groupTransform = group.getTransform() // 获取组的全局变换矩阵
-        const points = line.points() // 获取线条的局部点集
-        const transformedPoints: number[] = []
-
-        // 遍历点集并应用组的变换
-        for (let i = 0; i < points.length; i += 2) {
-            const localX = points[i]
-            const localY = points[i + 1]
-
-            // 应用组的变换，将局部坐标转换为全局坐标
-            const globalPos = groupTransform.point({ x: localX, y: localY })
-
-            transformedPoints.push(globalPos.x, globalPos.y)
-        }
-
-        return transformedPoints
-    }
-
-    /**
-     * 将当前绘制的曲线数据转换为 PDF.js 所需的注释存储数据格式。
-     * @param param0 参数对象
-     * @returns 符合 PDF.js 注释存储数据格式的对象
-     */
-    private calculateLinesForStorage({
-        group,
-        annotationType,
-        color,
-        thickness,
-        opacity,
-        pageIndex
-    }: {
-        group: Konva.Group
-        annotationType: PdfjsAnnotationEditorType
-        color: number[]
-        thickness: number
-        opacity: number
-        pageIndex: number
-    }): IPdfjsAnnotationStorage {
-        const canvasHeight = this.konvaStage.size().height / this.konvaStage.scale().y // 获取画布高度
-        let minX = Infinity,
-            minY = Infinity,
-            maxX = -Infinity,
-            maxY = -Infinity
-        const path: Array<{ bezier: number[]; points: number[] }> = []
-        const lines = this.getGroupNodesByClassName(group, 'Line') as Konva.Line[] // 获取所有 Line 对象
-
-        lines.forEach(line => {
-            const originalPoints = this.fixLineCoordinateForGroup(line, group) // 获取曲线的点集
-            const transformedPoints = originalPoints.map((coord, index) => {
-                if (index % 2 !== 0) {
-                    // 转换 y 坐标到 PDF.js 坐标系
-                    const transformedY = canvasHeight - coord
-                    // 更新边界框计算
-                    minY = Math.min(minY, transformedY)
-                    maxY = Math.max(maxY, transformedY)
-                    return transformedY
-                } else {
-                    // x 坐标保持不变，更新边界框计算
-                    minX = Math.min(minX, coord)
-                    maxX = Math.max(maxX, coord)
-                    return coord
-                }
-            })
-
-            // 将转换后的点集添加到路径数组中
-            path.push({
-                bezier: transformedPoints,
-                points: transformedPoints
-            })
-        })
-
-        // 构建边界框数组
-        const rect: [number, number, number, number] = [minX, minY, maxX, maxY]
-
-        // 返回符合 PDF.js 注释存储数据格式的对象
-        return {
-            annotationType,
-            color,
-            thickness,
-            opacity,
-            paths: path,
-            pageIndex,
-            rect: rect,
-            rotation: 0
-        }
     }
 
     /**

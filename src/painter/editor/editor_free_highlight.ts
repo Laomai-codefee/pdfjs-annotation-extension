@@ -1,8 +1,7 @@
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 
-import { AnnotationType, IAnnotationStore, IPdfjsAnnotationStorage, PdfjsAnnotationEditorType } from '../../const/definitions'
-import { getRGB } from '../../utils/utils'
+import { AnnotationType } from '../../const/definitions'
 import { Editor, IEditorOptions } from './editor'
 
 export class EditorFreeHighlight extends Editor {
@@ -101,15 +100,6 @@ export class EditorFreeHighlight extends Editor {
                         text: ''
                     }
                 }
-                // this.calculateLinesForStorage({
-                //     line: this.line,
-                //     group: this.currentShapeGroup.konvaGroup,
-                //     annotationType: this.currentAnnotation.pdfjsType,
-                //     color: getRGB(this.currentAnnotation.style.color),
-                //     thickness: this.currentAnnotation.style.strokeWidth || 2,
-                //     opacity: this.currentAnnotation.style.opacity,
-                //     pageIndex: this.pageNumber - 1
-                // })
             )
             this.line = null
         }
@@ -163,116 +153,6 @@ export class EditorFreeHighlight extends Editor {
         return points
     }
 
-    private fixLineCoordinateForGroup(line: Konva.Line, group: Konva.Group) {
-        // 获取组的全局变换矩阵
-        const groupTransform = group.getTransform()
-
-        // 获取线条的局部点集
-        const points = line.points()
-        const transformedPoints: number[] = []
-
-        // 遍历点集并应用组的变换
-        for (let i = 0; i < points.length; i += 2) {
-            const localX = points[i]
-            const localY = points[i + 1]
-
-            // 应用组的变换，将局部坐标转换为全局坐标
-            const globalPos = groupTransform.point({ x: localX, y: localY })
-
-            transformedPoints.push(globalPos.x, globalPos.y)
-        }
-
-        return transformedPoints
-    }
-
-    /**
-     * 将当前绘制的曲线数据转换为 PDF.js 所需的注释存储数据格式。
-     * @returns 符合 PDF.js 注释存储数据格式的对象
-     */
-    private calculateLinesForStorage({
-        group,
-        line,
-        annotationType,
-        color,
-        thickness,
-        opacity,
-        pageIndex
-    }: {
-        group: Konva.Group
-        line: Konva.Line
-        annotationType: PdfjsAnnotationEditorType
-        color: number[]
-        thickness: number
-        opacity: number
-        pageIndex: number
-    }): IPdfjsAnnotationStorage {
-        const canvasHeight = this.konvaStage.size().height / this.konvaStage.scale().y
-
-        // 初始化边界框变量
-        let minX = Infinity,
-            minY = Infinity,
-            maxX = -Infinity,
-            maxY = -Infinity
-
-        const path: Array<{ bezier: number[]; points: number[] }> = []
-
-        // 获取原始点集
-        const originalPoints = this.fixLineCoordinateForGroup(line, group) || []
-
-        // 获取当前线条的宽度
-        const strokeWidth = thickness
-        const halfStrokeWidth = strokeWidth / 2
-
-        // 转换点集并计算边界框
-        const transformedPoints = originalPoints.map((coord, index) => {
-            if (index % 2 !== 0) {
-                // Y 坐标
-                const transformedY = canvasHeight - coord
-                // 考虑到笔触宽度的边界框计算
-                minY = Math.min(minY, transformedY - halfStrokeWidth)
-                maxY = Math.max(maxY, transformedY + halfStrokeWidth)
-                return transformedY
-            } else {
-                // X 坐标
-                // 考虑到笔触宽度的边界框计算
-                minX = Math.min(minX, coord - halfStrokeWidth)
-                maxX = Math.max(maxX, coord + halfStrokeWidth)
-                return coord
-            }
-        })
-
-        // 添加转换后的点集到路径
-        path.push({
-            bezier: this.generateBezierPoints(transformedPoints),
-            points: transformedPoints
-        })
-
-        // 构建边界框数组
-        const rect: [number, number, number, number] = [minX, minY, maxX, maxY]
-
-        // 返回符合 PDF.js 注释存储数据格式的对象
-        return {
-            annotationType,
-            color,
-            thickness: strokeWidth,
-            opacity,
-            paths: path,
-            pageIndex,
-            rect: rect,
-            rotation: 0
-        }
-    }
-
-    /**
-     * 生成贝塞尔曲线点集（当前为占位符，仅返回原始点集）。
-     * @param path 原始点集
-     * @returns 生成的贝塞尔曲线点集
-     */
-    private generateBezierPoints(path: number[]): number[] {
-        // 当前实现仅返回原始点集
-        return path
-    }
-
     /**
      * 判断当前绘制的曲线是否太小。
      * @returns 如果曲线点集长度小于 5 返回 true，否则返回 false
@@ -281,27 +161,4 @@ export class EditorFreeHighlight extends Editor {
         return (this.line?.points().length || 0) < 5
     }
 
-    /**
-     * 刷新 Pdfjs 注释存储，用于更新或修正注释组。
-     * @param groupId 注释组 ID
-     * @param groupString 注释组的序列化字符串
-     * @param rawAnnotationStore 原始注释存储数据
-     * @returns 更新后的 Pdfjs 注释存储对象
-     */
-    public async refreshPdfjsAnnotationStorage(groupId: string, groupString: string, rawAnnotationStore: IAnnotationStore) {
-        return null
-        // const ghostGroup = Konva.Node.create(groupString)
-        // const line = this.getGroupNodesByClassName(ghostGroup, 'Line')[0] as Konva.Line
-        // return {
-        //     annotationStorage: this.calculateLinesForStorage({
-        //         group: ghostGroup,
-        //         line,
-        //         annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
-        //         color: rawAnnotationStore.pdfjsAnnotationStorage.color,
-        //         thickness: rawAnnotationStore.pdfjsAnnotationStorage.thickness,
-        //         opacity: rawAnnotationStore.pdfjsAnnotationStorage.opacity,
-        //         pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex
-        //     })
-        // }
-    }
 }

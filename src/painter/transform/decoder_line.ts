@@ -39,7 +39,6 @@ export class LineDecoder extends Decoder {
         const annotationStore: IAnnotationStore = {
             id: annotation.id,
             pageNumber: annotation.pageNumber,
-            pageRanges: null,
             konvaString: ghostGroup.toJSON(),
             konvaClientRect: ghostGroup.getClientRect(),
             title: annotation.titleObj.str,

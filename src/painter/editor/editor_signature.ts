@@ -1,8 +1,8 @@
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 
-import { AnnotationType, IAnnotationStore, IAnnotationType, IPdfjsAnnotationStorage, PdfjsAnnotationEditorType } from '../../const/definitions'
-import { base64ToImageBitmap, resizeImage, setCssCustomProperty } from '../../utils/utils'
+import { AnnotationType, IAnnotationType } from '../../const/definitions'
+import { resizeImage, setCssCustomProperty } from '../../utils/utils'
 import { CURSOR_CSS_PROPERTY } from '../const'
 import { Editor, IEditorOptions } from './editor'
 import { defaultOptions } from '../../const/default_options'
@@ -114,138 +114,18 @@ export class EditorSignature extends Editor {
                 base64: this.signatureUrl
             })
             this.currentShapeGroup.konvaGroup.add(this.signatureImage)
-
-            // 调整图片坐标并更新 PDF.js 注解存储
-            const { x, y, width, height } = this.fixImageCoordinateForGroup(this.signatureImage, this.currentShapeGroup.konvaGroup)
             const id = this.currentShapeGroup.konvaGroup.id()
-            this.setShapeGroupDone(
-                {
-                    id,
-                    contentsObj: {
-                        text: '',
-                        image: this.signatureUrl
-                    }
+            this.setShapeGroupDone({
+                id,
+                contentsObj: {
+                    text: '',
+                    image: this.signatureUrl
                 }
-                // await this.calculateImageForStorage({
-                //     x,
-                //     y,
-                //     width,
-                //     height,
-                //     annotationType: this.currentAnnotation.pdfjsType,
-                //     pageIndex: this.pageNumber - 1,
-                //     signatureUrl: this.signatureUrl,
-                //     id
-                // }),
-                // {
-                //     image: this.signatureUrl
-                // }
-            )
+            })
             this.signatureImage = null
         })
     }
 
-    /**
-     * 刷新 PDF.js 注解存储，从序列化的组字符串中恢复签名图片的信息。
-     * @param groupId 形状组的 ID
-     * @param groupString 序列化的组字符串
-     * @param rawAnnotationStore 原始注解存储对象
-     * @returns 返回更新后的 PDF.js 注解存储对象的 Promise
-     */
-    public async refreshPdfjsAnnotationStorage(
-        groupId: string,
-        groupString: string,
-        rawAnnotationStore: IAnnotationStore
-    ): Promise<{ annotationStorage: IPdfjsAnnotationStorage; batchPdfjsAnnotationStorage?: IPdfjsAnnotationStorage[] }> {
-        return null
-        // const ghostGroup = Konva.Node.create(groupString)
-        // const image = this.getGroupNodesByClassName(ghostGroup, 'Image')[0] as Konva.Image
-        // const { x, y, width, height } = this.fixImageCoordinateForGroup(image, ghostGroup)
-
-        // // 计算并返回更新后的 PDF.js 注解存储对象
-        // const annotationStorage = await this.calculateImageForStorage({
-        //     x,
-        //     y,
-        //     width,
-        //     height,
-        //     annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
-        //     pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex,
-        //     signatureUrl: image.getAttr('base64'),
-        //     id: groupId
-        // })
-        // return { annotationStorage }
-    }
-
-    /**
-     * 调整签名图片在组内的坐标。
-     * @param image Konva.Image 对象
-     * @param group Konva.Group 对象
-     * @returns 返回调整后的坐标信息
-     */
-    private fixImageCoordinateForGroup(image: Konva.Image, group: Konva.Group) {
-        const imageLocalRect = image.getClientRect({ relativeTo: group })
-
-        // 获取组的全局变换
-        const groupTransform = group.getTransform()
-
-        // 使用组的变换将局部坐标转换为全局坐标
-        const imageGlobalPos = groupTransform.point({
-            x: imageLocalRect.x,
-            y: imageLocalRect.y
-        })
-
-        // 计算形状的全局宽度和高度
-        const globalWidth = imageLocalRect.width * (group.attrs.scaleX || 1)
-        const globalHeight = imageLocalRect.height * (group.attrs.scaleY || 1)
-
-        return {
-            x: imageGlobalPos.x,
-            y: imageGlobalPos.y,
-            width: globalWidth,
-            height: globalHeight
-        }
-    }
-
-    /**
-     * 将签名图片数据转换为 PDF.js 注解存储所需的数据格式。
-     * @param param0 包含签名图片和相关信息的参数
-     * @returns 返回处理后的 PDF.js 注解存储对象的 Promise
-     */
-    private async calculateImageForStorage({
-        x,
-        y,
-        width,
-        height,
-        annotationType,
-        pageIndex,
-        signatureUrl,
-        id
-    }: {
-        x: number
-        y: number
-        width: number
-        height: number
-        annotationType: PdfjsAnnotationEditorType
-        pageIndex: number
-        signatureUrl: string
-        id: string
-    }): Promise<IPdfjsAnnotationStorage> {
-        const canvasHeight = this.konvaStage.size().height / this.konvaStage.scale().y
-        const rectBottomRightX: number = x + width
-        const rectBottomRightY: number = y + height
-        const rect: [number, number, number, number] = [x, canvasHeight - y, rectBottomRightX, canvasHeight - rectBottomRightY]
-
-        // 构造 PDF.js 注解存储对象
-        const annotationStorage: IPdfjsAnnotationStorage = {
-            annotationType,
-            isSvg: false,
-            bitmap: await base64ToImageBitmap(signatureUrl),
-            bitmapId: `image_${id}`,
-            pageIndex,
-            rect,
-            rotation: 0
-        }
-        return annotationStorage
-    }
     /**
      * 激活编辑器并设置签名图片。
      * @param konvaStage Konva 舞台对象

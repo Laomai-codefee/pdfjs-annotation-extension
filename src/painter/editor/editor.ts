@@ -2,7 +2,7 @@ import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 import { PDFViewerApplication } from 'pdfjs'
 
-import { AnnotationType, IAnnotationContentsObj, IAnnotationStore, IAnnotationType, IPdfjsAnnotationStorage } from '../../const/definitions'
+import { AnnotationType, IAnnotationContentsObj, IAnnotationStore, IAnnotationType } from '../../const/definitions'
 import { formatTimestamp, generateUUID } from '../../utils/utils'
 import { SHAPE_GROUP_NAME } from '../const'
 
@@ -78,7 +78,6 @@ export abstract class Editor {
     private dispatchAddEvent({
         shapeGroup,
         contentsObj,
-        pageRanges,
         color,
         fontSize
     }: {
@@ -92,7 +91,6 @@ export abstract class Editor {
         const annotationStore: IAnnotationStore = {
             id,
             pageNumber,
-            pageRanges,
             konvaString: konvaGroup.toJSON(),
             konvaClientRect: Konva.Node.create(konvaGroup.toJSON()).getClientRect(),
             title: this.userName,
@@ -189,7 +187,6 @@ export abstract class Editor {
     protected setShapeGroupDone({
         id,
         contentsObj,
-        pageRanges,
         color,
         fontSize
     }: {
@@ -205,7 +202,6 @@ export abstract class Editor {
             this.dispatchAddEvent({
                 shapeGroup,
                 contentsObj,
-                pageRanges,
                 color,
                 fontSize
             }) // 触发添加事件
@@ -281,19 +277,6 @@ export abstract class Editor {
         this.shapeGroupStore.set(id, shapeGroup) // 将形状组对象添加到 shapeGroupStore 中
         return shapeGroup // 返回新创建的形状组对象
     }
-
-    /**
-     * 刷新 PDF.js 注解存储，更新指定形状组的内容。
-     * @param groupId 形状组的 ID
-     * @param groupString 形状组的字符串表示
-     * @param rawAnnotationStore 原始注解存储对象
-     * @returns 返回更新后的 PDF.js 注解存储对象的 Promise
-     */
-    public abstract refreshPdfjsAnnotationStorage(
-        groupId: string,
-        groupString: string,
-        rawAnnotationStore: IAnnotationStore
-    ): Promise<{ annotationStorage: IPdfjsAnnotationStorage; batchPdfjsAnnotationStorage?: IPdfjsAnnotationStorage[] }>
 
     /**
      * 处理鼠标按下事件的抽象方法，子类需实现具体逻辑。

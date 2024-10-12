@@ -1,7 +1,6 @@
 import Konva from 'konva'
 
-import { AnnotationType, IPdfjsAnnotationStorage } from '../../const/definitions'
-import { getRGB } from '../../utils/utils'
+import { AnnotationType } from '../../const/definitions'
 import { Editor, IEditorOptions } from './editor'
 
 /**
@@ -149,73 +148,6 @@ export class EditorHighLight extends Editor {
             hitStrokeWidth: 10,
             height: 1
         })
-    }
-
-    /**
-     * 刷新 PDF.js 注解存储，目前未实现具体逻辑。
-     * @param groupId 形状组的 ID
-     * @param groupString 序列化的组字符串
-     * @returns 返回空 Promise
-     */
-    public async refreshPdfjsAnnotationStorage(): Promise<null> {
-        return null
-    }
-
-    /**
-     * 计算并存储当前高亮注释信息。
-     * @returns 返回高亮注释的存储信息 IPdfjsAnnotationStorage
-     */
-    private calculateHighlightForStorage(): IPdfjsAnnotationStorage {
-        return null
-        // const allHighlights: Konva.Rect[] = this.getNodesByClassName<Konva.Rect>('Rect')
-        // const quadPoints: number[] = []
-        // const outlines: number[][] = []
-
-        // let minX = Infinity
-        // let minY = Infinity
-        // let maxX = -Infinity
-        // let maxY = -Infinity
-
-        // const canvasHeight = this.konvaStage.size().height / this.konvaStage.scale().y
-
-        // allHighlights.forEach(shape => {
-        //     const { x, y, width, height } = shape.attrs
-
-        //     // 计算矩形的四个顶点坐标，并转换到 PDF.js 坐标系
-        //     const topLeft = [x, canvasHeight - y]
-        //     const bottomLeft = [x, canvasHeight - (y + height)]
-        //     const bottomRight = [x + width, canvasHeight - (y + height)]
-        //     const topRight = [x + width, canvasHeight - y]
-
-        //     // 对于 outlines，顺序是：左上，左下，右下，右上
-        //     const rectOutlines = [...topLeft, ...bottomLeft, ...bottomRight, ...topRight]
-        //     outlines.push(rectOutlines)
-
-        //     // 对于 quadPoints，顺序是：左上，右上，左下，右下
-        //     const rectQuadPoints = [...topLeft, ...topRight, ...bottomLeft, ...bottomRight]
-        //     quadPoints.push(...rectQuadPoints)
-
-        //     // 更新边界
-        //     minX = Math.min(minX, x)
-        //     minY = Math.min(minY, y)
-        //     maxX = Math.max(maxX, x + width)
-        //     maxY = Math.max(maxY, y + height)
-        // })
-
-        // // 构建包含所有形状的边界矩形 (rect)
-        // const rect: [number, number, number, number] = [minX, canvasHeight - maxY, maxX, canvasHeight - minY]
-
-        // // 构建综合存储对象
-        // return {
-        //     annotationType: this.currentAnnotation.pdfjsType,
-        //     color: getRGB(this.currentAnnotation.style.color),
-        //     opacity: this.currentAnnotation.style.opacity,
-        //     quadPoints: quadPoints,
-        //     outlines: outlines,
-        //     rect: rect,
-        //     pageIndex: this.pageNumber - 1,
-        //     rotation: 0
-        // }
     }
 
     /**

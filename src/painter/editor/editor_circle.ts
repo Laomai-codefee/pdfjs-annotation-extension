@@ -1,8 +1,7 @@
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 
-import { AnnotationType, IAnnotationStore, IPdfjsAnnotationStorage, PdfjsAnnotationEditorType } from '../../const/definitions'
-import { getRGB } from '../../utils/utils'
+import { AnnotationType } from '../../const/definitions'
 import { Editor, IEditorOptions } from './editor'
 
 /**
@@ -110,8 +109,6 @@ export class EditorCircle extends Editor {
             return
         }
 
-        // 提取椭圆的属性并保存形状组的状态
-        const { x, y, radiusX, radiusY } = this.ellipse.attrs
         this.setShapeGroupDone({
             id: group.id(),
             color: this.currentAnnotation.style.color,
@@ -119,18 +116,6 @@ export class EditorCircle extends Editor {
                 text: ''
             }
         }
-            
-            // this.calculateEllipseForStorage({
-            //     x,
-            //     y,
-            //     radiusX,
-            //     radiusY,
-            //     annotationType: this.currentAnnotation.pdfjsType,
-            //     color: getRGB(this.currentAnnotation.style.color),
-            //     thickness: this.currentAnnotation.style.strokeWidth || 2,
-            //     opacity: this.currentAnnotation.style.opacity,
-            //     pageIndex: this.pageNumber - 1
-            // })
         )
         this.ellipse = null // 重置当前椭圆对象为 null
     }
@@ -143,112 +128,6 @@ export class EditorCircle extends Editor {
         if (e.button !== 0) return // 只处理左键释放事件
         this.mouseUpHandler() // 调用指针释放处理方法
         window.removeEventListener('mouseup', this.globalPointerUpHandler) // 移除全局鼠标释放事件监听器
-    }
-
-    /**
-     * 刷新 Pdfjs 注释存储，用于更新或修正注释组。
-     * @param groupId 注释组 ID
-     * @param groupString 注释组的序列化字符串
-     * @param rawAnnotationStore 原始注释存储数据
-     * @returns 更新后的 Pdfjs 注释存储对象
-     */
-    public async refreshPdfjsAnnotationStorage(groupId: string, groupString: string, rawAnnotationStore: IAnnotationStore) {
-        return null
-        // const ghostGroup = Konva.Node.create(groupString) // 通过序列化字符串创建临时组
-        // const ellipse = this.getGroupNodesByClassName(ghostGroup, 'Ellipse')[0] as Konva.Ellipse // 获取椭圆对象
-        // const { x, y, radiusX, radiusY } = this.fixShapeCoordinateForGroup(ellipse, ghostGroup) // 修正椭圆坐标
-        // return {
-        //     annotationStorage: this.calculateEllipseForStorage({
-        //         x,
-        //         y,
-        //         radiusX,
-        //         radiusY,
-        //         annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
-        //         color: rawAnnotationStore.pdfjsAnnotationStorage.color,
-        //         thickness: rawAnnotationStore.pdfjsAnnotationStorage.thickness,
-        //         opacity: rawAnnotationStore.pdfjsAnnotationStorage.opacity,
-        //         pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex
-        //     })
-        // }
-    }
-
-    /**
-     * 修正椭圆在组内的坐标。
-     * @param shape Konva.Ellipse 对象
-     * @param group Konva.Group 对象
-     * @returns 修正后的坐标和半径
-     */
-    private fixShapeCoordinateForGroup(shape: Konva.Ellipse, group: Konva.Group) {
-        const groupTransform = group.getTransform() // 获取组的全局变换矩阵
-        const localX = shape.attrs.x // 获取椭圆的局部 x 坐标
-        const localY = shape.attrs.y // 获取椭圆的局部 y 坐标
-
-        // 将椭圆的局部坐标转换为全局坐标
-        const globalPos = groupTransform.point({ x: localX, y: localY })
-
-        // 计算椭圆的全局半径
-        const globalRadiusX = shape.attrs.radiusX * (group.attrs.scaleX || 1)
-        const globalRadiusY = shape.attrs.radiusY * (group.attrs.scaleY || 1)
-
-        return {
-            x: globalPos.x,
-            y: globalPos.y,
-            radiusX: globalRadiusX,
-            radiusY: globalRadiusY
-        }
-    }
-
-    /**
-     * 将椭圆数据转换为 PDF.js 所需的注释存储数据格式。
-     * @param param0 参数对象
-     * @returns 符合 PDF.js 注释存储数据格式的对象
-     */
-    private calculateEllipseForStorage({
-        x,
-        y,
-        radiusX,
-        radiusY,
-        annotationType,
-        color,
-        thickness,
-        opacity,
-        pageIndex
-    }: {
-        x: number
-        y: number
-        radiusX: number
-        radiusY: number
-        annotationType: PdfjsAnnotationEditorType
-        color: number[]
-        thickness: number
-        opacity: number
-        pageIndex: number
-    }): IPdfjsAnnotationStorage {
-        const canvasHeight = this.konvaStage.size().height / this.konvaStage.scale().y
-        const halfInterval: number = 0.5 // 角度间隔
-        const points: number[] = []
-
-        // 计算椭圆周上的点，并将其转换为适合 PDF.js 存储的格式
-        for (let angle = 0; angle <= 360; angle += halfInterval) {
-            const radians = (angle * Math.PI) / 180
-            const pointX = x + radiusX * Math.cos(radians)
-            const pointY = y + radiusY * Math.sin(radians)
-            points.push(pointX, canvasHeight - pointY) // 将点添加到数组中，并调整 y 坐标
-        }
-
-        // 计算椭圆的边界矩形的左上角和右下角顶点坐标
-        const rect: [number, number, number, number] = [x - radiusX * 2, canvasHeight - (y + radiusY * 2), x + radiusX * 2, canvasHeight - (y - radiusY * 2)]
-
-        return {
-            annotationType,
-            color,
-            thickness,
-            opacity,
-            paths: [{ bezier: points, points: points }], // 存储椭圆路径
-            pageIndex,
-            rect: rect,
-            rotation: 0
-        }
     }
 
     /**

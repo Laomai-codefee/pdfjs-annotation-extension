@@ -91,7 +91,6 @@ export class Store {
      * @returns 指定页面的注释列表
      */
     public getByPage(pageNumber: number): IAnnotationStore[] {
-        // 将 Map 转换为数组，并使用 filter 方法
         return Array.from(this.annotationStore.values()).filter(annotation => annotation.pageNumber === pageNumber)
     }
 

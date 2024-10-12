@@ -1,8 +1,7 @@
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 
-import { AnnotationType, IAnnotationStore, IPdfjsAnnotationStorage, PdfjsAnnotationEditorType } from '../../const/definitions'
-import { getRGB } from '../../utils/utils'
+import { AnnotationType } from '../../const/definitions'
 import { Editor, IEditorOptions } from './editor'
 
 /**
@@ -91,7 +90,6 @@ export class EditorRectangle extends Editor {
             this.rect = null
             return
         }
-        const { x, y, width, height } = this.fixShapeCoordinateForGroup(this.rect, this.currentShapeGroup.konvaGroup) // 调整矩形在组中的坐标
         this.setShapeGroupDone(
             {
                 id: group.id(),
@@ -100,17 +98,6 @@ export class EditorRectangle extends Editor {
                     text: ''
                 }
             }
-            // this.calculateRectForStorage({
-            //     x,
-            //     y,
-            //     width,
-            //     height,
-            //     annotationType: this.currentAnnotation.pdfjsType,
-            //     color: getRGB(this.currentAnnotation.style.color),
-            //     thickness: this.currentAnnotation.style.strokeWidth || 2,
-            //     opacity: this.currentAnnotation.style.opacity,
-            //     pageIndex: this.pageNumber - 1
-            // })
         ) // 更新 PDF.js 注解存储
         this.rect = null
     }
@@ -123,128 +110,6 @@ export class EditorRectangle extends Editor {
         if (e.button !== 0) return // 只处理左键释放事件
         this.mouseUpHandler() // 调用鼠标抬起处理方法
         window.removeEventListener('mouseup', this.globalPointerUpHandler) // 移除全局鼠标抬起事件监听器
-    }
-
-    /**
-     * 刷新 PDF.js 注解存储，从序列化的组字符串中恢复矩形的信息。
-     * @param groupId 形状组的 ID
-     * @param groupString 序列化的组字符串
-     * @param rawAnnotationStore 原始注解存储对象
-     * @returns 返回更新后的 PDF.js 注解存储对象的 Promise
-     */
-    public async refreshPdfjsAnnotationStorage(
-        groupId: string,
-        groupString: string,
-        rawAnnotationStore: IAnnotationStore
-    ): Promise<{ annotationStorage: IPdfjsAnnotationStorage; batchPdfjsAnnotationStorage?: IPdfjsAnnotationStorage[] }> {
-        return null
-        // const ghostGroup = Konva.Node.create(groupString) // 根据序列化的组字符串创建 Konva 节点
-        // const rect = this.getGroupNodesByClassName(ghostGroup, 'Rect')[0] as Konva.Rect // 获取组中的矩形对象
-        // const { x, y, width, height } = this.fixShapeCoordinateForGroup(rect, ghostGroup) // 调整矩形在组中的坐标
-        // return {
-        //     annotationStorage: this.calculateRectForStorage({
-        //         x,
-        //         y,
-        //         width,
-        //         height,
-        //         annotationType: rawAnnotationStore.pdfjsAnnotationStorage.annotationType,
-        //         color: rawAnnotationStore.pdfjsAnnotationStorage.color,
-        //         thickness: rawAnnotationStore.pdfjsAnnotationStorage.thickness,
-        //         opacity: rawAnnotationStore.pdfjsAnnotationStorage.opacity,
-        //         pageIndex: rawAnnotationStore.pdfjsAnnotationStorage.pageIndex
-        //     }) // 计算并返回更新后的 PDF.js 注解存储对象
-        // }
-    }
-
-    /**
-     * 调整矩形在组中的坐标和大小。
-     * @param shape Konva.Rect 对象（矩形）
-     * @param group Konva.Group 对象（组）
-     * @returns 返回调整后的坐标信息
-     */
-    private fixShapeCoordinateForGroup(shape: Konva.Rect, group: Konva.Group) {
-        const shapeLocalRect = shape.getClientRect({ relativeTo: group }) // 获取矩形在组中的局部坐标
-
-        const groupTransform = group.getTransform() // 获取组的全局变换
-
-        const shapeGlobalPos = groupTransform.point({
-            x: shapeLocalRect.x,
-            y: shapeLocalRect.y
-        }) // 使用组的变换将局部坐标转换为全局坐标
-
-        const globalWidth = shapeLocalRect.width * (group.attrs.scaleX || 1) // 计算形状的全局宽度
-        const globalHeight = shapeLocalRect.height * (group.attrs.scaleY || 1) // 计算形状的全局高度
-
-        return {
-            x: shapeGlobalPos.x,
-            y: shapeGlobalPos.y,
-            width: globalWidth,
-            height: globalHeight
-        }
-    }
-
-    /**
-     * 将矩形数据转换为 PDF.js 注解存储所需的数据格式。
-     * @param param0 包含矩形和相关信息的参数
-     * @returns 返回处理后的 PDF.js 注解存储对象
-     */
-    private calculateRectForStorage({
-        x,
-        y,
-        width,
-        height,
-        annotationType,
-        color,
-        thickness,
-        opacity,
-        pageIndex
-    }: {
-        x: number
-        y: number
-        width: number
-        height: number
-        annotationType: PdfjsAnnotationEditorType
-        color: number[]
-        thickness: number
-        opacity: number
-        pageIndex: number
-    }): IPdfjsAnnotationStorage {
-        const canvasHeight = this.konvaStage.size().height / this.konvaStage.scale().y // 获取舞台的缩放后的高度
-        const halfInterval: number = 0.5 // 半间隔大小
-        const points: number[] = [] // 用于存储顶点坐标的数组
-
-        const rectBottomRightX: number = x + width // 计算矩形的右下角顶点 X 坐标
-        const rectBottomRightY: number = y + height // 计算矩形的右下角顶点 Y 坐标
-        const rect: [number, number, number, number] = [x, canvasHeight - y, rectBottomRightX, canvasHeight - rectBottomRightY] // 组装矩形坐标信息
-
-        // 添加矩形边框上的顶点坐标
-        // 左边缘上的点
-        for (let i = y; i < rectBottomRightY; i += halfInterval) {
-            points.push(x, canvasHeight - i)
-        }
-        // 底边缘上的点
-        for (let i = x + halfInterval; i < rectBottomRightX; i += halfInterval) {
-            points.push(i, canvasHeight - rectBottomRightY)
-        }
-        // 右边缘上的点
-        for (let i = rectBottomRightY - halfInterval; i >= y; i -= halfInterval) {
-            points.push(rectBottomRightX, canvasHeight - i)
-        }
-        // 顶边缘上的点
-        for (let i = rectBottomRightX - halfInterval; i >= x + halfInterval; i -= halfInterval) {
-            points.push(i, canvasHeight - y)
-        }
-
-        return {
-            annotationType,
-            color,
-            thickness,
-            opacity,
-            paths: [{ bezier: points, points: points }], // 存储路径信息
-            pageIndex,
-            rect: rect, // 存储矩形的坐标信息
-            rotation: 0 // 默认旋转角度为 0
-        }
     }
 
     /**
