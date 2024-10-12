@@ -91,7 +91,7 @@
   ae_username= 批注人姓名，添加批注时显示的批注人姓名
 ```
 ```bash
-  ae_get_url= 批注数据地址，通过此地址加载已保存的批注数据 示例 ./examples/pdfjs-4.3.136-dist/web/pdfjs-annotation-extension-testdata.json
+  ae_get_url= 批注数据地址，通过此地址加载已保存的批注数据 示例 ./examples/pdfjs-4.3.136-dist/pdfjs-annotation-extension-testdata.json
 ```
 ```bash
   ae_post_url= 批注数据提交地址

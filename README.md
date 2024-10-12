@@ -91,7 +91,7 @@ Open the URL: http://localhost:8080/web/viewer.html to see the result.
   ae_username= Name of the annotator, displayed as the annotator's name when adding annotations
 ```
 ```bash
-  ae_get_url= URL for annotation data, used to load previously saved annotation data. Example: ./examples/pdfjs-4.3.136-dist/web/pdfjs-annotation-extension-testdata.json
+  ae_get_url= URL for annotation data, used to load previously saved annotation data. Example: ./examples/pdfjs-4.3.136-dist/pdfjs-annotation-extension-testdata.json
 ```
 ```bash
   ae_post_url= URL for submitting annotation data
