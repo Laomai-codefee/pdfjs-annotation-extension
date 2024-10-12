@@ -646,10 +646,13 @@ export class Painter {
      * @description 将annotation 存入 store, 包含外部 annotation 和 pdf 文件上的 annotation
      */
     public async initAnnotations(annotations: IAnnotationStore[], loadPdfAnnotation: boolean) {
+        console.log('%c [ annotations ]-649-「painter/index.ts」', 'font-size:13px; background:#380b3c; color:#7c4f80;', annotations)
+
         // 加载 pdf 文件批注
         if (loadPdfAnnotation) {
             // 先将 pdf 文件中的存入
             const annotationMap = await this.transform.decodePdfAnnotation()
+            console.log('%c [ annotationMap ]-655-「painter/index.ts」', 'font-size:13px; background:#abcaf4; color:#efffff;', annotationMap)
             annotationMap.forEach(annotation => {
                 this.saveToStore(annotation, true)
             })
