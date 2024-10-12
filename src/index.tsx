@@ -184,6 +184,7 @@ class PdfjsAnnotationExtension {
         createRoot(comment).render(
             <CustomComment
                 ref={this.customCommentRef}
+                userName={this.getOption(HASH_PARAMS_USERNAME)}
                 onSelected={async (annotation) => {
                     await this.painter.highlight(annotation)
                 }}

@@ -55,6 +55,7 @@ const AnnotationIcon: React.FC<{ subtype: PdfjsAnnotationSubtype }> = ({ subtype
 const { TextArea } = Input
 
 interface CustomCommentProps {
+    userName: string
     onSelected: (annotation: IAnnotationStore) => void
     onUpdate: (annotation: IAnnotationStore) => void
     onDelete: (id: string) => void
@@ -155,7 +156,7 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
     const addReply = (annotation: IAnnotationStore, comment: string) => {
         annotation.comments.push({
             id: generateUUID(),
-            title: 'username',
+            title: props.userName,
             date: formatTimestamp(Date.now()),
             content: comment
         })
@@ -165,7 +166,7 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
     const updateReply = (annotation: IAnnotationStore, reply: IAnnotationComment, comment: string) => {
         reply.date = formatTimestamp(Date.now())
         reply.content = comment
-        reply.title = 'username'
+        reply.title = props.userName
         props.onUpdate(annotation)
     }
 
