@@ -2,7 +2,7 @@ import './index.scss'
 import { ColorPicker, message } from 'antd'
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 import { annotationDefinitions, AnnotationType, IAnnotationType, PdfjsAnnotationEditorType } from '../../const/definitions'
-import { DownloadIcon, PaletteIcon, SaveIcon } from '../../const/icon'
+import { PaletteIcon, SaveIcon } from '../../const/icon'
 import { SignatureTool } from './signature'
 import { StampTool } from './stamp'
 import { useTranslation } from 'react-i18next'
@@ -11,7 +11,6 @@ import { defaultOptions } from '../../const/default_options'
 interface CustomToolbarProps {
     onChange: (annotation: IAnnotationType | null, dataTransfer: string | null) => void
     onSave: () => void
-    onDownload: () => void
 }
 
 export interface CustomToolbarRef {
@@ -123,17 +122,6 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
             </ul>
             <div className="splitToolbarButtonSeparator"></div>
             <ul className="buttons">
-                {
-                    defaultOptions.setting.DOWNLOAD_BUTTON && <li  title={t('normal.download')} onClick={() => {
-                        props.onDownload()
-                    }}>
-                        <div className="icon">
-                            <DownloadIcon />
-                        </div>
-                        <div className="name">{t('normal.download')}</div>
-                    </li>
-                }
-
                 {
                     defaultOptions.setting.SAVE_BUTTON && <li  title={t('normal.save')} onClick={() => {
                         props.onSave()

@@ -17,7 +17,9 @@ import {
     StampIcon,
     StrikeoutIcon,
     UnderlineIcon,
-    DownloadIcon
+    DownloadIcon,
+    SignatureIcon,
+    StarIcon
 } from '../../const/icon'
 
 const iconMapping: Record<PdfjsAnnotationSubtype, React.ReactNode> = {
@@ -32,10 +34,10 @@ const iconMapping: Record<PdfjsAnnotationSubtype, React.ReactNode> = {
     Line: <FreehandIcon />,
     Square: <RectangleIcon />,
     Polygon: <FreehandIcon />,
-    PolyLine: <FreehandIcon />,
-    Caret: <FreehandIcon />,
+    PolyLine: <FreeHighlightIcon />,
+    Caret: <SignatureIcon />,
     Link: <FreehandIcon />,
-    Text: <FreeHighlightIcon />,
+    Text: <StarIcon />,
     FileAttachment: <DownloadIcon />,
     Popup: <FreehandIcon />,
     Widget: <FreehandIcon />
@@ -99,7 +101,7 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
     }
 
     const updateAnnotation = (updatedAnnotation: IAnnotationStore) => {
-        setAnnotations(prevAnnotations => 
+        setAnnotations(prevAnnotations =>
             prevAnnotations.map(annotation => {
                 if (annotation.id === updatedAnnotation.id) {
                     // 更新内容、颜色或其他属性
@@ -113,7 +115,7 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                 return annotation;
             })
         );
-        
+
         // 清除当前编辑的批注
         setEditAnnotation(null);
     };

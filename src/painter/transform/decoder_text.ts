@@ -22,25 +22,16 @@ export class TextDecoder extends Decoder {
             name: SHAPE_GROUP_NAME,
             id: annotation.id
         })
+
         const star = new Konva.Star({
-            x: x + width / 2,
-            y: y + height / 2,
+            x: x + width / 3,
+            y: y + height / 3,
             numPoints: 5,
-            innerRadius: width/4,
-            outerRadius: width/ 2,
+            innerRadius: width / 6,
+            outerRadius: width / 3,
             fill: 'yellow',
             stroke: 'black',
             strokeWidth: 1
-        })
-        const circle = new Konva.Ellipse({
-            radiusX: width / 2,
-            radiusY: height / 2,
-            x: x + width / 2,
-            y: y + height / 2,
-            strokeScaleEnabled: false,
-            strokeWidth: annotation.borderStyle.width,
-            stroke: color,
-            dash: annotation.borderStyle.style === 2 ? annotation.borderStyle.dashArray : []
         })
         ghostGroup.add(star)
         const annotationStore: IAnnotationStore = {

@@ -148,9 +148,6 @@ class PdfjsAnnotationExtension {
                 onChange={(currentAnnotation, dataTransfer) => {
                     this.painter.activate(currentAnnotation, dataTransfer)
                 }}
-                onDownload={() => {
-                    this.downLoadPdf()
-                }}
                 onSave={() => {
                     this.saveData()
                 }}
@@ -320,9 +317,6 @@ class PdfjsAnnotationExtension {
         }
     }
 
-    private async downLoadPdf() {
-        this.PDFJS_EventBus.dispatch("download")
-    }
 }
 
 new PdfjsAnnotationExtension()

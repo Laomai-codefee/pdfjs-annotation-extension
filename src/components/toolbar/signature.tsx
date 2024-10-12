@@ -6,9 +6,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react' // 导�
 import {
     PlusCircleOutlined
 } from '@ant-design/icons';
-
 import { IAnnotationType } from '../../const/definitions' // 导入自定义类型和默认设置
-
 import { useTranslation } from 'react-i18next'
 import { defaultOptions } from '../../const/default_options';
 

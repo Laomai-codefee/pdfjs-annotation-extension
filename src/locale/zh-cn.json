@@ -22,10 +22,6 @@
         }
     },
     "editor": {
-        "stamp": {
-            "multiPageStamping": "批量设置盖章位置",
-            "stampRange": "应用范围"
-        },
         "text": {
             "startTyping": "开始输入..."
         }

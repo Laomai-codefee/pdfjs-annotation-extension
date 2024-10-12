@@ -358,6 +358,10 @@ export class Painter {
                     annotation,
                     onAdd: annotationStore => {
                         this.saveToStore(annotationStore)
+                        if (annotation.isOnce) {
+                            this.setDefaultMode()
+                            this.selector.select(annotationStore.id)
+                        }
                     }
                 })
                 break
@@ -371,6 +375,10 @@ export class Painter {
                     annotation,
                     onAdd: annotationStore => {
                         this.saveToStore(annotationStore)
+                        if (annotation.isOnce) {
+                            this.setDefaultMode()
+                            this.selector.select(annotationStore.id)
+                        }
                     }
                 })
                 break
@@ -615,9 +623,7 @@ export class Painter {
     /**
      * 重置 PDF.js 批注存储
      */
-    public resetPdfjsAnnotationStorage(): void {
-        this.store.resetAnnotationStorage()
-    }
+    public resetPdfjsAnnotationStorage(): void {}
 
     /**
      * @description 根据 range 加亮

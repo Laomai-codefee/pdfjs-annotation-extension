@@ -1,12 +1,9 @@
 import './index.scss'
 
 import { computePosition, flip } from '@floating-ui/dom'
-import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
-
+import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import { annotationDefinitions, IAnnotationType, PdfjsAnnotationEditorType } from '../../const/definitions'
-
 import { useTranslation } from 'react-i18next'
-
 
 interface CustomPopbarProps {
     onChange: (annotation: IAnnotationType | null, range: Range | null) => void

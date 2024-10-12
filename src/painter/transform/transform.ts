@@ -67,6 +67,7 @@ export class Transform {
 
     public async decodePdfAnnotation(): Promise<Map<string, IAnnotationStore>> {
         const allAnnotations = await this.getAnnotations()
+        console.log('%c [ allAnnotations ]-70-「transform/transform.ts」', 'font-size:13px; background:#65461d; color:#a98a61;', allAnnotations)
         const annotationStoreMap = new Map<string, IAnnotationStore>()
         allAnnotations.forEach(annotation => {
             const decodedAnnotation = this.decodeAnnotation(annotation, allAnnotations)

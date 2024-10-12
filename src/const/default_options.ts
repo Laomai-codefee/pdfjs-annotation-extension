@@ -32,9 +32,8 @@ const defaultOptions = {
         STROKE_WIDTH: 2, // 默认线条宽度
         OPACITY: 1, // 默认不透明度
         MAX_CURSOR_SIZE: 96, // 鼠标指针图片最大宽度/高度
-        DOWNLOAD_BUTTON: true, // 下载按钮
         SAVE_BUTTON: true, // 保存按钮
-        LOAD_PDF_ANNOTATION: true, // 是否加载 pdf 原有批注 
+        LOAD_PDF_ANNOTATION: false, // 是否加载 pdf 原有批注 
         HIDE_PDFJS_ELEMENT: [ // 需要隐藏的 pdfjs 按钮
             '#editorModeButtons',
             '#editorModeSeparator',

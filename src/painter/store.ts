@@ -40,17 +40,6 @@ export class Store {
             this.originalAnnotationStore.set(store.id, store)
         }
         return store
-
-        // const storage = this.pdfViewerApplication.pdfDocument.annotationStorage
-        // if (annotationContent?.batchPdfjsAnnotationStorage?.length) {
-        //     annotationContent.batchPdfjsAnnotationStorage.forEach(store => {
-        //         storage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}-${store.pageIndex}`, store)
-        //     })
-        // } else {
-        //     storage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}`, pdfjsAnnotationStorage)
-        // }
-
-        // console.log('%c [ annotationStore ]', 'font-size:13px; background:#6318bc; color:#a75cff;', this.annotationStore)
     }
 
     /**
@@ -70,14 +59,6 @@ export class Store {
                 this.annotationStore.set(id, updatedAnnotation)
                 console.log('%c [ this.annotationStore ]-67-「painter/store.ts」', 'font-size:13px; background:#f57a85; color:#ffbec9;', this.annotationStore)
                 return updatedAnnotation
-                // const storage = this.pdfViewerApplication.pdfDocument.annotationStorage
-                // if (updates.content?.batchPdfjsAnnotationStorage?.length) {
-                //     updates.content.batchPdfjsAnnotationStorage.forEach(store => {
-                //         storage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}-${store.pageIndex}`, store)
-                //     })
-                // } else {
-                //     storage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}`, updates.pdfjsAnnotationStorage)
-                // }
             }
         } else {
             console.warn(`Annotation with id ${id} not found.`)
@@ -100,52 +81,9 @@ export class Store {
      */
     public delete(id: string): void {
         if (this.annotationStore.has(id)) {
-            const batchPdfjsAnnotationStorage = this.annotationStore.get(id)?.content?.batchPdfjsAnnotationStorage
             this.annotationStore.delete(id)
-
-            const storage = this.pdfViewerApplication.pdfDocument.annotationStorage
-            storage.remove(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}`)
-            if (batchPdfjsAnnotationStorage?.length) {
-                batchPdfjsAnnotationStorage.forEach(store => {
-                    storage.remove(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}-${store.pageIndex}`)
-                })
-            }
         } else {
             console.warn(`Annotation with id ${id} not found.`)
-        }
-    }
-
-    /**
-     * 重置 PDF.js 注释存储中的 ImageBitmap
-     * 将存储中的 Base64 图片转换为 ImageBitmap 并更新存储
-     */
-    public async resetAnnotationStorage(): Promise<void> {
-        const annotationStorage = this.pdfViewerApplication.pdfDocument.annotationStorage
-
-        // 删除内部编辑器的所有注释
-        for (const key in annotationStorage._storage) {
-            if (key.startsWith(PDFJS_INTERNAL_EDITOR_PREFIX)) {
-                annotationStorage.remove(key)
-            }
-        }
-
-        // 更新存储中的 ImageBitmap
-        const entries = Array.from(this.annotationStore.entries())
-        for (const [id, annotation] of entries) {
-            if (annotation.content?.image) {
-                const batchPdfjsAnnotationStorage = annotation.content.batchPdfjsAnnotationStorage
-                if (batchPdfjsAnnotationStorage?.length) {
-                    for (const store of batchPdfjsAnnotationStorage) {
-                        const bitmap = await base64ToImageBitmap(annotation.content.image)
-                        store.bitmap = bitmap
-                        annotationStorage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}-${store.pageIndex}`, store)
-                    }
-                } else {
-                    const bitmap = await base64ToImageBitmap(annotation.content.image)
-                    annotation.pdfjsAnnotationStorage.bitmap = bitmap
-                    annotationStorage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${id}`, annotation.pdfjsAnnotationStorage)
-                }
-            }
         }
     }
 

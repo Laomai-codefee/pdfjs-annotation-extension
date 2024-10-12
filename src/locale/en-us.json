@@ -22,10 +22,6 @@
         }
     },
     "editor": {
-        "stamp": {
-            "multiPageStamping": "Multi Page Stamping",
-            "stampRange": "Pages range"
-        },
         "text": {
             "startTyping": "Start typing…"
         }
