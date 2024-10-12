@@ -12,11 +12,8 @@ export class TextDecoder extends Decoder {
 
     public decodePdfAnnotation(annotation: TextAnnotation, allAnnotations: Annotation[]) {
         if (annotation.inReplyTo) return null
-        console.log('%c [ annotation ]-14-「transform/decoder_text.ts」', 'font-size:13px; background:#30a495; color:#74e8d9;', annotation)
-
         const color = convertToRGB(annotation.color)
         const { x, y, width, height } = this.convertRect(annotation.rect, annotation.pageViewer.viewport.scale, annotation.pageViewer.viewport.height)
-        console.log('%c [  x, y, width, height ]-19-「transform/decoder_text.ts」', 'font-size:13px; background:#47a357; color:#8be79b;', x, y, width, height)
         const ghostGroup = new Konva.Group({
             draggable: false,
             name: SHAPE_GROUP_NAME,

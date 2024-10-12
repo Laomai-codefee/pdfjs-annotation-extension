@@ -72,7 +72,6 @@ class PdfjsAnnotationExtension {
             },
             onStoreDelete:(id) => {
                 this.customCommentRef.current.delAnnotation(id)
-                console.log('%c [ id ]-74-「src/index.tsx」', 'font-size:13px; background:#6bd1fc; color:#afffff;', id)
             },
             onAnnotationSelected: (annotation, isClick) => {
                 this.customCommentRef.current.selectedAnnotation(annotation, isClick)
@@ -292,6 +291,7 @@ class PdfjsAnnotationExtension {
      */
     private async saveData(): Promise<void> {
         const dataToSave = this.painter.getData();
+        console.log('%c [ dataToSave ]', 'font-size:13px; background:#d10d00; color:#ff5144;', dataToSave)
         const postUrl = this.getOption(HASH_PARAMS_POST_URL);
         if (!postUrl) {
             return;
