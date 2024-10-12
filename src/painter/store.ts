@@ -1,9 +1,7 @@
 import { PDFViewerApplication } from 'pdfjs'
 
 import { IAnnotationStore } from '../const/definitions'
-import { base64ToImageBitmap, formatTimestamp } from '../utils/utils'
-
-const PDFJS_INTERNAL_EDITOR_PREFIX = 'pdfjs_internal_editor_'
+import { formatTimestamp } from '../utils/utils'
 
 export class Store {
     // 所有注释

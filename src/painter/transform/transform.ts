@@ -1,5 +1,5 @@
-import { Annotation, CircleAnnotation, FreeTextAnnotation, HighlightAnnotation, PDFViewerApplication } from 'pdfjs'
-import { IAnnotationStore, PdfjsAnnotationType } from '../../const/definitions'
+import { Annotation, PDFViewerApplication } from 'pdfjs'
+import { IAnnotationStore, PDFJS_INTERNAL_EDITOR_PREFIX, PdfjsAnnotationType } from '../../const/definitions'
 import { CircleDecoder } from './decoder_circle'
 import { Decoder } from './decoder'
 import { FreeTextDecoder } from './decoder_free_text'
@@ -65,11 +65,23 @@ export class Transform {
         return null; // 不支持的类型返回 null
     }
 
+    /**
+     * 在 pdf store 中 清除原有 pdf 注释
+     * @param annotation 
+     */
+    private cleanAnnotationStore(annotation: Annotation) {
+        this.pdfViewerApplication?.pdfDocument?.annotationStorage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${annotation.id}`, {
+            deleted: true,
+            id: annotation.id,
+            pageIndex: annotation.pageNumber - 1
+        })
+    }
+
     public async decodePdfAnnotation(): Promise<Map<string, IAnnotationStore>> {
         const allAnnotations = await this.getAnnotations()
-        console.log('%c [ allAnnotations ]-70-「transform/transform.ts」', 'font-size:13px; background:#65461d; color:#a98a61;', allAnnotations)
         const annotationStoreMap = new Map<string, IAnnotationStore>()
         allAnnotations.forEach(annotation => {
+            this.cleanAnnotationStore(annotation)
             const decodedAnnotation = this.decodeAnnotation(annotation, allAnnotations)
             if (decodedAnnotation) {
                 annotationStoreMap.set(annotation.id, decodedAnnotation)
