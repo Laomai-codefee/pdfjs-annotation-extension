@@ -259,13 +259,6 @@ class PdfjsAnnotationExtension {
                 this.updatePdfjs()
             }
         })
-        // 重置 Pdfjs AnnotationStorage 解决有嵌入图片打印、下载会ImageBitmap报错的问题
-        this.PDFJS_EventBus._on('beforeprint', () => {
-            this.painter.resetPdfjsAnnotationStorage()
-        })
-        this.PDFJS_EventBus._on('download', () => {
-            this.painter.resetPdfjsAnnotationStorage()
-        })
     }
 
     /**

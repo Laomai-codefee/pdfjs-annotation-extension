@@ -305,8 +305,6 @@ export const annotationDefinitions: IAnnotationType[] = [
     }
 ]
 
-export const PDFJS_INTERNAL_EDITOR_PREFIX = 'pdfjs_internal_editor_'
-
 export const HASH_PARAMS_PREFIX = 'ae'
 
 export const HASH_PARAMS_USERNAME = `${HASH_PARAMS_PREFIX}_username`

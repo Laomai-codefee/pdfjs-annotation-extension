@@ -1,5 +1,5 @@
 import { Annotation, PDFViewerApplication } from 'pdfjs'
-import { IAnnotationStore, PDFJS_INTERNAL_EDITOR_PREFIX, PdfjsAnnotationType } from '../../const/definitions'
+import { IAnnotationStore, PdfjsAnnotationType } from '../../const/definitions'
 import { CircleDecoder } from './decoder_circle'
 import { Decoder } from './decoder'
 import { FreeTextDecoder } from './decoder_free_text'
@@ -10,6 +10,8 @@ import { LineDecoder } from './decoder_line'
 import { PolygonDecoder } from './decoder_polygon'
 import { PolylineDecoder } from './decoder_polyline'
 import { TextDecoder } from './decoder_text'
+
+const PDFJS_INTERNAL_EDITOR_PREFIX = 'pdfjs_internal_editor_'
 
 export class Transform {
     private pdfViewerApplication: PDFViewerApplication
@@ -52,22 +54,22 @@ export class Transform {
             [PdfjsAnnotationType.LINE]: LineDecoder,
             [PdfjsAnnotationType.POLYGON]: PolygonDecoder,
             [PdfjsAnnotationType.POLYLINE]: PolylineDecoder,
-            [PdfjsAnnotationType.TEXT]: TextDecoder,
-        };
-        const DecoderClass = decoderMap[annotation.annotationType];
+            [PdfjsAnnotationType.TEXT]: TextDecoder
+        }
+        const DecoderClass = decoderMap[annotation.annotationType]
         if (DecoderClass) {
             const decoder = new DecoderClass({
                 pdfViewerApplication: this.pdfViewerApplication,
                 id: annotation.id
-            });
-            return decoder.decodePdfAnnotation(annotation, allAnnotations);
+            })
+            return decoder.decodePdfAnnotation(annotation, allAnnotations)
         }
-        return null; // 不支持的类型返回 null
+        return null // 不支持的类型返回 null
     }
 
     /**
      * 在 pdf store 中 清除原有 pdf 注释
-     * @param annotation 
+     * @param annotation
      */
     private cleanAnnotationStore(annotation: Annotation) {
         this.pdfViewerApplication?.pdfDocument?.annotationStorage.setValue(`${PDFJS_INTERNAL_EDITOR_PREFIX}${annotation.id}`, {

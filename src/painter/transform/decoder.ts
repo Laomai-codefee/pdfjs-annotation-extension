@@ -6,11 +6,6 @@ export interface IDecoderOptions {
     id: string
 }
 
-interface quadPoint {
-    x: number
-    y: number
-}
-
 export abstract class Decoder {
     protected pdfViewerApplication: PDFViewerApplication
     protected id: string
