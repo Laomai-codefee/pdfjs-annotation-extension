@@ -7,9 +7,10 @@ import {
     PlusCircleOutlined
 } from '@ant-design/icons';
 
-import { DefaultSignatureSetting, IAnnotationType } from '../../const/definitions' // 导入自定义类型和默认设置
+import { IAnnotationType } from '../../const/definitions' // 导入自定义类型和默认设置
 
 import { useTranslation } from 'react-i18next'
+import { defaultOptions } from '../../const/default_options';
 
 interface SignatureToolProps {
     annotation: IAnnotationType // 签名工具的注释类型
@@ -19,7 +20,7 @@ interface SignatureToolProps {
 const SignatureTool: React.FC<SignatureToolProps> = props => {
     const [isPopoverOpen, setIsPopoverOpen] = useState(false) // 控制 Popover 的显示状态
     const [isModalOpen, setIsModalOpen] = useState(false) // 控制 Modal 的显示状态
-    const [currentColor, setCurrentColor] = useState(DefaultSignatureSetting.COLORS[0]) // 当前选择的颜色
+    const [currentColor, setCurrentColor] = useState(defaultOptions.signature.COLORS[0]) // 当前选择的颜色
     const containerRef = useRef<HTMLDivElement | null>(null) // 引用签名容器的 DOM 节点
     const konvaStageRef = useRef<Konva.Stage | null>(null) // 引用 Konva.Stage 实例
     const colorRef = useRef(currentColor) // 用于追踪 currentColor 的最新值
@@ -85,8 +86,8 @@ const SignatureTool: React.FC<SignatureToolProps> = props => {
             // 创建新的 Konva.Stage 实例并附加到容器中
             const stage = new Konva.Stage({
                 container: containerRef.current, // 容器节点
-                width: DefaultSignatureSetting.WIDTH, // 宽度
-                height: DefaultSignatureSetting.HEIGHT // 高度
+                width: defaultOptions.signature.WIDTH, // 宽度
+                height: defaultOptions.signature.HEIGHT // 高度
             })
             const layer = new Konva.Layer() // 创建新的图层
             stage.add(layer) // 将图层添加到舞台
@@ -213,13 +214,13 @@ const SignatureTool: React.FC<SignatureToolProps> = props => {
                 className="SignatureTool"
             >
                 <div>
-                    <div className="SignatureTool-Container" style={{ width: DefaultSignatureSetting.WIDTH }}>
+                    <div className="SignatureTool-Container" style={{ width: defaultOptions.signature.WIDTH }}>
                         <div className="SignatureTool-Container-info">{t('toolbar.message.signatureArea')}</div>
-                        <div ref={containerRef} style={{ height: DefaultSignatureSetting.HEIGHT, width: DefaultSignatureSetting.WIDTH }}></div>
+                        <div ref={containerRef} style={{ height: defaultOptions.signature.HEIGHT, width: defaultOptions.signature.WIDTH }}></div>
                     </div>
-                    <div className="SignatureTool-Toolbar" style={{ width: DefaultSignatureSetting.WIDTH }}>
+                    <div className="SignatureTool-Toolbar" style={{ width: defaultOptions.signature.WIDTH }}>
                         <div className="colorPalette">
-                            {DefaultSignatureSetting.COLORS.map(color => (
+                            {defaultOptions.signature.COLORS.map(color => (
                                 <div onClick={() => changeColor(color)} className={`cell ${color === currentColor ? 'active' : ''}`} key={color}>
                                     <span style={{ backgroundColor: color }}></span>
                                 </div>

@@ -1,11 +1,12 @@
 import './index.scss'
 import { ColorPicker, message } from 'antd'
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
-import { annotationDefinitions, AnnotationType, DefaultColors, DefaultSettings, IAnnotationType, PdfjsAnnotationEditorType } from '../../const/definitions'
+import { annotationDefinitions, AnnotationType, IAnnotationType, PdfjsAnnotationEditorType } from '../../const/definitions'
 import { DownloadIcon, PaletteIcon, SaveIcon } from '../../const/icon'
 import { SignatureTool } from './signature'
 import { StampTool } from './stamp'
 import { useTranslation } from 'react-i18next'
+import { defaultOptions } from '../../const/default_options'
 
 interface CustomToolbarProps {
     onChange: (annotation: IAnnotationType | null, dataTransfer: string | null) => void
@@ -106,11 +107,11 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
                 <ColorPicker
                     arrow={false}
                     disabledAlpha
-                    value={currentAnnotation?.style?.color || DefaultSettings.COLOR}
+                    value={currentAnnotation?.style?.color || defaultOptions.setting.COLOR}
                     disabled={isColorDisabled}
                     showText={false}
                     onChangeComplete={color => handleColorChange(color.toHexString())}
-                    presets={[{ label: '', colors: DefaultColors }]}
+                    presets={[{ label: '', colors: defaultOptions.colors }]}
                 >
                     <li className={isColorDisabled ? 'disabled' : ''}  title={t('normal.color')}>
                         <div className="icon">
@@ -123,7 +124,7 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
             <div className="splitToolbarButtonSeparator"></div>
             <ul className="buttons">
                 {
-                    DefaultSettings.DOWNLOAD_BUTTON && <li  title={t('normal.download')} onClick={() => {
+                    defaultOptions.setting.DOWNLOAD_BUTTON && <li  title={t('normal.download')} onClick={() => {
                         props.onDownload()
                     }}>
                         <div className="icon">
@@ -134,7 +135,7 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
                 }
 
                 {
-                    DefaultSettings.SAVE_BUTTON && <li  title={t('normal.save')} onClick={() => {
+                    defaultOptions.setting.SAVE_BUTTON && <li  title={t('normal.save')} onClick={() => {
                         props.onSave()
                     }}>
                         <div className="icon">

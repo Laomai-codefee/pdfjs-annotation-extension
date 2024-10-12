@@ -61,7 +61,7 @@ export class Painter {
         onAnnotationSelected,
         onAnnotationChange
     }: {
-        userName: string,
+        userName: string
         PDFViewerApplication: PDFViewerApplication
         PDFJS_EventBus: EventBus
         setDefaultMode: () => void
@@ -632,20 +632,27 @@ export class Painter {
     /**
      * @description 将annotation 存入 store, 包含外部 annotation 和 pdf 文件上的 annotation
      */
-    public async initAnnotations(annotations: IAnnotationStore[]) {
-        // 先将 pdf 文件中的存入
-        const annotationMap = await this.transform.decodePdfAnnotation()
-        annotationMap.forEach(annotation => {
-            this.saveToStore(annotation, true)
-        })
-        // 再用外部数据覆盖
-        annotations.forEach(annotation => {
-            if(annotationMap.has(annotation.id)) {
-                this.updateStore(annotation.id, annotation)
-            } else {
+    public async initAnnotations(annotations: IAnnotationStore[], loadPdfAnnotation: boolean) {
+        // 加载 pdf 文件批注
+        if (loadPdfAnnotation) {
+            // 先将 pdf 文件中的存入
+            const annotationMap = await this.transform.decodePdfAnnotation()
+            annotationMap.forEach(annotation => {
+                this.saveToStore(annotation, true)
+            })
+            // 再用外部数据覆盖
+            annotations.forEach(annotation => {
+                if (annotationMap.has(annotation.id)) {
+                    this.updateStore(annotation.id, annotation)
+                } else {
+                    this.saveToStore(annotation, false)
+                }
+            })
+        } else {
+            annotations.forEach(annotation => {
                 this.saveToStore(annotation, false)
-            }
-        })
+            })
+        }
     }
 
     /**
@@ -699,6 +706,4 @@ export class Painter {
     public getData() {
         return this.store.annotaions
     }
-
-
 }

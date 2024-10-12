@@ -1,10 +1,11 @@
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 
-import { AnnotationType, DefaultSettings, IAnnotationStore, IAnnotationType, IPdfjsAnnotationStorage, PdfjsAnnotationEditorType } from '../../const/definitions'
+import { AnnotationType, IAnnotationStore, IAnnotationType, IPdfjsAnnotationStorage, PdfjsAnnotationEditorType } from '../../const/definitions'
 import { base64ToImageBitmap, resizeImage, setCssCustomProperty } from '../../utils/utils'
 import { CURSOR_CSS_PROPERTY } from '../const'
 import { Editor, IEditorOptions } from './editor'
+import { defaultOptions } from '../../const/default_options'
 
 /**
  * EditorSignature 是继承自 Editor 的签名编辑器类。
@@ -37,7 +38,7 @@ export class EditorSignature extends Editor {
         // 从 URL 加载签名图片并处理
         Konva.Image.fromURL(this.signatureUrl, image => {
             const { width, height } = image.getClientRect()
-            const { newWidth, newHeight } = resizeImage(width, height, DefaultSettings.MAX_CURSOR_SIZE)
+            const { newWidth, newHeight } = resizeImage(width, height, defaultOptions.setting.MAX_CURSOR_SIZE)
             const crosshair = { x: newWidth / 2, y: newHeight / 2 }
 
             // 创建边框和交叉线

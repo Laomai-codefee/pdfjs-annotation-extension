@@ -4,11 +4,12 @@ import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 import React from 'react'
 
-import { AnnotationType, DefaultSettings, IAnnotationStore, IAnnotationType, IPdfjsAnnotationStorage, PdfjsAnnotationEditorType } from '../../const/definitions'
+import { AnnotationType, IAnnotationStore, IAnnotationType, IPdfjsAnnotationStorage, PdfjsAnnotationEditorType } from '../../const/definitions'
 import { base64ToImageBitmap, parsePageRanges, resizeImage, setCssCustomProperty } from '../../utils/utils'
 import { CURSOR_CSS_PROPERTY } from '../const'
 import { Editor, IEditorOptions } from './editor'
 import i18n from 'i18next'
+import { defaultOptions } from '../../const/default_options'
 
 /**
  * 批量设置盖章位置
@@ -113,7 +114,7 @@ export class EditorStamp extends Editor {
         // 从 URL 加载签章图片并处理
         Konva.Image.fromURL(this.stampUrl, image => {
             const { width, height } = image.getClientRect()
-            const { newWidth, newHeight } = resizeImage(width, height, DefaultSettings.MAX_CURSOR_SIZE)
+            const { newWidth, newHeight } = resizeImage(width, height, defaultOptions.setting.MAX_CURSOR_SIZE)
             const crosshair = { x: newWidth / 2, y: newHeight / 2 }
 
             // 创建边框和交叉线

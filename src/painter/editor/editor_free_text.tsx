@@ -1,7 +1,7 @@
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 
-import { AnnotationType, DefaultColors, DefaultFontSize, IAnnotationStore, IPdfjsAnnotationStorage, PdfjsAnnotationEditorType } from '../../const/definitions'
+import { AnnotationType, IAnnotationStore, IPdfjsAnnotationStorage, PdfjsAnnotationEditorType } from '../../const/definitions'
 import { base64ToImageBitmap } from '../../utils/utils'
 import { Editor, IEditorOptions } from './editor'
 import React from 'react'
@@ -10,6 +10,7 @@ import TextArea from 'antd/es/input/TextArea'
 import { FontSizeIcon } from '../../const/icon'
 import './editor_free_text.scss'
 import i18n from 'i18next'
+import { defaultOptions } from '../../const/default_options'
 
 async function setInputText(color: string, fontSize: number): Promise<{ inputValue: string, color: string, fontSize: number }> {
     let currentColor = color;
@@ -38,14 +39,14 @@ async function setInputText(color: string, fontSize: number): Promise<{ inputVal
                         />
                         <div className='EditorFreeText-Modal-Toolbar'>
                             <div className="colorPalette">
-                                {DefaultColors.map(color => (
+                                {defaultOptions.colors.map(color => (
                                     <div onClick={() => handleColorChange(color)} className={`cell ${color === currentColor ? 'active' : ''}`} key={color}>
                                         <span style={{ backgroundColor: color }}></span>
                                     </div>
                                 ))}
                             </div>
                             <Dropdown menu={{
-                                items: DefaultFontSize.map(size => ({
+                                items: defaultOptions.fontSize.map(size => ({
                                     key: size.toString(),
                                     label: size,
                                     onClick: () => handleFontSizeChange(size)
@@ -83,14 +84,14 @@ async function setInputText(color: string, fontSize: number): Promise<{ inputVal
                     />
                     <div className='EditorFreeText-Modal-Toolbar'>
                         <div className="colorPalette">
-                            {DefaultColors.map(color => (
+                            {defaultOptions.colors.map(color => (
                                 <div onClick={() => handleColorChange(color)} className={`cell ${color === currentColor ? 'active' : ''}`} key={color}>
                                     <span style={{ backgroundColor: color }}></span>
                                 </div>
                             ))}
                         </div>
                         <Dropdown menu={{
-                            items: DefaultFontSize.map(size => ({
+                            items: defaultOptions.fontSize.map(size => ({
                                 key: size.toString(),
                                 label: size,
                                 onClick: () => handleFontSizeChange(size)

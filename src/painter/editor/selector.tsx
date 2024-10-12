@@ -1,11 +1,12 @@
 import Konva from 'konva'
 
-import { DefaultChooseSetting, IAnnotationStore } from '../../const/definitions'
+import { IAnnotationStore } from '../../const/definitions'
 import { SELECTOR_HOVER_STYLE, SHAPE_GROUP_NAME } from '../const'
 import { KonvaCanvas } from '../index'
 import { Modal } from 'antd'
 import i18n from 'i18next'
 import { IRect } from 'konva/lib/types'
+import { defaultOptions } from '../../const/default_options'
 /**
  * 定义选择器的选项接口
  */
@@ -206,10 +207,10 @@ export class Selector {
         const transformer = new Konva.Transformer({
             resizeEnabled: !rawAnnotationStore.readonly,
             rotateEnabled: false,
-            borderStrokeWidth: DefaultChooseSetting.STROKEWIDTH,
-            borderStroke: DefaultChooseSetting.COLOR,
-            anchorFill: DefaultChooseSetting.COLOR,
-            anchorStroke: DefaultChooseSetting.COLOR,
+            borderStrokeWidth: defaultOptions.chooseSetting.STROKEWIDTH,
+            borderStroke: defaultOptions.chooseSetting.COLOR,
+            anchorFill: defaultOptions.chooseSetting.COLOR,
+            anchorStroke: defaultOptions.chooseSetting.COLOR,
             anchorCornerRadius: 5,
             anchorStrokeWidth: 2,
             anchorSize: 8,

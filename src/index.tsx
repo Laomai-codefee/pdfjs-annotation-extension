@@ -7,10 +7,11 @@ import { initializeI18n } from './locale/index'
 import i18n from 'i18next'
 import { CustomPopbar, CustomPopbarRef } from './components/popbar'
 import { CustomToolbar, CustomToolbarRef } from './components/toolbar'
-import { annotationDefinitions, DefaultSettings, HASH_PARAMS_GET_URL, HASH_PARAMS_POST_URL, HASH_PARAMS_USERNAME } from './const/definitions'
+import { annotationDefinitions, HASH_PARAMS_GET_URL, HASH_PARAMS_POST_URL, HASH_PARAMS_USERNAME } from './const/definitions'
 import { Painter } from './painter'
 import { CustomComment, CustomCommentRef } from './components/comment'
 import { once, parseQueryString } from './utils/utils'
+import { defaultOptions } from './const/default_options'
 
 interface AppOptions {
     [key: string]: string;
@@ -203,7 +204,7 @@ class PdfjsAnnotationExtension {
      * @description 隐藏 PDF.js 编辑模式按钮
      */
     private hidePdfjsEditorModeButtons(): void {
-        DefaultSettings.HIDE_PDFJS_ELEMENT.forEach(item => {
+        defaultOptions.setting.HIDE_PDFJS_ELEMENT.forEach(item => {
             const element = document.querySelector(item) as HTMLElement;
             if (element) {
                 element.style.display = 'none';
@@ -252,7 +253,7 @@ class PdfjsAnnotationExtension {
         // 监听文档加载完成事件
         this.PDFJS_EventBus._on('documentloaded', async (source) => {
             this.painter.initWebSelection(this.$PDFJS_viewerContainer)
-            await this.painter.initAnnotations(await this.getData())
+            await this.painter.initAnnotations(await this.getData(), defaultOptions.setting.LOAD_PDF_ANNOTATION)
             if (this.loadEnd) {
                 this.updatePdfjs()
             }

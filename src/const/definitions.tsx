@@ -13,6 +13,7 @@ import {
     UnderlineIcon
 } from './icon'
 import { IRect } from 'konva/lib/types'
+import { defaultOptions } from './default_options'
 
 /**
  * 描述批注路径数据的接口
@@ -215,53 +216,53 @@ export enum AnnotationType {
     STAMP = 10 // 盖章批注
 }
 
-// 配置默认颜色
-// 提供一组默认的颜色选项
-export const DefaultColors = ['#ff0000', '#ffbe00', '#ffff00', '#83d33c', '#00b445', '#00b2f4', '#0071c4', '#001f63', '#7828a4']
+// // 配置默认颜色
+// // 提供一组默认的颜色选项
+// export const DefaultColors = ['#ff0000', '#ffbe00', '#ffff00', '#83d33c', '#00b445', '#00b2f4', '#0071c4', '#001f63', '#7828a4']
 
-// 配置默认字体大小
-// 提供一组默认的字体大小选项
-export const DefaultFontSize = [14, 16, 18, 20, 22, 24]
+// // 配置默认字体大小
+// // 提供一组默认的字体大小选项
+// export const DefaultFontSize = [14, 16, 18, 20, 22, 24]
 
-// 配置默认的签名设置
-export const DefaultSignatureSetting = {
-    COLORS: ['#000000', '#ff0000'], // 签名的默认颜色选项
-    WIDTH: 366, // 签名框的宽度
-    HEIGHT: 200 // 签名框的高度
-}
+// // 配置默认的签名设置
+// export const DefaultSignatureSetting = {
+//     COLORS: ['#000000', '#ff0000'], // 签名的默认颜色选项
+//     WIDTH: 366, // 签名框的宽度
+//     HEIGHT: 200 // 签名框的高度
+// }
 
-export const DefaultStampSetting = {
-    MAX_SIZE: 1024 * 1024 * 5 // 最大文件大小为 5MB
-}
+// export const DefaultStampSetting = {
+//     MAX_SIZE: 1024 * 1024 * 5 // 最大文件大小为 5MB
+// }
 
-// 配置默认的选择设置
-// 提供默认的选择工具的颜色和线条宽度
-export const DefaultChooseSetting = {
-    COLOR: '#000', // 选择工具的颜色
-    STROKEWIDTH: 1 // 选择工具的线条宽度
-}
+// // 配置默认的选择设置
+// // 提供默认的选择工具的颜色和线条宽度
+// export const DefaultChooseSetting = {
+//     COLOR: '#000', // 选择工具的颜色
+//     STROKEWIDTH: 1 // 选择工具的线条宽度
+// }
 
-// 默认配置对象
-// 提供一组默认的批注设置
-export const DefaultSettings = {
-    COLOR: DefaultColors[0], // 默认颜色
-    FONT_SIZE: DefaultFontSize[2], // 默认字体大小
-    HIGHLIGHT_COLOR: DefaultColors[2], // 默认高亮颜色
-    STRIKEOUT_COLOR: DefaultColors[0], // 默认删除线颜色
-    UNDERLINE_COLOR: DefaultColors[6], // 默认下划线颜色
-    STROKE_WIDTH: 2, // 默认线条宽度
-    OPACITY: 1, // 默认不透明度
-    MAX_CURSOR_SIZE: 96, // 鼠标指针图片最大宽度/高度
-    DOWNLOAD_BUTTON: true, // 下载按钮
-    SAVE_BUTTON: true, // 保存按钮
-    HIDE_PDFJS_ELEMENT: [ // 需要隐藏的 pdfjs 按钮
-        '#editorModeButtons',
-        '#editorModeSeparator',
-        '#pageRotateCw',
-        '#pageRotateCcw',
-        '#download'
-    ]
-}
+// // 默认配置对象
+// // 提供一组默认的批注设置
+// export const setting = {
+//     COLOR: DefaultColors[0], // 默认颜色
+//     FONT_SIZE: DefaultFontSize[2], // 默认字体大小
+//     HIGHLIGHT_COLOR: DefaultColors[2], // 默认高亮颜色
+//     STRIKEOUT_COLOR: DefaultColors[0], // 默认删除线颜色
+//     UNDERLINE_COLOR: DefaultColors[6], // 默认下划线颜色
+//     STROKE_WIDTH: 2, // 默认线条宽度
+//     OPACITY: 1, // 默认不透明度
+//     MAX_CURSOR_SIZE: 96, // 鼠标指针图片最大宽度/高度
+//     DOWNLOAD_BUTTON: true, // 下载按钮
+//     SAVE_BUTTON: true, // 保存按钮
+//     HIDE_PDFJS_ELEMENT: [ // 需要隐藏的 pdfjs 按钮
+//         '#editorModeButtons',
+//         '#editorModeSeparator',
+//         '#pageRotateCw',
+//         '#pageRotateCcw',
+//         '#download'
+//     ]
+// }
 
 // 定义批注类型的接口
 // 用于描述应用中支持的批注类型
@@ -343,7 +344,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         readonly: true,
         icon: <HighlightIcon />,
         style: {
-            color: DefaultSettings.HIGHLIGHT_COLOR, // 默认高亮颜色
+            color: defaultOptions.setting.HIGHLIGHT_COLOR, // 默认高亮颜色
             opacity: 0.5 // 默认透明度
         }
     },
@@ -357,8 +358,8 @@ export const annotationDefinitions: IAnnotationType[] = [
         readonly: true,
         icon: <StrikeoutIcon />,
         style: {
-            color: DefaultSettings.STRIKEOUT_COLOR, // 默认删除线颜色
-            opacity: DefaultSettings.OPACITY // 默认透明度
+            color: defaultOptions.setting.STRIKEOUT_COLOR, // 默认删除线颜色
+            opacity: defaultOptions.setting.OPACITY // 默认透明度
         }
     },
     {
@@ -371,8 +372,8 @@ export const annotationDefinitions: IAnnotationType[] = [
         readonly: true,
         icon: <UnderlineIcon />,
         style: {
-            color: DefaultSettings.UNDERLINE_COLOR, // 默认下划线颜色
-            opacity: DefaultSettings.OPACITY // 默认透明度
+            color: defaultOptions.setting.UNDERLINE_COLOR, // 默认下划线颜色
+            opacity: defaultOptions.setting.OPACITY // 默认透明度
         }
     },
     {
@@ -385,9 +386,9 @@ export const annotationDefinitions: IAnnotationType[] = [
         readonly: false,
         icon: <RectangleIcon />,
         style: {
-            color: DefaultSettings.COLOR, // 默认矩形颜色
-            strokeWidth: DefaultSettings.STROKE_WIDTH, // 默认线条宽度
-            opacity: DefaultSettings.OPACITY // 默认透明度
+            color: defaultOptions.setting.COLOR, // 默认矩形颜色
+            strokeWidth: defaultOptions.setting.STROKE_WIDTH, // 默认线条宽度
+            opacity: defaultOptions.setting.OPACITY // 默认透明度
         }
     },
     {
@@ -400,9 +401,9 @@ export const annotationDefinitions: IAnnotationType[] = [
         readonly: false,
         icon: <CircleIcon />,
         style: {
-            color: DefaultSettings.COLOR, // 默认圆形颜色
-            strokeWidth: DefaultSettings.STROKE_WIDTH, // 默认线条宽度
-            opacity: DefaultSettings.OPACITY // 默认透明度
+            color: defaultOptions.setting.COLOR, // 默认圆形颜色
+            strokeWidth: defaultOptions.setting.STROKE_WIDTH, // 默认线条宽度
+            opacity: defaultOptions.setting.OPACITY // 默认透明度
         }
     },
     {
@@ -415,9 +416,9 @@ export const annotationDefinitions: IAnnotationType[] = [
         readonly: false,
         icon: <FreehandIcon />,
         style: {
-            color: DefaultSettings.COLOR, // 默认自由绘制颜色
-            strokeWidth: DefaultSettings.STROKE_WIDTH, // 默认线条宽度
-            opacity: DefaultSettings.OPACITY // 默认透明度
+            color: defaultOptions.setting.COLOR, // 默认自由绘制颜色
+            strokeWidth: defaultOptions.setting.STROKE_WIDTH, // 默认线条宽度
+            opacity: defaultOptions.setting.OPACITY // 默认透明度
         }
     },
     {
@@ -430,7 +431,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         readonly: false,
         icon: <FreeHighlightIcon />,
         style: {
-            color: DefaultSettings.COLOR, // 默认自由高亮颜色
+            color: defaultOptions.setting.COLOR, // 默认自由高亮颜色
             strokeWidth: 10, // 默认线条宽度
             opacity: 0.5 // 默认透明度
         }
@@ -445,9 +446,9 @@ export const annotationDefinitions: IAnnotationType[] = [
         readonly: false,
         icon: <FreetextIcon />,
         style: {
-            color: DefaultSettings.COLOR, // 默认文字颜色
-            fontSize: DefaultSettings.FONT_SIZE, // 默认字体大小
-            opacity: DefaultSettings.OPACITY // 默认透明度
+            color: defaultOptions.setting.COLOR, // 默认文字颜色
+            fontSize: defaultOptions.setting.FONT_SIZE, // 默认字体大小
+            opacity: defaultOptions.setting.OPACITY // 默认透明度
         }
     },
     {
