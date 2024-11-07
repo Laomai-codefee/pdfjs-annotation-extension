@@ -230,9 +230,63 @@ export class Selector {
             this.onChange(group.id(), group.toJSON(), { ...rawAnnotationStore }, Konva.Node.create(group.toJSON()).getClientRect())
         })
 
+        transformer.on('dragmove', () => {
+            const boxes = transformer.nodes().map(node => node.getClientRect())
+            const box = this.getTotalBox(boxes)
+            transformer.nodes().forEach(shape => {
+                const absPos = shape.getAbsolutePosition()
+                // where are shapes inside bounding box of all shapes?
+                const offsetX = box.x - absPos.x
+                const offsetY = box.y - absPos.y
+
+                // we total box goes outside of viewport, we need to move absolute position of shape
+                const halfWidth = box.width / 2
+                const halfHeight = box.height / 2
+                const newAbsPos = { ...absPos }
+                if (box.x + halfWidth < 0) {
+                    newAbsPos.x = -offsetX - halfWidth
+                }
+                if (box.y + halfHeight < 0) {
+                    newAbsPos.y = -offsetY - halfHeight
+                }
+                if (box.x + halfWidth > konvaStage.width()) {
+                    newAbsPos.x = konvaStage.width() - halfWidth - offsetX
+                }
+                if (box.y + halfHeight > konvaStage.height()) {
+                    newAbsPos.y = konvaStage.height() - halfHeight - offsetY
+                }
+                shape.setAbsolutePosition(newAbsPos)
+            })
+        })
+
         transformer.nodes([group])
         this.getBackgroundLayer(konvaStage).add(transformer)
         this.transformerStore.set(groupId, transformer)
+    }
+
+    /**
+     * 获取所有形状的总包围盒。
+     * @param boxes
+     * @returns
+     */
+    private getTotalBox(boxes: IRect[]): IRect {
+        let minX = Infinity
+        let minY = Infinity
+        let maxX = -Infinity
+        let maxY = -Infinity
+
+        boxes.forEach(box => {
+            minX = Math.min(minX, box.x)
+            minY = Math.min(minY, box.y)
+            maxX = Math.max(maxX, box.x + box.width)
+            maxY = Math.max(maxY, box.y + box.height)
+        })
+        return {
+            x: minX,
+            y: minY,
+            width: maxX - minX,
+            height: maxY - minY
+        }
     }
 
     /**
