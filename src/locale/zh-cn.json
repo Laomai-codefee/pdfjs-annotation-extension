@@ -5,6 +5,7 @@
         "strikeout": "删除线",
         "underline": "下划线",
         "rectangle": "矩形",
+        "polygon": "多边形",
         "circle": "圆形",
         "freehand": "自由绘制",
         "freeHighlight": "自由高亮",
@@ -12,7 +13,7 @@
         "signature": "签名",
         "stamp": "盖章"
     },
-    "toolbar": {
+    "toolbar": {    
         "buttons": {
             "createSignature": "创建签名"
         },
