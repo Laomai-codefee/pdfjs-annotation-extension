@@ -1,26 +1,19 @@
-import './index.scss'
-import React, { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react'
-import { IAnnotationComment, IAnnotationStore, PdfjsAnnotationSubtype } from '../../const/definitions'
-import { useTranslation } from 'react-i18next'
-import { formatPDFDate, formatTimestamp, generateUUID } from '../../utils/utils'
-import { Button, Dropdown, Input } from 'antd'
+import './index.scss';
+
+import { Button, Dropdown, Input } from 'antd';
+import React, { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { MoreOutlined } from '@ant-design/icons';
+
 import {
-    MoreOutlined
-} from '@ant-design/icons';
+    IAnnotationComment, IAnnotationStore, PdfjsAnnotationSubtype
+} from '../../const/definitions';
 import {
-    CircleIcon,
-    FreehandIcon,
-    FreeHighlightIcon,
-    FreetextIcon,
-    HighlightIcon,
-    RectangleIcon,
-    StampIcon,
-    StrikeoutIcon,
-    UnderlineIcon,
-    DownloadIcon,
-    SignatureIcon,
-    StarIcon
-} from '../../const/icon'
+    CircleIcon, DownloadIcon, FreehandIcon, FreeHighlightIcon, FreetextIcon, HighlightIcon,
+    RectangleIcon, SignatureIcon, StampIcon, StarIcon, StrikeoutIcon, UnderlineIcon
+} from '../../const/icon';
+import { formatPDFDate, formatTimestamp, generateUUID } from '../../utils/utils';
 
 const iconMapping: Record<PdfjsAnnotationSubtype, React.ReactNode> = {
     Circle: <CircleIcon />,
@@ -311,7 +304,7 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                             {annotation.comments?.map((reply, index) => (
                                 <div className='reply' key={index}>
                                     <div className='title'>
-                                    <div className='username'> {reply.title}</div>
+                                        <div className='username'> {reply.title}</div>
                                         <span className='tool'>{formatPDFDate(reply.date)}
                                             <Dropdown menu={{
                                                 items: [
@@ -333,6 +326,7 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                                                     },
                                                 ]
                                             }} trigger={['click']}>
+
                                                 <span className='icon'>
                                                     <MoreOutlined />
                                                 </span>
@@ -359,7 +353,7 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
 
 
     return (
-        <div className="CustomComment">
+        <div className="CustomComment" hidden>
             <div className='filters'>
                 {t('comment.total', { value: annotations.length })}
             </div>

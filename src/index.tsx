@@ -1,17 +1,20 @@
-import './scss/app.scss'
+import './scss/app.scss';
 
-import { EventBus, PDFPageView, PDFViewerApplication } from 'pdfjs'
-import { createRef } from 'react'
-import { createRoot } from 'react-dom/client'
-import { initializeI18n } from './locale/index'
-import i18n from 'i18next'
-import { CustomPopbar, CustomPopbarRef } from './components/popbar'
-import { CustomToolbar, CustomToolbarRef } from './components/toolbar'
-import { annotationDefinitions, HASH_PARAMS_GET_URL, HASH_PARAMS_POST_URL, HASH_PARAMS_USERNAME } from './const/definitions'
-import { Painter } from './painter'
-import { CustomComment, CustomCommentRef } from './components/comment'
-import { once, parseQueryString } from './utils/utils'
-import { defaultOptions } from './const/default_options'
+import i18n from 'i18next';
+import { EventBus, PDFPageView, PDFViewerApplication } from 'pdfjs';
+import { createRef } from 'react';
+import { createRoot } from 'react-dom/client';
+
+import { CustomComment, CustomCommentRef } from './components/comment';
+import { CustomPopbar, CustomPopbarRef } from './components/popbar';
+import { CustomToolbar, CustomToolbarRef } from './components/toolbar';
+import { defaultOptions } from './const/default_options';
+import {
+    annotationDefinitions, HASH_PARAMS_GET_URL, HASH_PARAMS_POST_URL, HASH_PARAMS_USERNAME
+} from './const/definitions';
+import { initializeI18n } from './locale/index';
+import { Painter } from './painter';
+import { once, parseQueryString } from './utils/utils';
 
 interface AppOptions {
     [key: string]: string;
@@ -70,7 +73,7 @@ class PdfjsAnnotationExtension {
             onStoreAdd: annotation => {
                 this.customCommentRef.current.addAnnotation(annotation)
             },
-            onStoreDelete:(id) => {
+            onStoreDelete: (id) => {
                 this.customCommentRef.current.delAnnotation(id)
             },
             onAnnotationSelected: (annotation, isClick) => {
@@ -113,12 +116,12 @@ class PdfjsAnnotationExtension {
         }
         if (params.has(HASH_PARAMS_GET_URL)) {
             this.setOption(HASH_PARAMS_GET_URL, params.get(HASH_PARAMS_GET_URL))
-        }else {
+        } else {
             console.warn(`${HASH_PARAMS_GET_URL} is undefined`);
         }
         if (params.has(HASH_PARAMS_POST_URL)) {
             this.setOption(HASH_PARAMS_POST_URL, params.get(HASH_PARAMS_POST_URL))
-        }else {
+        } else {
             console.warn(`${HASH_PARAMS_POST_URL} is undefined`);
         }
 
@@ -296,6 +299,7 @@ class PdfjsAnnotationExtension {
         if (!postUrl) {
             return;
         }
+        localStorage.setItem(`document-viewer-ae-${postUrl.split('/')[2]}`, JSON.stringify(dataToSave))
 
         try {
             const response = await fetch(postUrl, {
@@ -307,6 +311,7 @@ class PdfjsAnnotationExtension {
             if (!response.ok) {
                 throw new Error(`Failed to save PDF. Status: ${response.status} ${response.statusText}`);
             }
+
 
             const result = await response.json();
             console.log('Saved successfully:', result);
