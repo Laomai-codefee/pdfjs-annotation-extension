@@ -15,6 +15,7 @@ import { EditorHighLight } from './editor/editor_highlight'
 import { EditorRectangle } from './editor/editor_rectangle'
 import { EditorSignature } from './editor/editor_signature'
 import { EditorStamp } from './editor/editor_stamp'
+import { EditorCallout } from './editor/editor_callout'
 import { Selector } from './editor/selector'
 import { Store } from './store'
 import { WebSelection } from './webSelection'
@@ -469,6 +470,23 @@ export class Painter {
                 this.selector.activate(pageNumber) // 激活选择器
                 break
 
+            case AnnotationType.CALLOUT:
+                editor = new EditorCallout({
+                    userName: this.userName,
+                    pdfViewerApplication: this.pdfViewerApplication,
+                    konvaStage,
+                    pageNumber,
+                    annotation,
+                    onAdd: annotationStore => {
+                        this.saveToStore(annotationStore)
+                        if (annotation.isOnce) {
+                            this.setDefaultMode()
+                            this.selector.select(annotationStore.id)
+                        }
+                    }
+                })
+                break
+
             default:
                 console.warn(`未实现的批注类型: ${annotation.type}`)
                 return
@@ -616,6 +634,7 @@ export class Painter {
             case AnnotationType.SIGNATURE:
             case AnnotationType.STAMP:
             case AnnotationType.SELECT:
+            case AnnotationType.CALLOUT:
                 this.setMode('painting') // 设置绘画模式
                 break
 
