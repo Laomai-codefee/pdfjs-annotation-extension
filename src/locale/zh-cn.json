@@ -10,7 +10,8 @@
         "freeHighlight": "自由高亮",
         "freeText": "文字",
         "signature": "签名",
-        "stamp": "盖章"
+        "stamp": "盖章",
+        "callout": "标注"
     },
     "toolbar": {
         "buttons": {

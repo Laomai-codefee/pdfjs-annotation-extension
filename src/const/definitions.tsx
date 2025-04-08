@@ -9,7 +9,8 @@ import {
     SignatureIcon,
     StampIcon,
     StrikeoutIcon,
-    UnderlineIcon
+    UnderlineIcon,
+    CalloutIcon
 } from './icon'
 import { IRect } from 'konva/lib/types'
 import { defaultOptions } from './default_options'
@@ -33,6 +34,7 @@ export type PdfjsAnnotationSubtype =
     | 'StrikeOut'
     | 'Stamp'
     | 'FileAttachment'
+    | 'CallOut'
 
 // PDF.js 批注类型
 export enum PdfjsAnnotationType {
@@ -62,7 +64,8 @@ export enum PdfjsAnnotationType {
     TRAPNET = 23,
     WATERMARK = 24,
     THREED = 25,
-    REDACT = 26
+    REDACT = 26,
+    CALLOUT = 27
 }
 
 // PDF.js 自带的批注编辑器类型枚举
@@ -90,7 +93,8 @@ export enum AnnotationType {
     FREEHAND = 7, // 自由绘制批注
     FREE_HIGHLIGHT = 8, // 自由高亮批注
     SIGNATURE = 9, // 签名批注
-    STAMP = 10 // 盖章批注
+    STAMP = 10, // 盖章批注
+    CALLOUT = 11
 }
 
 // 定义批注类型的接口
@@ -234,6 +238,22 @@ export const annotationDefinitions: IAnnotationType[] = [
             opacity: defaultOptions.setting.OPACITY // 默认透明度
         }
     },
+    {
+        name: 'callout',
+        type: AnnotationType.CALLOUT,
+        pdfjsEditorType: PdfjsAnnotationEditorType.INK,
+        pdfjsAnnotationType: PdfjsAnnotationType.CALLOUT,
+        subtype: 'CallOut',
+        isOnce: true,
+        readonly: false,
+        icon: <CalloutIcon />,
+        style: {
+            color: defaultOptions.setting.COLOR, // 默认多边形颜色
+            strokeWidth: defaultOptions.setting.STROKE_WIDTH, // 默认线条宽度
+            opacity: defaultOptions.setting.OPACITY // 默认透明度
+        }
+    },
+
     {
         name: 'freehand',
         type: AnnotationType.FREEHAND,
