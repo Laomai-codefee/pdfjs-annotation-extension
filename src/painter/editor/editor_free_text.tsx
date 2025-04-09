@@ -11,7 +11,7 @@ import './editor_free_text.scss'
 import i18n from 'i18next'
 import { defaultOptions } from '../../const/default_options'
 
-async function setInputText(color: string, fontSize: number): Promise<{ inputValue: string, color: string, fontSize: number }> {
+export async function setInputText(color: string, fontSize: number): Promise<{ inputValue: string, color: string, fontSize: number }> {
     let currentColor = color;
     let currentFontSize = fontSize;
     return new Promise(resolve => {

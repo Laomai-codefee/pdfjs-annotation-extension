@@ -10,7 +10,8 @@
         "freeHighlight": "Free Highlight",
         "freeText": "Text",
         "signature": "Signature",
-        "stamp": "Stamp"
+        "stamp": "Stamp",
+        "note": "Note"
     },
     "toolbar": {
         "buttons": {
