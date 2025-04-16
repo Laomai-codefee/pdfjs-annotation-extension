@@ -20,6 +20,15 @@ interface AppOptions {
     [key: string]: string;
 }
 
+
+declare global {
+    interface Window {
+        iframeAPI?: {
+            saveData: () => void;
+        };
+    }
+}
+
 class PdfjsAnnotationExtension {
     PDFJS_PDFViewerApplication: PDFViewerApplication // PDF.js 的 PDFViewerApplication 对象
     PDFJS_EventBus: EventBus // PDF.js 的 EventBus 对象
@@ -35,10 +44,25 @@ class PdfjsAnnotationExtension {
     loadEnd: Boolean
 
     constructor() {
+        window.iframeAPI = {
+            saveData: this.saveData.bind(this),
+        };
         this.loadEnd = false
         // 初始化 PDF.js 对象和相关属性
-        this.PDFJS_PDFViewerApplication = (window as any).PDFViewerApplication
-        this.PDFJS_EventBus = this.PDFJS_PDFViewerApplication.eventBus
+        this.PDFJS_PDFViewerApplication = (window as any).PDFViewerApplication || null
+        if (this.PDFJS_PDFViewerApplication) {
+            this.PDFJS_EventBus = this.PDFJS_PDFViewerApplication.eventBus;
+        } else {
+            console.warn("PDFViewerApplication is not yet initialized. Retrying...");
+            setTimeout(() => {
+                this.PDFJS_PDFViewerApplication = (window as any).PDFViewerApplication;
+                if (this.PDFJS_PDFViewerApplication) {
+                    this.PDFJS_EventBus = this.PDFJS_PDFViewerApplication.eventBus;
+                } else {
+                    console.error("PDFViewerApplication is still undefined.");
+                }
+            }, 500); // Retry after 500ms
+        }
         this.$PDFJS_sidebarContainer = this.PDFJS_PDFViewerApplication.appConfig.sidebar.sidebarContainer
         this.$PDFJS_toolbar_container = this.PDFJS_PDFViewerApplication.appConfig.toolbar.container
         this.$PDFJS_viewerContainer = this.PDFJS_PDFViewerApplication.appConfig.viewerContainer
@@ -288,11 +312,13 @@ class PdfjsAnnotationExtension {
         }
     }
 
+
+
     /**
      * @description 保存批注数据
      * @returns 
      */
-    private async saveData(): Promise<void> {
+    public async saveData(): Promise<void> {
         const dataToSave = this.painter.getData();
         console.log('%c [ dataToSave ]', 'font-size:13px; background:#d10d00; color:#ff5144;', dataToSave)
         const postUrl = this.getOption(HASH_PARAMS_POST_URL);
@@ -319,6 +345,8 @@ class PdfjsAnnotationExtension {
             console.error('Error while saving data:', error);
         }
     }
+
+
 
 }
 

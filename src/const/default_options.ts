@@ -39,7 +39,7 @@ const defaultOptions = {
             '#editorModeSeparator',
             '#pageRotateCw',
             '#pageRotateCcw',
-            '#download'
+            // '#download'
         ]
     }
 }

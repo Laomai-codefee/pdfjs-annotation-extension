@@ -1,24 +1,28 @@
-import './index.scss' // 导入画笔样式文件
+import './index.scss'; // 导入画笔样式文件
 
-import Konva from 'konva'
-import { EventBus, PageViewport, PDFPageView, PDFViewerApplication } from 'pdfjs'
+import Konva from 'konva';
+import { EventBus, PageViewport, PDFPageView, PDFViewerApplication } from 'pdfjs';
 
-import { annotationDefinitions, AnnotationType, IAnnotationStore, IAnnotationType } from '../const/definitions'
-import { isElementInDOM, removeCssCustomProperty } from '../utils/utils'
-import { CURSOR_CSS_PROPERTY, PAINTER_IS_PAINTING_STYLE, PAINTER_PAINTING_TYPE, PAINTER_WRAPPER_PREFIX } from './const'
-import { Editor } from './editor/editor'
-import { EditorCircle } from './editor/editor_circle'
-import { EditorFreeHand } from './editor/editor_free_hand'
-import { EditorFreeHighlight } from './editor/editor_free_highlight'
-import { EditorFreeText } from './editor/editor_free_text'
-import { EditorHighLight } from './editor/editor_highlight'
-import { EditorRectangle } from './editor/editor_rectangle'
-import { EditorSignature } from './editor/editor_signature'
-import { EditorStamp } from './editor/editor_stamp'
-import { Selector } from './editor/selector'
-import { Store } from './store'
-import { WebSelection } from './webSelection'
-import { Transform } from './transform/transform'
+import {
+    annotationDefinitions, AnnotationType, IAnnotationStore, IAnnotationType
+} from '../const/definitions';
+import { isElementInDOM, removeCssCustomProperty } from '../utils/utils';
+import {
+    CURSOR_CSS_PROPERTY, PAINTER_IS_PAINTING_STYLE, PAINTER_PAINTING_TYPE, PAINTER_WRAPPER_PREFIX
+} from './const';
+import { Editor } from './editor/editor';
+import { EditorCircle } from './editor/editor_circle';
+import { EditorFreeHand } from './editor/editor_free_hand';
+import { EditorFreeHighlight } from './editor/editor_free_highlight';
+import { EditorFreeText } from './editor/editor_free_text';
+import { EditorHighLight } from './editor/editor_highlight';
+import { EditorRectangle } from './editor/editor_rectangle';
+import { EditorSignature } from './editor/editor_signature';
+import { EditorStamp } from './editor/editor_stamp';
+import { Selector } from './editor/selector';
+import { Store } from './store';
+import { Transform } from './transform/transform';
+import { WebSelection } from './webSelection';
 
 // KonvaCanvas 接口定义
 export interface KonvaCanvas {
@@ -205,6 +209,8 @@ export class Painter {
         const backgroundLayer = new Konva.Layer()
         stage.add(backgroundLayer)
 
+        const dataUrl = stage.toDataURL()
+        console.log('TheNewCreatedDataURL', dataUrl)
         return stage
     }
 
