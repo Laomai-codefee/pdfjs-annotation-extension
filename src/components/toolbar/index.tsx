@@ -14,7 +14,8 @@ import { StampTool } from './stamp';
 
 interface CustomToolbarProps {
     onChange: (annotation: IAnnotationType | null, dataTransfer: string | null) => void
-    onSave: () => void
+    onSave: () => void,
+    allow?: string[]
 }
 
 export interface CustomToolbarRef {
@@ -25,8 +26,21 @@ export interface CustomToolbarRef {
  * @description CustomToolbar
  */
 const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function CustomToolbar(props, ref) {
+    const allow = props.allow
+    const allowSign = ['Caret']
+    const allowAnnotate = ['FreeText', 'PolyLine', 'Ink', 'Circle', 'Square', 'Underline', 'StrikeOut', 'Highlight', 'Stamp']
+    const allowed = []
+    if (allow.includes('sign')) {
+        allowed.push(...allowSign)
+    }
+    if (allow.includes('annotate')) {
+        allowed.push(...allowAnnotate)
+    }
     const [currentAnnotation, setCurrentAnnotation] = useState<IAnnotationType | null>(null)
-    const [annotations, setAnnotations] = useState<IAnnotationType[]>(annotationDefinitions.filter(item => item.pdfjsEditorType !== PdfjsAnnotationEditorType.HIGHLIGHT))
+    const [annotations, setAnnotations] = useState<IAnnotationType[]>(annotationDefinitions.filter(item => {
+
+        return item.pdfjsEditorType !== PdfjsAnnotationEditorType.HIGHLIGHT && allowed.includes(item.subtype)
+    }))
     const [dataTransfer, setDataTransfer] = useState<string | null>(null)
     const { t } = useTranslation()
 
@@ -56,12 +70,14 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
         setCurrentAnnotation(annotation)
     }
 
+
     const buttons = annotations.map((annotation, index) => {
         const isSelected = annotation.type === selectedType
 
         const commonProps = {
             className: isSelected ? 'selected' : ''
         }
+
 
         switch (annotation.type) {
             case AnnotationType.STAMP:

@@ -10,7 +10,8 @@ import { CustomPopbar, CustomPopbarRef } from './components/popbar';
 import { CustomToolbar, CustomToolbarRef } from './components/toolbar';
 import { defaultOptions } from './const/default_options';
 import {
-    annotationDefinitions, HASH_PARAMS_GET_URL, HASH_PARAMS_POST_URL, HASH_PARAMS_USERNAME
+    annotationDefinitions, HASH_PARAMS_ALLOW_ARR, HASH_PARAMS_GET_URL, HASH_PARAMS_POST_URL,
+    HASH_PARAMS_USERNAME
 } from './const/definitions';
 import { initializeI18n } from './locale/index';
 import { Painter } from './painter';
@@ -78,7 +79,8 @@ class PdfjsAnnotationExtension {
         this.appOptions = {
             [HASH_PARAMS_USERNAME]: i18n.t('normal.unknownUser'), // 默认用户名
             [HASH_PARAMS_GET_URL]: '', // 默认 GET URL
-            [HASH_PARAMS_POST_URL]: '', // 默认 POST URL
+            [HASH_PARAMS_POST_URL]: '', // 默认 POST URL,
+            [HASH_PARAMS_ALLOW_ARR]: ''
         };
 
         // 处理地址栏参数
@@ -148,6 +150,11 @@ class PdfjsAnnotationExtension {
         } else {
             console.warn(`${HASH_PARAMS_POST_URL} is undefined`);
         }
+        if (params.has(HASH_PARAMS_ALLOW_ARR)) {
+            this.setOption(HASH_PARAMS_ALLOW_ARR, params.get(HASH_PARAMS_ALLOW_ARR))
+        } else {
+            console.warn(`${HASH_PARAMS_ALLOW_ARR} is undefined`);
+        }
 
     }
 
@@ -174,6 +181,7 @@ class PdfjsAnnotationExtension {
         this.$PDFJS_toolbar_container.insertAdjacentElement('afterend', toolbar)
         createRoot(toolbar).render(
             <CustomToolbar
+                allow={this.appOptions[HASH_PARAMS_ALLOW_ARR].split(',')}
                 ref={this.customToolbarRef}
                 onChange={(currentAnnotation, dataTransfer) => {
                     this.painter.activate(currentAnnotation, dataTransfer)
@@ -193,6 +201,7 @@ class PdfjsAnnotationExtension {
         this.$PDFJS_viewerContainer.insertAdjacentElement('afterend', popbar)
         createRoot(popbar).render(
             <CustomPopbar
+                allow={this.appOptions[HASH_PARAMS_ALLOW_ARR].split(',')}
                 ref={this.customPopbarRef}
                 onChange={(currentAnnotation, range) => {
                     this.painter.highlightRange(range, currentAnnotation)
