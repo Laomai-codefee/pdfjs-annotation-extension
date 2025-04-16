@@ -327,23 +327,23 @@ class PdfjsAnnotationExtension {
         }
         localStorage.setItem(`document-viewer-ae-${postUrl.split('/')[2]}`, JSON.stringify(dataToSave))
 
-        try {
-            const response = await fetch(postUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(dataToSave),
-            });
+        // try {
+        //     const response = await fetch(postUrl, {
+        //         method: 'POST',
+        //         headers: { 'Content-Type': 'application/json' },
+        //         body: JSON.stringify(dataToSave),
+        //     });
 
-            if (!response.ok) {
-                throw new Error(`Failed to save PDF. Status: ${response.status} ${response.statusText}`);
-            }
+        //     if (!response.ok) {
+        //         throw new Error(`Failed to save PDF. Status: ${response.status} ${response.statusText}`);
+        //     }
 
 
-            const result = await response.json();
-            console.log('Saved successfully:', result);
-        } catch (error) {
-            console.error('Error while saving data:', error);
-        }
+        //     const result = await response.json();
+        //     console.log('Saved successfully:', result);
+        // } catch (error) {
+        //     console.error('Error while saving data:', error);
+        // }
     }
 
 

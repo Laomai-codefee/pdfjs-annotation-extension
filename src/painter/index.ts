@@ -210,7 +210,6 @@ export class Painter {
         stage.add(backgroundLayer)
 
         const dataUrl = stage.toDataURL()
-        console.log('TheNewCreatedDataURL', dataUrl)
         return stage
     }
 
