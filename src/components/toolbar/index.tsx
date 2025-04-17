@@ -39,7 +39,7 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
     const [currentAnnotation, setCurrentAnnotation] = useState<IAnnotationType | null>(null)
     const [annotations, setAnnotations] = useState<IAnnotationType[]>(annotationDefinitions.filter(item => {
 
-        return item.pdfjsEditorType !== PdfjsAnnotationEditorType.HIGHLIGHT && allowed.includes(item.subtype)
+        return (item.pdfjsEditorType !== PdfjsAnnotationEditorType.HIGHLIGHT && allowed.includes(item.subtype)) || item.name == 'select'
     }))
     const [dataTransfer, setDataTransfer] = useState<string | null>(null)
     const { t } = useTranslation()
@@ -123,22 +123,24 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
         <div className="CustomToolbar">
             <ul className="buttons">
                 {buttons}
-                <ColorPicker
-                    arrow={false}
-                    disabledAlpha
-                    value={currentAnnotation?.style?.color || defaultOptions.setting.COLOR}
-                    disabled={isColorDisabled}
-                    showText={false}
-                    onChangeComplete={color => handleColorChange(color.toHexString())}
-                    presets={[{ label: '', colors: defaultOptions.colors }]}
-                >
-                    <li className={isColorDisabled ? 'disabled' : ''} title={t('normal.color')}>
-                        <div className="icon">
-                            <PaletteIcon style={{ color: currentAnnotation?.style?.color }} />
-                        </div>
-                        <div className="name">{t('normal.color')}</div>
-                    </li>
-                </ColorPicker>
+                {allow.includes('annotate') && (
+                    <ColorPicker
+                        arrow={false}
+                        disabledAlpha
+                        value={currentAnnotation?.style?.color || defaultOptions.setting.COLOR}
+                        disabled={isColorDisabled}
+                        showText={false}
+                        onChangeComplete={color => handleColorChange(color.toHexString())}
+                        presets={[{ label: '', colors: defaultOptions.colors }]}
+                    >
+                        <li className={isColorDisabled ? 'disabled' : ''} title={t('normal.color')}>
+                            <div className="icon">
+                                <PaletteIcon style={{ color: currentAnnotation?.style?.color }} />
+                            </div>
+                            <div className="name">{t('normal.color')}</div>
+                        </li>
+                    </ColorPicker>
+                )}
             </ul>
             <div className="splitToolbarButtonSeparator"></div>
             <ul className="buttons">

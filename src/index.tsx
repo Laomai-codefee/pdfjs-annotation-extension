@@ -80,7 +80,7 @@ class PdfjsAnnotationExtension {
             [HASH_PARAMS_USERNAME]: i18n.t('normal.unknownUser'), // 默认用户名
             [HASH_PARAMS_GET_URL]: '', // 默认 GET URL
             [HASH_PARAMS_POST_URL]: '', // 默认 POST URL,
-            [HASH_PARAMS_ALLOW_ARR]: ''
+            [HASH_PARAMS_ALLOW_ARR]: '' // Initial Data for Allowed tools 'sign' , 'annotate'
         };
 
         // 处理地址栏参数
@@ -345,7 +345,7 @@ class PdfjsAnnotationExtension {
 
         //     if (!response.ok) {
         //         throw new Error(`Failed to save PDF. Status: ${response.status} ${response.statusText}`);
-        //     }
+        //     
 
 
         //     const result = await response.json();
