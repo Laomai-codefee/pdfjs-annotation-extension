@@ -151,7 +151,7 @@ class PdfjsAnnotationExtension {
             console.warn(`${HASH_PARAMS_POST_URL} is undefined`);
         }
         if (params.has(HASH_PARAMS_ALLOW_ARR)) {
-            this.setOption(HASH_PARAMS_ALLOW_ARR, params.get(HASH_PARAMS_ALLOW_ARR))
+            this.setOption(HASH_PARAMS_ALLOW_ARR, params.get(HASH_PARAMS_ALLOW_ARR) != '' ? params.get(HASH_PARAMS_ALLOW_ARR) : "sign,annotate")
         } else {
             console.warn(`${HASH_PARAMS_ALLOW_ARR} is undefined`);
         }
