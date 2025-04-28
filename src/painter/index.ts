@@ -1,24 +1,28 @@
-import './index.scss' // 导入画笔样式文件
+import './index.scss'; // 导入画笔样式文件
 
-import Konva from 'konva'
-import { EventBus, PageViewport, PDFPageView, PDFViewerApplication } from 'pdfjs'
+import Konva from 'konva';
+import { EventBus, PageViewport, PDFPageView, PDFViewerApplication } from 'pdfjs';
 
-import { annotationDefinitions, AnnotationType, IAnnotationStore, IAnnotationType } from '../const/definitions'
-import { isElementInDOM, removeCssCustomProperty } from '../utils/utils'
-import { CURSOR_CSS_PROPERTY, PAINTER_IS_PAINTING_STYLE, PAINTER_PAINTING_TYPE, PAINTER_WRAPPER_PREFIX } from './const'
-import { Editor } from './editor/editor'
-import { EditorCircle } from './editor/editor_circle'
-import { EditorFreeHand } from './editor/editor_free_hand'
-import { EditorFreeHighlight } from './editor/editor_free_highlight'
-import { EditorFreeText } from './editor/editor_free_text'
-import { EditorHighLight } from './editor/editor_highlight'
-import { EditorRectangle } from './editor/editor_rectangle'
-import { EditorSignature } from './editor/editor_signature'
-import { EditorStamp } from './editor/editor_stamp'
-import { Selector } from './editor/selector'
-import { Store } from './store'
-import { WebSelection } from './webSelection'
-import { Transform } from './transform/transform'
+import {
+    annotationDefinitions, AnnotationType, IAnnotationStore, IAnnotationType
+} from '../const/definitions';
+import { isElementInDOM, removeCssCustomProperty } from '../utils/utils';
+import {
+    CURSOR_CSS_PROPERTY, PAINTER_IS_PAINTING_STYLE, PAINTER_PAINTING_TYPE, PAINTER_WRAPPER_PREFIX
+} from './const';
+import { Editor } from './editor/editor';
+import { EditorCircle } from './editor/editor_circle';
+import { EditorFreeHand } from './editor/editor_free_hand';
+import { EditorFreeHighlight } from './editor/editor_free_highlight';
+import { EditorFreeText } from './editor/editor_free_text';
+import { EditorHighLight } from './editor/editor_highlight';
+import { EditorRectangle } from './editor/editor_rectangle';
+import { EditorSignature } from './editor/editor_signature';
+import { EditorStamp } from './editor/editor_stamp';
+import { Selector } from './editor/selector';
+import { Store } from './store';
+import { Transform } from './transform/transform';
+import { WebSelection } from './webSelection';
 
 // KonvaCanvas 接口定义
 export interface KonvaCanvas {
@@ -95,12 +99,13 @@ export class Painter {
             // eslint-disable-next-line prettier/prettier
             onChange: async (id, groupString, rawAnnotationStore, konvaClientRect) => {
                 const editor = this.findEditorForGroupId(id)
-                if (editor) {
-                    this.updateStore(id, {
-                        konvaString: groupString,
-                        konvaClientRect
-                    })
-                }
+                // console.log('%c [ onChange ]', 'font-size:13px; background:#d10d00; color:#ff5144;', { editor, groupString, konvaClientRect })
+                // if (editor) {
+                this.updateStore(id, {
+                    konvaString: groupString,
+                    konvaClientRect
+                })
+                // }
             },
             onDelete: id => {
                 this.deleteAnnotation(id, true)
@@ -205,6 +210,7 @@ export class Painter {
         const backgroundLayer = new Konva.Layer()
         stage.add(backgroundLayer)
 
+        const dataUrl = stage.toDataURL()
         return stage
     }
 
@@ -304,6 +310,7 @@ export class Painter {
                 return
             }
         })
+        // console.log("EditorStoreStuff", { editorStore: this.editorStore, groupId })
         return editor
     }
 
@@ -411,6 +418,7 @@ export class Painter {
                 })
                 break
             case AnnotationType.SIGNATURE:
+
                 editor = new EditorSignature(
                     {
                         userName: this.userName,
@@ -428,6 +436,8 @@ export class Painter {
                     },
                     this.tempDataTransfer
                 )
+                // console.log('%c [ new dataToSave ]', 'font-size:13px; background:#d10d00; color:#ff5144;', { editor })
+
                 break
             case AnnotationType.STAMP:
                 editor = new EditorStamp(
@@ -470,7 +480,6 @@ export class Painter {
                 break
 
             default:
-                console.warn(`未实现的批注类型: ${annotation.type}`)
                 return
         }
 
@@ -538,7 +547,7 @@ export class Painter {
         if (storeEditor) {
             storeEditor.deleteGroup(id, konvaCanvasStore.konvaStage)
         }
-        if(emit) {
+        if (emit) {
             this.onStoreDelete(id)
         }
     }
@@ -630,7 +639,7 @@ export class Painter {
     /**
      * 重置 PDF.js 批注存储
      */
-    public resetPdfjsAnnotationStorage(): void {}
+    public resetPdfjsAnnotationStorage(): void { }
 
     /**
      * @description 根据 range 加亮
@@ -654,6 +663,8 @@ export class Painter {
                 this.saveToStore(annotation, true)
             })
             // 再用外部数据覆盖
+
+
             annotations.forEach(annotation => {
                 if (annotationMap.has(annotation.id)) {
                     this.updateStore(annotation.id, annotation)

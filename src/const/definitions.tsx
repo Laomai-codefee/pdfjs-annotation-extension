@@ -1,18 +1,10 @@
+import { IRect } from 'konva/lib/types';
+
+import { defaultOptions } from './default_options';
 import {
-    CircleIcon,
-    FreehandIcon,
-    FreeHighlightIcon,
-    FreetextIcon,
-    HighlightIcon,
-    RectangleIcon,
-    SelectIcon,
-    SignatureIcon,
-    StampIcon,
-    StrikeoutIcon,
-    UnderlineIcon
-} from './icon'
-import { IRect } from 'konva/lib/types'
-import { defaultOptions } from './default_options'
+    CircleIcon, FreehandIcon, FreeHighlightIcon, FreetextIcon, HighlightIcon, RectangleIcon,
+    SelectIcon, SignatureIcon, StampIcon, StrikeoutIcon, UnderlineIcon
+} from './icon';
 
 export type PdfjsAnnotationSubtype =
     | 'Link'
@@ -312,4 +304,6 @@ export const HASH_PARAMS_USERNAME = `${HASH_PARAMS_PREFIX}_username`
 export const HASH_PARAMS_GET_URL = `${HASH_PARAMS_PREFIX}_get_url`
 
 export const HASH_PARAMS_POST_URL = `${HASH_PARAMS_PREFIX}_post_url`
+
+export const HASH_PARAMS_ALLOW_ARR = `${HASH_PARAMS_PREFIX}_allow_arr`
 
