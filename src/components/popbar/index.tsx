@@ -1,12 +1,17 @@
-import './index.scss'
+import './index.scss';
 
-import { computePosition, flip } from '@floating-ui/dom'
-import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react'
-import { annotationDefinitions, IAnnotationType, PdfjsAnnotationEditorType } from '../../const/definitions'
-import { useTranslation } from 'react-i18next'
+import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { computePosition, flip } from '@floating-ui/dom';
+
+import {
+    annotationDefinitions, IAnnotationType, PdfjsAnnotationEditorType
+} from '../../const/definitions';
 
 interface CustomPopbarProps {
-    onChange: (annotation: IAnnotationType | null, range: Range | null) => void
+    onChange: (annotation: IAnnotationType | null, range: Range | null) => void,
+    allow?: string[]
 }
 
 export interface CustomPopbarRef {
@@ -96,7 +101,7 @@ const CustomPopbar = forwardRef<CustomPopbarRef, CustomPopbarProps>(function Cus
 
     return (
         <>
-            <div className={`CustomPopbar ${show ? 'show' : 'hide'}`} ref={containerRef}>
+            <div className={`CustomPopbar ${props.allow.includes('annotate') ? show ? 'show' : 'hide' : 'hide'}`} ref={containerRef}>
                 <ul className="buttons">{buttons}</ul>
             </div>
         </>

@@ -1,14 +1,14 @@
-import './index.scss' // 导入样式
+import './index.scss'; // 导入样式
 
-import { Button, Modal, Popover } from 'antd' // 导入 antd 组件
-import Konva from 'konva' // 导入 Konva 库
-import React, { useCallback, useEffect, useRef, useState } from 'react' // 导入 React 和相关 Hooks
-import {
-    PlusCircleOutlined
-} from '@ant-design/icons';
-import { IAnnotationType } from '../../const/definitions' // 导入自定义类型和默认设置
-import { useTranslation } from 'react-i18next'
+import { Button, Modal, Popover } from 'antd'; // 导入 antd 组件
+import Konva from 'konva'; // 导入 Konva 库
+import React, { useCallback, useEffect, useRef, useState } from 'react'; // 导入 React 和相关 Hooks
+import { useTranslation } from 'react-i18next';
+
+import { PlusCircleOutlined } from '@ant-design/icons';
+
 import { defaultOptions } from '../../const/default_options';
+import { HASH_PARAMS_GET_URL, IAnnotationType } from '../../const/definitions'; // 导入自定义类型和默认设置
 
 interface SignatureToolProps {
     annotation: IAnnotationType // 签名工具的注释类型
@@ -27,7 +27,21 @@ const SignatureTool: React.FC<SignatureToolProps> = props => {
 
     const [signatures, setSignatures] = useState<string[]>([]) // 存储所有签名的数组
 
+
     const { t } = useTranslation()
+
+    useEffect(() => {
+        let current_document_store
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i)
+            if (key && key.startsWith('document-viewer-ae')) {
+                current_document_store = JSON.parse(localStorage.getItem(key))
+                const signature = current_document_store.find((annotation) => annotation.subtype == 'Caret')
+                setSignatures([signature.contentsObj.image])
+                break
+            }
+        }
+    }, [])
 
     // 更新 colorRef 当 currentColor 改变时
     useEffect(() => {
@@ -181,11 +195,13 @@ const SignatureTool: React.FC<SignatureToolProps> = props => {
                                 )
                             })}
                         </ul>
+                        {signatures.length < 1 && (
                         <div className="SignaturePop-Toolbar">
                             <Button block type="link" onClick={openModal} icon={<PlusCircleOutlined />}>
                                 {t('toolbar.buttons.createSignature')}
                             </Button>
                         </div>
+                        )}
                     </div>
                 }
                 trigger="click"

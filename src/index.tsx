@@ -1,20 +1,33 @@
-import './scss/app.scss'
+import './scss/app.scss';
 
-import { EventBus, PDFPageView, PDFViewerApplication } from 'pdfjs'
-import { createRef } from 'react'
-import { createRoot } from 'react-dom/client'
-import { initializeI18n } from './locale/index'
-import i18n from 'i18next'
-import { CustomPopbar, CustomPopbarRef } from './components/popbar'
-import { CustomToolbar, CustomToolbarRef } from './components/toolbar'
-import { annotationDefinitions, HASH_PARAMS_GET_URL, HASH_PARAMS_POST_URL, HASH_PARAMS_USERNAME } from './const/definitions'
-import { Painter } from './painter'
-import { CustomComment, CustomCommentRef } from './components/comment'
-import { once, parseQueryString } from './utils/utils'
-import { defaultOptions } from './const/default_options'
+import i18n from 'i18next';
+import { EventBus, PDFPageView, PDFViewerApplication } from 'pdfjs';
+import { createRef } from 'react';
+import { createRoot } from 'react-dom/client';
+
+import { CustomComment, CustomCommentRef } from './components/comment';
+import { CustomPopbar, CustomPopbarRef } from './components/popbar';
+import { CustomToolbar, CustomToolbarRef } from './components/toolbar';
+import { defaultOptions } from './const/default_options';
+import {
+    annotationDefinitions, HASH_PARAMS_ALLOW_ARR, HASH_PARAMS_GET_URL, HASH_PARAMS_POST_URL,
+    HASH_PARAMS_USERNAME
+} from './const/definitions';
+import { initializeI18n } from './locale/index';
+import { Painter } from './painter';
+import { once, parseQueryString } from './utils/utils';
 
 interface AppOptions {
     [key: string]: string;
+}
+
+
+declare global {
+    interface Window {
+        iframeAPI?: {
+            saveData: () => void;
+        };
+    }
 }
 
 class PdfjsAnnotationExtension {
@@ -32,10 +45,25 @@ class PdfjsAnnotationExtension {
     loadEnd: Boolean
 
     constructor() {
+        window.iframeAPI = {
+            saveData: this.saveData.bind(this),
+        };
         this.loadEnd = false
         // 初始化 PDF.js 对象和相关属性
-        this.PDFJS_PDFViewerApplication = (window as any).PDFViewerApplication
-        this.PDFJS_EventBus = this.PDFJS_PDFViewerApplication.eventBus
+        this.PDFJS_PDFViewerApplication = (window as any).PDFViewerApplication || null
+        if (this.PDFJS_PDFViewerApplication) {
+            this.PDFJS_EventBus = this.PDFJS_PDFViewerApplication.eventBus;
+        } else {
+            console.warn("PDFViewerApplication is not yet initialized. Retrying...");
+            setTimeout(() => {
+                this.PDFJS_PDFViewerApplication = (window as any).PDFViewerApplication;
+                if (this.PDFJS_PDFViewerApplication) {
+                    this.PDFJS_EventBus = this.PDFJS_PDFViewerApplication.eventBus;
+                } else {
+                    console.error("PDFViewerApplication is still undefined.");
+                }
+            }, 500); // Retry after 500ms
+        }
         this.$PDFJS_sidebarContainer = this.PDFJS_PDFViewerApplication.appConfig.sidebar.sidebarContainer
         this.$PDFJS_toolbar_container = this.PDFJS_PDFViewerApplication.appConfig.toolbar.container
         this.$PDFJS_viewerContainer = this.PDFJS_PDFViewerApplication.appConfig.viewerContainer
@@ -51,7 +79,8 @@ class PdfjsAnnotationExtension {
         this.appOptions = {
             [HASH_PARAMS_USERNAME]: i18n.t('normal.unknownUser'), // 默认用户名
             [HASH_PARAMS_GET_URL]: '', // 默认 GET URL
-            [HASH_PARAMS_POST_URL]: '', // 默认 POST URL
+            [HASH_PARAMS_POST_URL]: '', // 默认 POST URL,
+            [HASH_PARAMS_ALLOW_ARR]: 'sign,annotate' // Initial Data for Allowed tools 'sign' , 'annotate'
         };
 
         // 处理地址栏参数
@@ -70,7 +99,7 @@ class PdfjsAnnotationExtension {
             onStoreAdd: annotation => {
                 this.customCommentRef.current.addAnnotation(annotation)
             },
-            onStoreDelete:(id) => {
+            onStoreDelete: (id) => {
                 this.customCommentRef.current.delAnnotation(id)
             },
             onAnnotationSelected: (annotation, isClick) => {
@@ -113,13 +142,18 @@ class PdfjsAnnotationExtension {
         }
         if (params.has(HASH_PARAMS_GET_URL)) {
             this.setOption(HASH_PARAMS_GET_URL, params.get(HASH_PARAMS_GET_URL))
-        }else {
+        } else {
             console.warn(`${HASH_PARAMS_GET_URL} is undefined`);
         }
         if (params.has(HASH_PARAMS_POST_URL)) {
             this.setOption(HASH_PARAMS_POST_URL, params.get(HASH_PARAMS_POST_URL))
-        }else {
+        } else {
             console.warn(`${HASH_PARAMS_POST_URL} is undefined`);
+        }
+        if (params.has(HASH_PARAMS_ALLOW_ARR)) {
+            this.setOption(HASH_PARAMS_ALLOW_ARR, params.get(HASH_PARAMS_ALLOW_ARR) != '' ? params.get(HASH_PARAMS_ALLOW_ARR) : "sign,annotate")
+        } else {
+            console.warn(`${HASH_PARAMS_ALLOW_ARR} is undefined`);
         }
 
     }
@@ -147,6 +181,7 @@ class PdfjsAnnotationExtension {
         this.$PDFJS_toolbar_container.insertAdjacentElement('afterend', toolbar)
         createRoot(toolbar).render(
             <CustomToolbar
+                allow={this.appOptions[HASH_PARAMS_ALLOW_ARR].split(',')}
                 ref={this.customToolbarRef}
                 onChange={(currentAnnotation, dataTransfer) => {
                     this.painter.activate(currentAnnotation, dataTransfer)
@@ -166,6 +201,7 @@ class PdfjsAnnotationExtension {
         this.$PDFJS_viewerContainer.insertAdjacentElement('afterend', popbar)
         createRoot(popbar).render(
             <CustomPopbar
+                allow={this.appOptions[HASH_PARAMS_ALLOW_ARR].split(',')}
                 ref={this.customPopbarRef}
                 onChange={(currentAnnotation, range) => {
                     this.painter.highlightRange(range, currentAnnotation)
@@ -285,35 +321,41 @@ class PdfjsAnnotationExtension {
         }
     }
 
+
+
     /**
      * @description 保存批注数据
      * @returns 
      */
-    private async saveData(): Promise<void> {
+    public async saveData(): Promise<void> {
         const dataToSave = this.painter.getData();
-        console.log('%c [ dataToSave ]', 'font-size:13px; background:#d10d00; color:#ff5144;', dataToSave)
+        console.log('%c [ new dataToSave ]', 'font-size:13px; background:#d10d00; color:#ff5144;', dataToSave)
         const postUrl = this.getOption(HASH_PARAMS_POST_URL);
         if (!postUrl) {
             return;
         }
+        localStorage.setItem(`document-viewer-ae-${postUrl.split('/')[2]}`, JSON.stringify(dataToSave))
 
-        try {
-            const response = await fetch(postUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(dataToSave),
-            });
+        // try {
+        //     const response = await fetch(postUrl, {
+        //         method: 'POST',
+        //         headers: { 'Content-Type': 'application/json' },
+        //         body: JSON.stringify(dataToSave),
+        //     });
 
-            if (!response.ok) {
-                throw new Error(`Failed to save PDF. Status: ${response.status} ${response.statusText}`);
-            }
+        //     if (!response.ok) {
+        //         throw new Error(`Failed to save PDF. Status: ${response.status} ${response.statusText}`);
+        //     
 
-            const result = await response.json();
-            console.log('Saved successfully:', result);
-        } catch (error) {
-            console.error('Error while saving data:', error);
-        }
+
+        //     const result = await response.json();
+        //     console.log('Saved successfully:', result);
+        // } catch (error) {
+        //     console.error('Error while saving data:', error);
+        // }
     }
+
+
 
 }
 

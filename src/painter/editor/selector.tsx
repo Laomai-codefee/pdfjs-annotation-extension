@@ -1,12 +1,13 @@
-import Konva from 'konva'
+import { Modal } from 'antd';
+import i18n from 'i18next';
+import Konva from 'konva';
+import { IRect } from 'konva/lib/types';
 
-import { IAnnotationStore } from '../../const/definitions'
-import { SELECTOR_HOVER_STYLE, SHAPE_GROUP_NAME } from '../const'
-import { KonvaCanvas } from '../index'
-import { Modal } from 'antd'
-import i18n from 'i18next'
-import { IRect } from 'konva/lib/types'
-import { defaultOptions } from '../../const/default_options'
+import { defaultOptions } from '../../const/default_options';
+import { IAnnotationStore } from '../../const/definitions';
+import { SELECTOR_HOVER_STYLE, SHAPE_GROUP_NAME } from '../const';
+import { KonvaCanvas } from '../index';
+
 /**
  * 定义选择器的选项接口
  */
@@ -155,7 +156,8 @@ export class Selector {
             })
         })
 
-        shape.on('pointerclick', e => {
+        shape.on('pointerdown', e => {
+            console.log('SelectorPointerDown', e)
             if (e.evt.button === 0) {
                 this.handleShapeClick(shape, konvaStage, true)
             }

@@ -1,5 +1,5 @@
 .CustomComment {
-    width: 330px;
+    width: 0px;
     position: absolute;
     top: 107px;
     right: 0;
@@ -78,26 +78,26 @@
     }
 }
 
-@media all and (max-width: 780px) {
-    .CustomComment {
-        width: 250px;
-    }
-    .PdfjsAnnotationExtension {
-        #viewerContainer {
-            right: 250px;
-        }
-    }
-}
-@media all and (max-width: 690px) {
-    .CustomComment {
-        width: 150px;
-    }
-    .PdfjsAnnotationExtension {
-        #viewerContainer {
-            right: 150px;
-        }
-    }
-}
+// @media all and (max-width: 780px) {
+//     .CustomComment {
+//         width: 250px;
+//     }
+//     .PdfjsAnnotationExtension {
+//         #viewerContainer {
+//             right: 250px;
+//         }
+//     }
+// }
+// @media all and (max-width: 690px) {
+//     .CustomComment {
+//         width: 150px;
+//     }
+//     .PdfjsAnnotationExtension {
+//         #viewerContainer {
+//             right: 150px;
+//         }
+//     }
+// }
 
 @media (hover: hover) {
 }
