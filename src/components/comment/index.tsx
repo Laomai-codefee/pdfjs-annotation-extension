@@ -108,6 +108,8 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
     }
 
     const updateAnnotation = (updatedAnnotation: IAnnotationStore) => {
+
+
         setAnnotations(prevAnnotations =>
             prevAnnotations.map(annotation => {
                 if (annotation.id === updatedAnnotation.id) {

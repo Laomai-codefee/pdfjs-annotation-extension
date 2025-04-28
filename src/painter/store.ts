@@ -1,7 +1,7 @@
-import { PDFViewerApplication } from 'pdfjs'
+import { PDFViewerApplication } from 'pdfjs';
 
-import { IAnnotationStore } from '../const/definitions'
-import { formatTimestamp } from '../utils/utils'
+import { IAnnotationStore } from '../const/definitions';
+import { formatTimestamp } from '../utils/utils';
 
 export class Store {
     // 所有注释
@@ -46,6 +46,8 @@ export class Store {
      * @param updates - 更新的部分注释数据
      */
     public update(id: string, updates: Partial<IAnnotationStore>) {
+        // console.log("AnnotationStoreUpdate", { AnnotationStore: this.annotationStore, id })
+
         if (this.annotationStore.has(id)) {
             const existingAnnotation = this.annotationStore.get(id)
             if (existingAnnotation) {

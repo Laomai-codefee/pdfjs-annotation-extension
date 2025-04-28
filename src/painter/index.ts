@@ -99,12 +99,13 @@ export class Painter {
             // eslint-disable-next-line prettier/prettier
             onChange: async (id, groupString, rawAnnotationStore, konvaClientRect) => {
                 const editor = this.findEditorForGroupId(id)
-                if (editor) {
-                    this.updateStore(id, {
-                        konvaString: groupString,
-                        konvaClientRect
-                    })
-                }
+                // console.log('%c [ onChange ]', 'font-size:13px; background:#d10d00; color:#ff5144;', { editor, groupString, konvaClientRect })
+                // if (editor) {
+                this.updateStore(id, {
+                    konvaString: groupString,
+                    konvaClientRect
+                })
+                // }
             },
             onDelete: id => {
                 this.deleteAnnotation(id, true)
@@ -309,6 +310,7 @@ export class Painter {
                 return
             }
         })
+        // console.log("EditorStoreStuff", { editorStore: this.editorStore, groupId })
         return editor
     }
 
@@ -416,6 +418,7 @@ export class Painter {
                 })
                 break
             case AnnotationType.SIGNATURE:
+
                 editor = new EditorSignature(
                     {
                         userName: this.userName,
@@ -433,6 +436,8 @@ export class Painter {
                     },
                     this.tempDataTransfer
                 )
+                // console.log('%c [ new dataToSave ]', 'font-size:13px; background:#d10d00; color:#ff5144;', { editor })
+
                 break
             case AnnotationType.STAMP:
                 editor = new EditorStamp(
@@ -475,7 +480,6 @@ export class Painter {
                 break
 
             default:
-                console.warn(`未实现的批注类型: ${annotation.type}`)
                 return
         }
 
@@ -543,7 +547,7 @@ export class Painter {
         if (storeEditor) {
             storeEditor.deleteGroup(id, konvaCanvasStore.konvaStage)
         }
-        if(emit) {
+        if (emit) {
             this.onStoreDelete(id)
         }
     }
@@ -635,7 +639,7 @@ export class Painter {
     /**
      * 重置 PDF.js 批注存储
      */
-    public resetPdfjsAnnotationStorage(): void {}
+    public resetPdfjsAnnotationStorage(): void { }
 
     /**
      * @description 根据 range 加亮
@@ -659,6 +663,8 @@ export class Painter {
                 this.saveToStore(annotation, true)
             })
             // 再用外部数据覆盖
+
+
             annotations.forEach(annotation => {
                 if (annotationMap.has(annotation.id)) {
                     this.updateStore(annotation.id, annotation)

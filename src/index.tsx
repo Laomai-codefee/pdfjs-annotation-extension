@@ -80,7 +80,7 @@ class PdfjsAnnotationExtension {
             [HASH_PARAMS_USERNAME]: i18n.t('normal.unknownUser'), // 默认用户名
             [HASH_PARAMS_GET_URL]: '', // 默认 GET URL
             [HASH_PARAMS_POST_URL]: '', // 默认 POST URL,
-            [HASH_PARAMS_ALLOW_ARR]: '' // Initial Data for Allowed tools 'sign' , 'annotate'
+            [HASH_PARAMS_ALLOW_ARR]: 'sign,annotate' // Initial Data for Allowed tools 'sign' , 'annotate'
         };
 
         // 处理地址栏参数
@@ -329,7 +329,7 @@ class PdfjsAnnotationExtension {
      */
     public async saveData(): Promise<void> {
         const dataToSave = this.painter.getData();
-        console.log('%c [ dataToSave ]', 'font-size:13px; background:#d10d00; color:#ff5144;', dataToSave)
+        console.log('%c [ new dataToSave ]', 'font-size:13px; background:#d10d00; color:#ff5144;', dataToSave)
         const postUrl = this.getOption(HASH_PARAMS_POST_URL);
         if (!postUrl) {
             return;
