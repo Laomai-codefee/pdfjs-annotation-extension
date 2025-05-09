@@ -139,7 +139,6 @@ export class Selector {
      * @param konvaStage - 形状所在的 Konva Stage。
      */
     private bindShapeEvents(shape: Konva.Shape, konvaStage: Konva.Stage): void {
-
         shape.on('pointerdblclick', () => {
             Modal.confirm({
                 title: i18n.t('normal.deleteConfirm'),
@@ -200,6 +199,8 @@ export class Selector {
      * @param konvaStage
      */
     private createTransformer(group: Konva.Group, konvaStage: Konva.Stage) {
+        const line = group.children[0] as Konva.Line
+
         const groupId = group.id()
         this.currentTransformerId = groupId
         const rawAnnotationStore = this.getAnnotationStore(groupId)
@@ -220,6 +221,10 @@ export class Selector {
                 return newBox
             }
         })
+
+        if (line.attrs.id && line.attrs.id === 'note') {
+            transformer.resizeEnabled(false)
+        }
         group.draggable(!rawAnnotationStore.readonly)
         transformer.off('transformend')
         transformer.on('transformend', () => {

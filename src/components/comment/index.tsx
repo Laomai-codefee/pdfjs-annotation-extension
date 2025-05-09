@@ -19,7 +19,8 @@ import {
     UnderlineIcon,
     DownloadIcon,
     SignatureIcon,
-    StarIcon
+    StarIcon,
+    NoteIcon
 } from '../../const/icon'
 
 const iconMapping: Record<PdfjsAnnotationSubtype, React.ReactNode> = {
@@ -40,7 +41,8 @@ const iconMapping: Record<PdfjsAnnotationSubtype, React.ReactNode> = {
     Text: <StarIcon />,
     FileAttachment: <DownloadIcon />,
     Popup: <FreehandIcon />,
-    Widget: <FreehandIcon />
+    Widget: <FreehandIcon />,
+    Note: <NoteIcon />
 };
 
 const getIconBySubtype = (subtype: PdfjsAnnotationSubtype): React.ReactNode => {

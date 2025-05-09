@@ -15,6 +15,7 @@ import { EditorHighLight } from './editor/editor_highlight'
 import { EditorRectangle } from './editor/editor_rectangle'
 import { EditorSignature } from './editor/editor_signature'
 import { EditorStamp } from './editor/editor_stamp'
+import { EditorNote } from './editor/editor_note'
 import { Selector } from './editor/selector'
 import { Store } from './store'
 import { WebSelection } from './webSelection'
@@ -386,6 +387,22 @@ export class Painter {
                     }
                 })
                 break
+            case AnnotationType.NOTE:
+                editor = new EditorNote({
+                    userName: this.userName,
+                    pdfViewerApplication: this.pdfViewerApplication,
+                    konvaStage,
+                    pageNumber,
+                    annotation,
+                    onAdd: annotationStore => {
+                        this.saveToStore(annotationStore)
+                        if (annotation.isOnce) {
+                            this.setDefaultMode()
+                            this.selector.select(annotationStore.id)
+                        }
+                    }
+                })
+                break
             case AnnotationType.FREEHAND:
                 editor = new EditorFreeHand({
                     userName: this.userName,
@@ -616,6 +633,7 @@ export class Painter {
             case AnnotationType.SIGNATURE:
             case AnnotationType.STAMP:
             case AnnotationType.SELECT:
+            case AnnotationType.NOTE:
                 this.setMode('painting') // 设置绘画模式
                 break
 
