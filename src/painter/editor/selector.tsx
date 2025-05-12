@@ -189,7 +189,7 @@ export class Selector {
         if (!group) return
         this.onSelected(group.id(), isClick)
         this.clearTransformers() // 清除之前的变换器
-        this.createTransformer(group, konvaStage)
+        this.createTransformer(group, konvaStage, !isClick)
         this.bindGlobalEvents() // 绑定全局事件
     }
 
@@ -198,7 +198,7 @@ export class Selector {
      * @param group
      * @param konvaStage
      */
-    private createTransformer(group: Konva.Group, konvaStage: Konva.Stage) {
+    private createTransformer(group: Konva.Group, konvaStage: Konva.Stage, flash: boolean) {
         const line = group.children[0] as Konva.Line
 
         const groupId = group.id()
@@ -206,7 +206,7 @@ export class Selector {
         const rawAnnotationStore = this.getAnnotationStore(groupId)
         group.off('dragend')
         const transformer = new Konva.Transformer({
-            resizeEnabled: !rawAnnotationStore.readonly,
+            resizeEnabled: rawAnnotationStore.resizable,
             rotateEnabled: false,
             borderStrokeWidth: defaultOptions.chooseSetting.STROKEWIDTH,
             borderStroke: defaultOptions.chooseSetting.COLOR,
@@ -225,7 +225,7 @@ export class Selector {
         if (line.attrs.id && line.attrs.id === 'note') {
             transformer.resizeEnabled(false)
         }
-        group.draggable(!rawAnnotationStore.readonly)
+        group.draggable(rawAnnotationStore.draggable)
         transformer.off('transformend')
         transformer.on('transformend', () => {
             this.onChange(group.id(), group.toJSON(), { ...rawAnnotationStore }, Konva.Node.create(group.toJSON()).getClientRect())
@@ -267,7 +267,54 @@ export class Selector {
         transformer.nodes([group])
         this.getBackgroundLayer(konvaStage).add(transformer)
         this.transformerStore.set(groupId, transformer)
+        if(flash){
+            this.flashNodeWithTransformer(group, transformer);
+        }
     }
+    private flashNodeWithTransformer(group: Konva.Group, transformer: Konva.Transformer) {
+        let flashCount = 0;
+        const maxFlashes = 0;
+        const fadeDuration = 0.1;
+    
+        const originalStroke = transformer.borderStroke();
+        const highlightStroke = 'red'; // 你也可以自定义颜色
+    
+        const fadeOut = () => {
+            const groupTween = new Konva.Tween({
+                node: group,
+                duration: fadeDuration,
+                opacity: 0,
+                onFinish: () => {
+                    transformer.borderStroke(highlightStroke); // 设置边框颜色为闪烁色
+                    transformer.getLayer()?.batchDraw();
+                    fadeIn();
+                }
+            });
+            groupTween.play();
+        };
+    
+        const fadeIn = () => {
+            const groupTween = new Konva.Tween({
+                node: group,
+                duration: fadeDuration,
+                opacity: 1,
+                onFinish: () => {
+                    transformer.borderStroke(originalStroke); // 恢复原颜色
+                    transformer.getLayer()?.batchDraw();
+    
+                    flashCount++;
+                    if (flashCount < maxFlashes) {
+                        setTimeout(fadeOut, 100);
+                    }
+                }
+            });
+            groupTween.play();
+        };
+    
+        fadeOut(); // 启动第一轮
+    }
+    
+
 
     /**
      * 获取所有形状的总包围盒。

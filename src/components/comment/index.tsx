@@ -19,7 +19,6 @@ import {
     UnderlineIcon,
     DownloadIcon,
     SignatureIcon,
-    StarIcon,
     NoteIcon
 } from '../../const/icon'
 
@@ -38,7 +37,7 @@ const iconMapping: Record<PdfjsAnnotationSubtype, React.ReactNode> = {
     PolyLine: <FreeHighlightIcon />,
     Caret: <SignatureIcon />,
     Link: <FreehandIcon />,
-    Text: <StarIcon />,
+    Text: <NoteIcon />,
     FileAttachment: <DownloadIcon />,
     Popup: <FreehandIcon />,
     Widget: <FreehandIcon />,

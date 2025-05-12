@@ -50,7 +50,8 @@ export class CircleDecoder extends Decoder {
                 text: annotation.contentsObj.str
             },
             comments: this.getComments(annotation, allAnnotations),
-            readonly: false
+            draggable: true,
+            resizable: true
         }
 
         ghostGroup.destroy()

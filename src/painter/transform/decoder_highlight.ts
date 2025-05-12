@@ -110,7 +110,6 @@ export class HighlightDecoder extends Decoder {
         const annotationStore: IAnnotationStore = {
             id: annotation.id,
             pageNumber: annotation.pageNumber,
-            pageRanges: null,
             konvaString: ghostGroup.toJSON(),
             konvaClientRect: ghostGroup.getClientRect(),
             title: annotation.titleObj.str,
@@ -124,7 +123,8 @@ export class HighlightDecoder extends Decoder {
                 text: annotation.contentsObj.str
             },
             comments: this.getComments(annotation, allAnnotations),
-            readonly: true,
+            draggable: false,
+            resizable: false
         };
     
         ghostGroup.destroy();

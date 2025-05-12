@@ -53,7 +53,8 @@ export class FreeTextDecoder extends Decoder {
                 text: textStr
             },
             comments: this.getComments(annotation, allAnnotations),
-            readonly: false
+            draggable: true,
+            resizable: true
         };
     
         return annotationStore;

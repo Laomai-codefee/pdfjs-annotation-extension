@@ -521,7 +521,6 @@ export class Painter {
         const annotationStores = this.store.getByPage(pageNumber) // 获取指定页码的批注存储
         annotationStores.forEach(annotationStore => {
             let storeEditor = this.findEditor(pageNumber, annotationStore.type) // 查找编辑器实例
-
             if (!storeEditor) {
                 // 如果编辑器不存在，启用编辑器
                 const annotationDefinition = annotationDefinitions.find(item => item.type === annotationStore.type)
@@ -555,7 +554,7 @@ export class Painter {
         if (storeEditor) {
             storeEditor.deleteGroup(id, konvaCanvasStore.konvaStage)
         }
-        if(emit) {
+        if (emit) {
             this.onStoreDelete(id)
         }
     }
@@ -709,7 +708,18 @@ export class Painter {
      * @param annotation
      */
     public async highlight(annotation: IAnnotationStore) {
-        this.pdfViewerApplication.page = annotation.pageNumber
+        console.log(annotation)
+        // 跳转至对应页面位置
+        const pageView = this.pdfViewerApplication.pdfViewer.getPageView(annotation.pageNumber)
+        const { x, y } = annotation.konvaClientRect
+        // 把 Konva 的左上角坐标转换为 PDF 内部坐标（以页面左下角为原点）
+        const [pdfX, pdfY] = pageView.viewport.convertToPdfPoint(x, y)
+        this.pdfViewerApplication.pdfViewer.scrollPageIntoView({
+            pageNumber: annotation.pageNumber,
+            destArray: [null, { name: 'XYZ' }, pdfX, pdfY, null], // 可以加偏移
+            allowNegativeOffset: true
+        })
+
         const maxRetries = 5 // 最大重试次数
         const retryInterval = 200 // 每次重试间隔
         // 封装递归重试机制

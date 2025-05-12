@@ -103,7 +103,8 @@ export abstract class Editor {
             date: formatTimestamp(Date.now()),
             contentsObj,
             comments: [],
-            readonly: annotation.readonly
+            resizable: annotation.resizable,
+            draggable: annotation.draggable
         }
         this.onAdd(annotationStore) // 调用 onAdd 回调函数
     }
@@ -321,7 +322,6 @@ export abstract class Editor {
         const ghostGroup = Konva.Node.create(konvaString) // 根据序列化字符串创建 Konva.Group 对象
         const id = ghostGroup.id()
         this.getBgLayer(konvaStage).add(ghostGroup) // 将 Konva.Group 对象添加到背景图层
-
         if(this.shapeGroupStore.has(id)) return
         const shapeGroup: IShapeGroup = {
             // 创建形状组对象

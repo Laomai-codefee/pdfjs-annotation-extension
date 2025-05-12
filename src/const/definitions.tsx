@@ -106,7 +106,8 @@ export interface IAnnotationType {
     pdfjsAnnotationType: PdfjsAnnotationType
     subtype?: PdfjsAnnotationSubtype
     isOnce: boolean // 是否只绘制一次
-    readonly: boolean // 绘制的图形是否可以调整修改
+    resizable: boolean // 是否可调整大小
+    draggable: boolean // 是否可拖动位置
     icon?: React.JSX.Element // 可选的图标，用于表示批注类型
     style?: IAnnotationStyle // 可选的样式配置对象
 }
@@ -151,7 +152,8 @@ export interface IAnnotationStore {
     date: string; // 创建或修改日期
     contentsObj?: IAnnotationContentsObj | null; // 可选的内容对象
     comments: IAnnotationComment[]; // 与批注相关的评论数组
-    readonly: boolean; // 表示批注是否只读，不可移动
+    resizable: boolean // 是否可调整大小
+    draggable: boolean // 是否可拖动位置
 }
 
 // 批注类型定义数组
@@ -163,7 +165,8 @@ export const annotationDefinitions: IAnnotationType[] = [
         pdfjsEditorType: PdfjsAnnotationEditorType.NONE, // 对应的 PDF.js 批注类型
         pdfjsAnnotationType: PdfjsAnnotationType.NONE,
         isOnce: false, // 是否只绘制一次
-        readonly: true, // 是否只读
+        resizable: false,
+        draggable: false,
         icon: <SelectIcon /> // 图标
     },
     {
@@ -173,7 +176,8 @@ export const annotationDefinitions: IAnnotationType[] = [
         pdfjsAnnotationType: PdfjsAnnotationType.HIGHLIGHT,
         subtype: 'Highlight',
         isOnce: false,
-        readonly: true,
+        resizable: false,
+        draggable: false,
         icon: <HighlightIcon />,
         style: {
             color: defaultOptions.setting.HIGHLIGHT_COLOR, // 默认高亮颜色
@@ -187,7 +191,8 @@ export const annotationDefinitions: IAnnotationType[] = [
         pdfjsAnnotationType: PdfjsAnnotationType.STRIKEOUT,
         subtype: 'StrikeOut',
         isOnce: false,
-        readonly: true,
+        resizable: false,
+        draggable: false,
         icon: <StrikeoutIcon />,
         style: {
             color: defaultOptions.setting.STRIKEOUT_COLOR, // 默认删除线颜色
@@ -201,7 +206,8 @@ export const annotationDefinitions: IAnnotationType[] = [
         pdfjsAnnotationType: PdfjsAnnotationType.UNDERLINE,
         subtype: 'Underline',
         isOnce: false,
-        readonly: true,
+        resizable: false,
+        draggable: false,
         icon: <UnderlineIcon />,
         style: {
             color: defaultOptions.setting.UNDERLINE_COLOR, // 默认下划线颜色
@@ -215,7 +221,8 @@ export const annotationDefinitions: IAnnotationType[] = [
         pdfjsAnnotationType: PdfjsAnnotationType.SQUARE,
         subtype: 'Square',
         isOnce: true,
-        readonly: false,
+        resizable: true,
+        draggable: true,
         icon: <RectangleIcon />,
         style: {
             color: defaultOptions.setting.COLOR, // 默认矩形颜色
@@ -230,7 +237,8 @@ export const annotationDefinitions: IAnnotationType[] = [
         pdfjsAnnotationType: PdfjsAnnotationType.CIRCLE,
         subtype: 'Circle',
         isOnce: true,
-        readonly: false,
+        resizable: true,
+        draggable: true,
         icon: <CircleIcon />,
         style: {
             color: defaultOptions.setting.COLOR, // 默认圆形颜色
@@ -242,15 +250,13 @@ export const annotationDefinitions: IAnnotationType[] = [
         name: 'note',
         type: AnnotationType.NOTE,
         pdfjsEditorType: PdfjsAnnotationEditorType.INK,
-        pdfjsAnnotationType: PdfjsAnnotationType.NOTE,
-        subtype: 'Note',
+        pdfjsAnnotationType: PdfjsAnnotationType.TEXT,
+        subtype: 'Text',
         isOnce: true,
-        readonly: false,
+        resizable: false,
+        draggable: true,
         icon: <NoteIcon />,
         style: {
-            color: defaultOptions.setting.COLOR, // 默认多边形颜色
-            strokeWidth: defaultOptions.setting.STROKE_WIDTH, // 默认线条宽度
-            opacity: defaultOptions.setting.OPACITY // 默认透明度
         }
     },
     {
@@ -260,7 +266,8 @@ export const annotationDefinitions: IAnnotationType[] = [
         pdfjsAnnotationType: PdfjsAnnotationType.INK,
         subtype: 'Ink',
         isOnce: false,
-        readonly: false,
+        resizable: true,
+        draggable: true,
         icon: <FreehandIcon />,
         style: {
             color: defaultOptions.setting.COLOR, // 默认自由绘制颜色
@@ -275,7 +282,8 @@ export const annotationDefinitions: IAnnotationType[] = [
         pdfjsAnnotationType: PdfjsAnnotationType.POLYLINE,
         subtype: 'PolyLine',
         isOnce: false,
-        readonly: false,
+        resizable: true,
+        draggable: true,
         icon: <FreeHighlightIcon />,
         style: {
             color: defaultOptions.setting.COLOR, // 默认自由高亮颜色
@@ -290,7 +298,8 @@ export const annotationDefinitions: IAnnotationType[] = [
         pdfjsAnnotationType: PdfjsAnnotationType.FREETEXT,
         subtype: 'FreeText',
         isOnce: true,
-        readonly: false,
+        resizable: true,
+        draggable: true,
         icon: <FreetextIcon />,
         style: {
             color: defaultOptions.setting.COLOR, // 默认文字颜色
@@ -305,7 +314,8 @@ export const annotationDefinitions: IAnnotationType[] = [
         pdfjsAnnotationType: PdfjsAnnotationType.CARET,
         subtype: 'Caret',
         isOnce: true,
-        readonly: false,
+        resizable: true,
+        draggable: true,
         icon: <SignatureIcon />,
         style: {
             strokeWidth: 3, // 默认线条宽度
@@ -319,7 +329,8 @@ export const annotationDefinitions: IAnnotationType[] = [
         pdfjsAnnotationType: PdfjsAnnotationType.STAMP,
         subtype: 'Stamp',
         isOnce: true,
-        readonly: false,
+        resizable: true,
+        draggable: true,
         icon: <StampIcon />
     }
 ]
