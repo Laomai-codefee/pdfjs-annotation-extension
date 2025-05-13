@@ -1,4 +1,5 @@
 import { nanoid } from 'nanoid'
+import { PDFHexString } from 'pdf-lib'
 /**
  * 根据颜色字符串获取 RGB 数组。
  * 支持以下格式：'#RRGGBB'、'rgb(R, G, B)'、'rgba(R, G, B, A)'。
@@ -28,6 +29,30 @@ function getRGB(color: string): number[] {
 
     console.error(`Not a valid color format: "${color}"`)
     return [0, 0, 0]
+}
+
+function rgbToPdfColor(input: string | undefined): [number, number, number] {
+    if (!input) return [1, 1, 0] // 默认黄色
+
+    // 支持 rgb(...) 格式
+    if (input.startsWith('rgb')) {
+        const match = input.match(/\d+/g)
+        if (!match || match.length < 3) return [1, 1, 0]
+        return match.slice(0, 3).map(x => parseInt(x) / 255) as [number, number, number]
+    }
+
+    // 支持 #rrggbb 格式
+    if (input.startsWith('#')) {
+        const hex = input.replace('#', '')
+        if (hex.length !== 6) return [1, 1, 0]
+        const r = parseInt(hex.slice(0, 2), 16) / 255
+        const g = parseInt(hex.slice(2, 4), 16) / 255
+        const b = parseInt(hex.slice(4, 6), 16) / 255
+        return [r, g, b]
+    }
+
+    // 无法解析，默认返回黄色
+    return [1, 1, 0]
 }
 
 /**
@@ -283,11 +308,41 @@ function once<T extends (...args: any[]) => any>(fn: T): (...args: Parameters<T>
     let result: ReturnType<T>
     return function (...args: Parameters<T>): ReturnType<T> {
         if (!called) {
-            called = true 
+            called = true
             result = fn.apply(this, args)
         }
         return result
     }
+}
+
+/**
+ * 将 Konva 的 Rect（左上坐标系统）转换为 PDF 的 Rect（左下坐标系统）
+ * @param konvaRect Konva 的 { x, y, width, height }
+ * @param pageHeight 当前 PDF 页的高度
+ * @returns 一个 [x1, y1, x2, y2] 数组，可用于 PDF 的 Rect
+ */
+function convertKonvaRectToPdfRect(konvaRect: { x: number; y: number; width: number; height: number }, pageHeight: number): [number, number, number, number] {
+    const { x, y, width, height } = konvaRect
+    const pdfX1 = x
+    const pdfY1 = pageHeight - y - height
+    const pdfX2 = pdfX1 + width
+    const pdfY2 = pdfY1 + height
+    return [pdfX1, pdfY1, pdfX2, pdfY2]
+}
+
+function stringToPDFHexString(input: string): PDFHexString {
+    // 加上 BOM（Byte Order Mark）
+    const bom = [0xfe, 0xff]
+    const utf16be: number[] = [...bom]
+    for (let i = 0; i < input.length; i++) {
+        const code = input.charCodeAt(i)
+        utf16be.push((code >> 8) & 0xff, code & 0xff) // 高位在前（Big Endian）
+    }
+    const hexString = utf16be
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('')
+        .toUpperCase()
+    return PDFHexString.of(hexString)
 }
 
 export {
@@ -296,6 +351,7 @@ export {
     generateUUID,
     getRandomBytes,
     getRGB,
+    rgbToPdfColor,
     isElementInDOM,
     parsePageRanges,
     removeCssCustomProperty,
@@ -306,5 +362,7 @@ export {
     formatPDFDate,
     parseQueryString,
     debounce,
-    once
+    once,
+    convertKonvaRectToPdfRect,
+    stringToPDFHexString
 }

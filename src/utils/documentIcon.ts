@@ -3,7 +3,7 @@ import Konva from 'konva'
 export function createDocumentIcon({
     x,
     y,
-    fill = '#ffde21',
+    fill = 'rgb(255, 222, 33)',
     stroke = '#000',
     strokeWidth = 1,
     cornerSize = 3

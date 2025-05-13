@@ -4,7 +4,8 @@ import { EventBus, PDFPageView, PDFViewerApplication } from 'pdfjs'
 import { createRef } from 'react'
 import { createRoot } from 'react-dom/client'
 import { initializeI18n } from './locale/index'
-import i18n from 'i18next'
+import { SyncOutlined } from '@ant-design/icons';
+import i18n, { t } from 'i18next'
 import { CustomPopbar, CustomPopbarRef } from './components/popbar'
 import { CustomToolbar, CustomToolbarRef } from './components/toolbar'
 import { annotationDefinitions, HASH_PARAMS_GET_URL, HASH_PARAMS_POST_URL, HASH_PARAMS_USERNAME } from './const/definitions'
@@ -12,6 +13,8 @@ import { Painter } from './painter'
 import { CustomComment, CustomCommentRef } from './components/comment'
 import { once, parseQueryString } from './utils/utils'
 import { defaultOptions } from './const/default_options'
+import { exportAnnotationsToPdf } from './annot'
+import { message, Modal, Space } from 'antd'
 
 interface AppOptions {
     [key: string]: string;
@@ -35,6 +38,7 @@ class PdfjsAnnotationExtension {
         this.loadEnd = false
         // 初始化 PDF.js 对象和相关属性
         this.PDFJS_PDFViewerApplication = (window as any).PDFViewerApplication
+        console.log(this.PDFJS_PDFViewerApplication)
         this.PDFJS_EventBus = this.PDFJS_PDFViewerApplication.eventBus
         this.$PDFJS_sidebarContainer = this.PDFJS_PDFViewerApplication.appConfig.sidebar.sidebarContainer
         this.$PDFJS_toolbar_container = this.PDFJS_PDFViewerApplication.appConfig.toolbar.container
@@ -70,7 +74,7 @@ class PdfjsAnnotationExtension {
             onStoreAdd: annotation => {
                 this.customCommentRef.current.addAnnotation(annotation)
             },
-            onStoreDelete:(id) => {
+            onStoreDelete: (id) => {
                 this.customCommentRef.current.delAnnotation(id)
             },
             onAnnotationSelected: (annotation, isClick) => {
@@ -113,12 +117,12 @@ class PdfjsAnnotationExtension {
         }
         if (params.has(HASH_PARAMS_GET_URL)) {
             this.setOption(HASH_PARAMS_GET_URL, params.get(HASH_PARAMS_GET_URL))
-        }else {
+        } else {
             console.warn(`${HASH_PARAMS_GET_URL} is undefined`);
         }
         if (params.has(HASH_PARAMS_POST_URL)) {
             this.setOption(HASH_PARAMS_POST_URL, params.get(HASH_PARAMS_POST_URL))
-        }else {
+        } else {
             console.warn(`${HASH_PARAMS_POST_URL} is undefined`);
         }
 
@@ -153,6 +157,9 @@ class PdfjsAnnotationExtension {
                 }}
                 onSave={() => {
                     this.saveData()
+                }}
+                onDownload={async () => {
+                    await this.downloadPdf()
                 }}
             />
         )
@@ -291,6 +298,7 @@ class PdfjsAnnotationExtension {
      */
     private async saveData(): Promise<void> {
         const dataToSave = this.painter.getData();
+
         console.log('%c [ dataToSave ]', 'font-size:13px; background:#d10d00; color:#ff5144;', dataToSave)
         const postUrl = this.getOption(HASH_PARAMS_POST_URL);
         if (!postUrl) {
@@ -313,6 +321,27 @@ class PdfjsAnnotationExtension {
         } catch (error) {
             console.error('Error while saving data:', error);
         }
+    }
+
+    private async downloadPdf() {
+        const dataToSave = this.painter.getData();
+        const modal = Modal.info({
+            title: <Space><SyncOutlined spin />{t('normal.processing')}</Space>,
+            closable: false,
+            okButtonProps: {
+                loading: true
+            },
+            okText: t('normal.ok')
+        })
+        await exportAnnotationsToPdf(this.PDFJS_PDFViewerApplication.url, dataToSave)
+        modal.update({
+            type: 'success',
+            title: t('pdf.generationSuccess'),
+            closable: true,
+            okButtonProps: {
+                loading: false
+            },
+        })
     }
 
 }

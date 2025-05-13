@@ -11,7 +11,7 @@ export class EditorNote extends Editor {
     protected mouseMoveHandler() {}
 
     protected async mouseUpHandler(e: KonvaEventObject<PointerEvent>) {
-        const color = '#ffde21'
+        const color = 'rgb(255, 222, 33)'
         const {x, y} = this.konvaStage.getRelativePointerPosition()
         if (e.currentTarget !== this.konvaStage) {
             return

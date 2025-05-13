@@ -43,10 +43,14 @@
         "edit": "Edit",
         "delete": "Delete",
         "confirm": "Confirm",
-        "unknownUser": "Unknown User"
+        "unknownUser": "Unknown User",
+        "processing": "Processing, please wait..."
     },
     "comment": {
         "total": "Comment {{value}}",
         "page": "Page {{value}}"
+    },
+    "pdf": {
+        "generationSuccess": "File has been successfully generated and downloaded"
     }
 }

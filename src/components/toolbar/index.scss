@@ -188,7 +188,7 @@
     }
 }
 
-@media all and (max-width: 960px) {
+@media all and (max-width: 1024px) {
     .CustomToolbar {
         .buttons {
             .name {
@@ -207,8 +207,8 @@
     .CustomToolbar {
         justify-content: flex-start;
         .buttons {
-            margin-left: 10px;
-            padding-right: 10px;
+            margin-left: 5px;
+            padding-right: 5px;
         }
     }
 }
