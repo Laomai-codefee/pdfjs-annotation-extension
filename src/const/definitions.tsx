@@ -312,7 +312,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         type: AnnotationType.SIGNATURE,
         pdfjsEditorType: PdfjsAnnotationEditorType.STAMP,
         pdfjsAnnotationType: PdfjsAnnotationType.STAMP,
-        subtype: 'Stamp',
+        subtype: 'Caret',
         isOnce: true,
         resizable: true,
         draggable: true,

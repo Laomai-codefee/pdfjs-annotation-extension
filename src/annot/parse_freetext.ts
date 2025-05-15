@@ -24,7 +24,7 @@ export class FreeTextParser extends AnnotationParser {
 
         const mainAnn = context.obj({
             Type: PDFName.of('Annot'),
-            Subtype: PDFName.of('Caret'),
+            Subtype: PDFName.of('Text'),
             Rect: rect,
             NM: PDFHexString.fromText(annotation.id), // 唯一标识
             Contents: stringToPDFHexString(annotation.contentsObj?.text || ''),

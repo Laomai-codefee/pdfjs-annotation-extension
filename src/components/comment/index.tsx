@@ -1,6 +1,6 @@
 import './index.scss'
 import React, { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react'
-import { IAnnotationComment, IAnnotationStore, PdfjsAnnotationSubtype } from '../../const/definitions'
+import { IAnnotationComment, IAnnotationStore, PdfjsAnnotationSubtype, PdfjsAnnotationType } from '../../const/definitions'
 import { useTranslation } from 'react-i18next'
 import { formatPDFDate, formatTimestamp, generateUUID } from '../../utils/utils'
 import { Button, Dropdown, Input } from 'antd'
@@ -17,10 +17,11 @@ import {
     StampIcon,
     StrikeoutIcon,
     UnderlineIcon,
-    DownloadIcon,
     SignatureIcon,
-    NoteIcon
+    NoteIcon,
+    ExportIcon
 } from '../../const/icon'
+import { defaultOptions } from '../../const/default_options'
 
 const iconMapping: Record<PdfjsAnnotationSubtype, React.ReactNode> = {
     Circle: <CircleIcon />,
@@ -38,7 +39,7 @@ const iconMapping: Record<PdfjsAnnotationSubtype, React.ReactNode> = {
     Caret: <SignatureIcon />,
     Link: <FreehandIcon />,
     Text: <NoteIcon />,
-    FileAttachment: <DownloadIcon />,
+    FileAttachment: <ExportIcon />,
     Popup: <FreehandIcon />,
     Widget: <FreehandIcon />,
     Note: <NoteIcon />
@@ -206,9 +207,6 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
         }
     };
 
-
-
-
     // Comment 编辑框
     const commentInput = useCallback((annotation: IAnnotationStore) => {
         let comment = ''
@@ -279,6 +277,7 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                                             {
                                                 label: t('normal.reply'),
                                                 key: '0',
+                                                disabled: !defaultOptions.setting.ALLOW_REPLY_ON_STAMP && annotation.pdfjsType === PdfjsAnnotationType.STAMP,
                                                 onClick: (e) => {
                                                     e.domEvent.stopPropagation();
                                                     setReplyAnnotation(annotation);
@@ -287,6 +286,7 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                                             {
                                                 label: t('normal.edit'),
                                                 key: '1',
+                                                disabled: !defaultOptions.setting.ALLOW_REPLY_ON_STAMP && annotation.pdfjsType === PdfjsAnnotationType.STAMP,
                                                 onClick: (e) => {
                                                     e.domEvent.stopPropagation();
                                                     setEditAnnotation(annotation);
@@ -345,7 +345,7 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                             ))}
                             <div className='reply-input'>
                                 {replyInput(annotation)}
-                                {!replyAnnotation && !currentReply && !editAnnotation && currentAnnotation?.id === annotation.id && (
+                                {(!defaultOptions.setting.ALLOW_REPLY_ON_STAMP && annotation.pdfjsType !== PdfjsAnnotationType.STAMP) && !replyAnnotation && !currentReply && !editAnnotation && currentAnnotation?.id === annotation.id && (
                                     <Button style={{ marginTop: '8px' }} onClick={() => setReplyAnnotation(annotation)} type="primary" block>
                                         {t('normal.reply')}
                                     </Button>
