@@ -2,7 +2,7 @@ import './index.scss'
 import { ColorPicker, message } from 'antd'
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 import { annotationDefinitions, AnnotationType, IAnnotationType, PdfjsAnnotationEditorType } from '../../const/definitions'
-import { DownloadIcon, PaletteIcon, SaveIcon } from '../../const/icon'
+import { ExportIcon, PaletteIcon, SaveIcon } from '../../const/icon'
 import { SignatureTool } from './signature'
 import { StampTool } from './stamp'
 import { useTranslation } from 'react-i18next'
@@ -11,7 +11,7 @@ import { defaultOptions } from '../../const/default_options'
 interface CustomToolbarProps {
     onChange: (annotation: IAnnotationType | null, dataTransfer: string | null) => void
     onSave: () => void
-    onDownload: () => void
+    onExport: () => void
 }
 
 export interface CustomToolbarRef {
@@ -134,13 +134,13 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
                     </li>
                 }
                 {
-                    defaultOptions.setting.DOWNLOAD_BUTTON && <li title={t('normal.download')} onClick={() => {
-                        props.onDownload()
+                    defaultOptions.setting.EXPORT_BUTTON && <li title={t('normal.export')} onClick={() => {
+                        props.onExport()
                     }}>
                         <div className="icon">
-                            <DownloadIcon />
+                            <ExportIcon />
                         </div>
-                        <div className="name">{t('normal.download')}</div>
+                        <div className="name">{t('normal.export')}</div>
                     </li>
                 }
 

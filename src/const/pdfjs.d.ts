@@ -5,6 +5,8 @@ declare module 'pdfjs' {
         eventBus: EventBus
         pdfViewer: PDFPageView
         pagesCount: number
+        _title: string
+        _downloadUrl: string
         [key: string]: any // 其他未知属性的类型定义
     }
     interface Sidebar {

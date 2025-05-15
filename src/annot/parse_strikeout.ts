@@ -2,8 +2,7 @@ import { AnnotationParser } from './parse'
 import { PDFHexString, PDFName, PDFString } from 'pdf-lib'
 import { convertKonvaRectToPdfRect, rgbToPdfColor, stringToPDFHexString } from '../utils/utils'
 import { t } from 'i18next'
-
-export class HighlightParser extends AnnotationParser {
+export class StrikeOutParser extends AnnotationParser {
     async parse() {
         const { annotation, page, pdfDoc } = this
         const context = pdfDoc.context
@@ -20,26 +19,20 @@ export class HighlightParser extends AnnotationParser {
             const y1 = pageHeight - y
             const x2 = x + width
             const y2 = pageHeight - (y + height)
-
-            // QuadPoints: 每个矩形有 4 个点（左上、右上、左下、右下）
-            quadPoints.push(
-                x1, y1, // 左上
-                x2, y1, // 右上
-                x1, y2, // 左下
-                x2, y2  // 右下
-            )
+            quadPoints.push(x1, y1, x2, y1, x1, y2, x2, y2)
         }
 
         const mainAnn = context.obj({
             Type: PDFName.of('Annot'),
-            Subtype: PDFName.of('Highlight'),
+            Subtype: PDFName.of('StrikeOut'),
             Rect: convertKonvaRectToPdfRect(annotation.konvaClientRect, pageHeight),
             QuadPoints: quadPoints,
-            C: rgbToPdfColor(annotation.color), // 批注颜色
-            T: stringToPDFHexString(annotation.title || t('normal.unknownUser')), // 作者
-            Contents: '', // 主内容
-            M: PDFString.of(annotation.date), // 日期
-            NM: PDFHexString.fromText(annotation.id), // 唯一标识
+            C: rgbToPdfColor(annotation.color),
+            T: stringToPDFHexString(annotation.title || t('normal.unknownUser')),
+            // 这里如果置空，写入的批注中就不会出现内容，和 highlight 不一致
+            Contents: stringToPDFHexString(annotation.contentsObj?.text || ''),
+            M: PDFString.of(annotation.date),
+            NM: PDFHexString.fromText(annotation.id)
         })
         const mainAnnRef = context.register(mainAnn)
         this.addAnnotationToPage(page, mainAnnRef)
@@ -55,7 +48,7 @@ export class HighlightParser extends AnnotationParser {
                 C: rgbToPdfColor(annotation.color),
                 IRT: mainAnnRef,
                 RT: PDFName.of('R'),
-                NM: PDFHexString.fromText(comment.id), // 唯一标识
+                NM: PDFHexString.fromText(comment.id),
                 Open: false
             })
             const replyAnnRef = context.register(replyAnn)

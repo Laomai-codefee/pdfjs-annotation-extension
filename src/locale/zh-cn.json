@@ -37,7 +37,7 @@
         "no": "否",
         "example": "例如：",
         "color": "颜色",
-        "download": "下载",
+        "export": "导出",
         "save": "保存",
         "reply": "回复",
         "edit": "编辑",
@@ -51,6 +51,6 @@
         "page": "第{{value}}页"
     },
     "pdf": {
-        "generationSuccess": "文件已生成"
+        "generationSuccess": "文件已生成！"
     }
 }

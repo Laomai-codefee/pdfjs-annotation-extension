@@ -1,9 +1,12 @@
 {
+  "include": ["src", "typings.d.ts"],
   "compilerOptions": {
     "resolveJsonModule": true,
     "lib": ["DOM", "ESNext"],
     "target": "ES5",
     "jsx": "preserve",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
   },
 }

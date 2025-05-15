@@ -14,7 +14,7 @@ import { CustomComment, CustomCommentRef } from './components/comment'
 import { once, parseQueryString } from './utils/utils'
 import { defaultOptions } from './const/default_options'
 import { exportAnnotationsToPdf } from './annot'
-import { message, Modal, Space } from 'antd'
+import { Modal, Space } from 'antd'
 
 interface AppOptions {
     [key: string]: string;
@@ -158,8 +158,8 @@ class PdfjsAnnotationExtension {
                 onSave={() => {
                     this.saveData()
                 }}
-                onDownload={async () => {
-                    await this.downloadPdf()
+                onExport={async () => {
+                    await this.exportPdf()
                 }}
             />
         )
@@ -323,20 +323,22 @@ class PdfjsAnnotationExtension {
         }
     }
 
-    private async downloadPdf() {
+    private async exportPdf() {
         const dataToSave = this.painter.getData();
         const modal = Modal.info({
-            title: <Space><SyncOutlined spin />{t('normal.processing')}</Space>,
+            title: t('normal.export'),
+            content: <Space><SyncOutlined spin />{t('normal.processing')}</Space>,
             closable: false,
             okButtonProps: {
                 loading: true
             },
             okText: t('normal.ok')
         })
-        await exportAnnotationsToPdf(this.PDFJS_PDFViewerApplication.url, dataToSave)
+        await exportAnnotationsToPdf(this.PDFJS_PDFViewerApplication, dataToSave)
         modal.update({
             type: 'success',
-            title: t('pdf.generationSuccess'),
+            title: t('normal.export'),
+            content: t('pdf.generationSuccess'),
             closable: true,
             okButtonProps: {
                 loading: false

@@ -1,27 +1,32 @@
 {
-  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "plugin:react/recommended", "plugin:react-hooks/recommended"],
-  "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "react", "simple-import-sort", "unused-imports", "prettier"],
-  "rules": {
-    "no-tabs": "error",
-    "indent": "off",
-    "space-before-function-paren": "off",
-    "@typescript-eslint/indent": ["error", 4],
-    "@typescript-eslint/explicit-function-return-type": "off",
-    "simple-import-sort/imports": "error",
-    "simple-import-sort/exports": "error",
-    "import/prefer-default-export": "off",
-    "react/react-in-jsx-scope": "off",
-    "prettier/prettier": "error"
-  },
-  "globals": {
-    "browser": false,
-    "window": true,
-    "document": true
-  },
-  "settings": {
-    "react": {
-        "version": "18"
+    "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "plugin:react/recommended", "plugin:react-hooks/recommended"],
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["@typescript-eslint", "react", "simple-import-sort", "unused-imports", "prettier"],
+    "rules": {
+        "no-unused-vars": "error",
+        "no-var": "error",
+        "no-unused-expressions": 0,
+        "unused-imports/no-unused-imports": "error",
+        "unused-imports/no-unused-vars": "error",
+        "no-tabs": "error",
+        "indent": "off",
+        "space-before-function-paren": "off",
+        "@typescript-eslint/indent": ["error", 4],
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "simple-import-sort/imports": "error",
+        "simple-import-sort/exports": "error",
+        "import/prefer-default-export": "off",
+        "react/react-in-jsx-scope": "off",
+        "prettier/prettier": "error"
+    },
+    "globals": {
+        "browser": false,
+        "window": true,
+        "document": true
+    },
+    "settings": {
+        "react": {
+            "version": "18"
+        }
     }
-  }
 }

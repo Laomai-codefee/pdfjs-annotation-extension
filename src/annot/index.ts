@@ -1,8 +1,18 @@
 import { PDFDocument, PDFName, PDFPage } from 'pdf-lib'
+import { PDFViewerApplication } from 'pdfjs'
 import { IAnnotationStore, PdfjsAnnotationType } from '../const/definitions'
 import { TextParser } from './parse_text'
 import { AnnotationParser } from './parse'
 import { HighlightParser } from './parse_highlight'
+import { UnderlineParser } from './parse_underline'
+import { StrikeOutParser } from './parse_strikeout'
+import { SquareParser } from './parse_square'
+import { CircleParser } from './parse_circle'
+import { InkParser } from './parse_ink'
+import { getTimestampString } from '../utils/utils'
+import { FreeTextParser } from './parse_freetext'
+import { StampParser } from './parse_stamp'
+
 // import { HighlightParser } from './parse_highlight' // future
 // import { InkParser } from './parse_ink' // future
 
@@ -11,8 +21,15 @@ const parserMap: {
     [key: number]: new (pdfDoc: PDFDocument, page: PDFPage, ann: IAnnotationStore) => AnnotationParser
 } = {
     [PdfjsAnnotationType.TEXT]: TextParser,
-    [PdfjsAnnotationType.HIGHLIGHT]: HighlightParser
-    // [PdfjsAnnotationType.INK]: InkParser,
+    [PdfjsAnnotationType.HIGHLIGHT]: HighlightParser,
+    [PdfjsAnnotationType.UNDERLINE]: UnderlineParser,
+    [PdfjsAnnotationType.STRIKEOUT]: StrikeOutParser,
+    [PdfjsAnnotationType.SQUARE]: SquareParser,
+    [PdfjsAnnotationType.CIRCLE]: CircleParser,
+    [PdfjsAnnotationType.INK]: InkParser,
+    [PdfjsAnnotationType.POLYLINE]: InkParser,
+    [PdfjsAnnotationType.FREETEXT]: FreeTextParser,
+    [PdfjsAnnotationType.STAMP]: StampParser
     // 你可以在这里扩展其他类型的解析器
 }
 
@@ -57,7 +74,7 @@ function downloadPdf(data: Uint8Array, filename: string) {
 
 /**
  * 从 PDF 中清除所有页面上的原始注解（Annots）
- * 
+ *
  * @param pdfDoc - 要处理的 PDF 文档对象
  */
 function clearAllAnnotations(pdfDoc: PDFDocument) {
@@ -69,15 +86,23 @@ function clearAllAnnotations(pdfDoc: PDFDocument) {
     }
 }
 
+// 动态加载字体文件，返回 ArrayBuffer
+async function loadFontBuffer(url: string): Promise<ArrayBuffer> {
+    const response = await fetch(url)
+    if (!response.ok) throw new Error(`Failed to load font at ${url}`)
+    return await response.arrayBuffer()
+}
+
 /**
  * 主导函数：加载 PDF，插入所有注解，然后触发下载。
  *
  * @param url - 要加载的 PDF 文件 URL
  * @param annotations - 解析后的批注数据数组
  */
-async function exportAnnotationsToPdf(url: string, annotations: IAnnotationStore[]) {
+async function exportAnnotationsToPdf(PDFViewerApplication: PDFViewerApplication, annotations: IAnnotationStore[]) {
+    console.log(PDFViewerApplication)
     // 加载 PDF 文件为 pdf-lib 可识别的文档对象
-    const response = await fetch(url)
+    const response = await fetch(PDFViewerApplication._downloadUrl)
     const pdfBytes = await response.arrayBuffer()
     const pdfDoc = await PDFDocument.load(pdfBytes)
 
@@ -90,9 +115,13 @@ async function exportAnnotationsToPdf(url: string, annotations: IAnnotationStore
         await parseAnnotationToPdf(ann, page, pdfDoc)
     }
 
-    // 保存带注解的 PDF 并触发下载
+    // 保存带注解的 PDF
     const modifiedPdf = await pdfDoc.save()
-    downloadPdf(modifiedPdf, 'with-annotations.pdf')
+    // 使用 title + 时间戳作为文件名
+    const baseName = PDFViewerApplication._title || 'annotated'
+    const fileName = `${baseName}-${getTimestampString()}.pdf`
+
+    downloadPdf(modifiedPdf, fileName)
 }
 
 export { exportAnnotationsToPdf }
