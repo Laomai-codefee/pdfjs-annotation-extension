@@ -28,8 +28,6 @@ Site： [https://laomai-codefee.github.io/pdfjs-annotation-extension/](https://l
 
 --- 
 
-Let me know if you need further adjustments! 😊
-
 ## 1. Background
 
 [PDF.js](https://mozilla.github.io/pdf.js/) provides a [Viewer](https://mozilla.github.io/pdf.js/web/viewer.html) for online PDF preview and includes some basic annotation functionalities (FREETEXT, HIGHLIGHT, STAMP, INK).
