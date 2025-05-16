@@ -3,11 +3,26 @@
     <p align="center">
         <strong>An annotation extension based on the PDF.js viewer<br/> Supporting the editing of existing PDF file annotations, posting comments, replying, submitting annotation data, and loading for further editing.</strong>
     </p>
+    <p align="center">
+        <strong>🚀 Now supports exporting annotations to PDF files.
+</strong>
+    </p>
 </div>
 
 ---
 
 English | [简体中文](./README_CN.md)
+
+## 📣 Recent Updates  
+
+* 🔥🔥 **2025.5.16  Version 2.1.0** – Key features include:  
+  1. **Added PDF export functionality**: Export drawn annotations to a new PDF file. Supported annotation types: TEXT, HIGHLIGHT, UNDERLINE, STRIKEOUT, SQUARE, CIRCLE, INK, POLYLINE, FREETEXT, STAMP.  
+  2. **Signatures and stamps**: Introduced the `ALLOW_REPLY_ON_STAMP` parameter to control whether comments/replies are allowed on stamps (disabled by default).  
+  3. **New Note annotation tool**: Corresponds to the PDF Text annotation type.  
+
+--- 
+
+Let me know if you need further adjustments! 😊
 
 ## 1. Background
 
@@ -45,7 +60,7 @@ For PDF Viewer users, this is a highly useful feature. If your requirement is si
 
 ## 3. Editing existing annotations in PDF files
 
-<strong style="color:red">💡 Only editing of existing annotations in the PDF file is supported. Writing annotations back to the PDF file is no longer supported. To write annotations to the file, please use the annotation data and process the writing on the server.</strong>
+<strong style="color:red">🚀 Now supports exporting annotations to PDF files.</strong>
 
 1. Square
 2. Circle

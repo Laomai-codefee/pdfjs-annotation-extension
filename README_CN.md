@@ -2,12 +2,24 @@
     <h1 align="center"><code>pdf.js Annotation Extension</code> ⚡️ </h1>
     <p align="center">
         <strong>基于pdf.js viewer的批注扩展，支持PDF文件原有批注编辑、发表评论、回复、批注数据的提交及载入编辑</strong>
+      </p>
+    <p align="center">
+        <strong>🚀 现已支持批注导出至PDF文件</strong>
     </p>
 </div>
 
 ---
 
 [English](./README.md) ｜ 简体中文
+
+## 📣 近期更新
+
+* 🔥🔥2025.5.16  2.1.0 版本，主要包含如下内容
+  1. **支持导出 PDF 功能** - 将所绘制批注导出到新的 PDF 文件，支持批注类型 TEXT、HIGHLIGHT、UNDERLINE、STRIKEOUT、SQUARE、CIRCLE、INK、POLYLINE、FREETEXT、STAMP
+  2. **签名、盖章** - 增加 ALLOW_REPLY_ON_STAMP 控制是否允许评论、回复，默认关闭
+  3. **新增 Note 批注工具** - 对应 PDF Text 类型批注
+
+--- 
 
 ## 1、背景
 
@@ -42,11 +54,12 @@
 8. 文字高亮
 9. 文字删除线
 10. 文字下划线
-11. 选择，选中对象，可双击删除
+11. 注解
+12. 选择，选中对象，可双击删除
 
 ## 3、PDF 文件原有批注编辑，支持类型如下
 
-<strong style="color:red">💡仅支持PDF 文件中原有批注的编辑，不支持将批注写入到 PDF 文件，如需写入批注到文件,请使用提交的批注数据并在服务器上处理写入</strong>
+<strong style="color:red">🚀 现已支持批注导出至PDF文件</strong>
 
 1. 矩形 Square
 2. 圆形 Circle
@@ -59,6 +72,7 @@
 9. 高亮 Highlight
 10. 下划线 Underline
 11. 删除线 StrikeOut
+12. 注解 Note
 
 ## 4、快速开始
 
@@ -87,43 +101,51 @@
 ## 5、使用方式
 
 ### 地址栏参数
+
 ```bash
   ae_username= 批注人姓名，添加批注时显示的批注人姓名
 ```
+
 ```bash
   ae_get_url= 批注数据地址，通过此地址加载已保存的批注数据 示例 ./examples/pdfjs-4.3.136-dist/pdfjs-annotation-extension-testdata.json
 ```
+
 ```bash
   ae_post_url= 批注数据提交地址
 ```
+
 使用方式 ： http://localhost:8888/web/viewer.html?#ae_username=老麦&ae_get_url=http://localhost:8888/pdfjs-annotation-extension-testdata.json&ae_post_url=http://localhost:8888/save
 
 ### 默认配置修改
 
- ```
- src/const/default_options.ts
- ```
+```
+src/const/default_options.ts
+```
 
- 加载PDF文件批注，需修改：
- ```
-   LOAD_PDF_ANNOTATION: true, // 是否加载 pdf 原有批注 
- ```
- ***注意： 如果需要编辑 pdf 原有批注，需将 pdfjs 中的 annotationMode 改为 0，这样 pdfjs 才不会渲染批注***
+加载PDF文件批注，需修改：
+
+```
+  LOAD_PDF_ANNOTATION: true, // 是否加载 pdf 原有批注 
+```
+
+***注意： 如果需要编辑 pdf 原有批注，需将 pdfjs 中的 annotationMode 改为 0，这样 pdfjs 才不会渲染批注***
+
 ```
   pdfjs-dist/web/viewer.mjs
- ```
+```
 
- ```
-  annotationMode: {
-    value: 0,  //这里改为 0
-    kind: OptionKind.VIEWER + OptionKind.PREFERENCE
-  },
- ```
+```
+ annotationMode: {
+   value: 0,  //这里改为 0
+   kind: OptionKind.VIEWER + OptionKind.PREFERENCE
+ },
+```
+
 ### 修改生成文件地址
 
-   配置在文件：/configuration/environment.js 中
-   默认为 examples/pdfjs-4.3.136-dist/web/pdfjs-annotation-extension
-   您可将它修改为您pdfjs dist地址，以方便开发
+配置在文件：/configuration/environment.js 中
+默认为 examples/pdfjs-4.3.136-dist/web/pdfjs-annotation-extension
+您可将它修改为您pdfjs dist地址，以方便开发
 
 ```bash
   output: path.resolve(__dirname, '../examples/pdfjs-4.3.136-dist/web/pdfjs-annotation-extension'),
@@ -156,8 +178,8 @@
 利用pdfjs EventBus捕获页面事件，动态插入Konva绘图层，在Konva上绘制图形
 批注类型虽然看上去多了，但实际支持与pdfjs一致，只是做了一些特殊的转换。
 关于 pdfjs 批注类型的说明请看这里 👇
- https://github.com/mozilla/pdf.js/wiki/Frequently-Asked-Questions#faq-annotations
+https://github.com/mozilla/pdf.js/wiki/Frequently-Asked-Questions#faq-annotations
 
 ## 7、兼容性
 
- 目前仅测试 pdfjs-4.3.136-dist， 不支持页面旋转后的绘制
+目前仅测试 pdfjs-4.3.136-dist， 不支持页面旋转后的绘制
