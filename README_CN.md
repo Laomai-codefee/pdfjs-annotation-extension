@@ -12,6 +12,13 @@
 
 [English](./README.md) ｜ 简体中文
 
+## 🧭 演示
+
+地址： [https://laomai-codefee.github.io/pdfjs-annotation-extension/](https://laomai-codefee.github.io/pdfjs-annotation-extension/)
+打开速度较慢，请耐性等待...
+
+--- 
+
 ## 📣 近期更新
 
 * 🔥🔥2025.5.16  2.1.0 版本，主要包含如下内容

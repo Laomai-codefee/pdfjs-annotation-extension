@@ -13,6 +13,12 @@
 
 English | [简体中文](./README_CN.md)
 
+## 🧭 Online Demo
+
+Site： [https://laomai-codefee.github.io/pdfjs-annotation-extension/](https://laomai-codefee.github.io/pdfjs-annotation-extension/)
+
+--- 
+
 ## 📣 Recent Updates  
 
 * 🔥🔥 **2025.5.16  Version 2.1.0** – Key features include:  
