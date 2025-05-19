@@ -2,7 +2,7 @@ import './index.scss'
 import { ColorPicker, message } from 'antd'
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 import { annotationDefinitions, AnnotationType, IAnnotationType, PdfjsAnnotationEditorType } from '../../const/definitions'
-import { ExportIcon, PaletteIcon, SaveIcon } from '../../const/icon'
+import { AnnoIcon, ExportIcon, PaletteIcon, SaveIcon } from '../../const/icon'
 import { SignatureTool } from './signature'
 import { StampTool } from './stamp'
 import { useTranslation } from 'react-i18next'
@@ -12,10 +12,12 @@ interface CustomToolbarProps {
     onChange: (annotation: IAnnotationType | null, dataTransfer: string | null) => void
     onSave: () => void
     onExport: () => void
+    onSidebarOpen: (open: boolean) => void
 }
 
 export interface CustomToolbarRef {
     activeAnnotation(annotation: IAnnotationType): void
+    toggleSidebarBtn(open: boolean) :void
 }
 
 /**
@@ -25,14 +27,20 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
     const [currentAnnotation, setCurrentAnnotation] = useState<IAnnotationType | null>(null)
     const [annotations, setAnnotations] = useState<IAnnotationType[]>(annotationDefinitions.filter(item => item.pdfjsEditorType !== PdfjsAnnotationEditorType.HIGHLIGHT))
     const [dataTransfer, setDataTransfer] = useState<string | null>(null)
+    const [sidebarOpen, setSidebarOpen] = useState<boolean>(defaultOptions.setting.DEFAULT_SIDE_BAR_OPEN)
     const { t } = useTranslation()
 
     useImperativeHandle(ref, () => ({
-        activeAnnotation
+        activeAnnotation,
+        toggleSidebarBtn
     }))
 
     const activeAnnotation = (annotation: IAnnotationType) => {
         handleAnnotationClick(annotation)
+    }
+
+    const toggleSidebarBtn = (open: boolean) => {
+        setSidebarOpen(open)
     }
 
     const selectedType = currentAnnotation?.type
@@ -100,6 +108,11 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
         setCurrentAnnotation(updatedAnnotation)
     }
 
+    const handleSidebarOpen = (isOpen) => {
+        props.onSidebarOpen(!isOpen)
+        setSidebarOpen(!isOpen)
+    }
+
     return (
         <div className="CustomToolbar">
             <ul className="buttons">
@@ -144,6 +157,17 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
                     </li>
                 }
 
+            </ul>
+            <ul className="buttons right">
+                <li
+                onClick={() => handleSidebarOpen(sidebarOpen)}
+                className={`${sidebarOpen? 'selected': ''}`}
+                >
+                    <div className="icon">
+                        <AnnoIcon />
+                    </div>
+                    <div className="name">{t('anno')}</div>
+                </li>
             </ul>
         </div>
     )

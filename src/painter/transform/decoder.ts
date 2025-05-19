@@ -67,7 +67,6 @@ export abstract class Decoder {
 
     protected getComments(annotation: Annotation, allAnnotations: Annotation[]) : IAnnotationComment[]{
         const reply: IAnnotationComment[] = []
-        console.log(allAnnotations)
         allAnnotations.forEach((_item) => {
             if(_item.annotationType === PdfjsAnnotationType.TEXT && _item.inReplyTo  === annotation.id) {
                 reply.push({

@@ -128,6 +128,10 @@ export class Painter {
                                 annotation: this.currentAnnotation,
                                 onAdd: annotationStore => {
                                     this.saveToStore(annotationStore)
+                                    if (this.currentAnnotation.isOnce) {
+                                        this.setDefaultMode()
+                                        this.selector.select(annotationStore.id)
+                                    }
                                 }
                             },
                             this.currentAnnotation.type
@@ -708,7 +712,6 @@ export class Painter {
      * @param annotation
      */
     public async highlight(annotation: IAnnotationStore) {
-        console.log(annotation)
         // 跳转至对应页面位置
         const pageView = this.pdfViewerApplication.pdfViewer.getPageView(annotation.pageNumber)
         const { x, y } = annotation.konvaClientRect

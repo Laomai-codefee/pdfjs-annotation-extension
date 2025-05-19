@@ -38,7 +38,6 @@ class PdfjsAnnotationExtension {
         this.loadEnd = false
         // 初始化 PDF.js 对象和相关属性
         this.PDFJS_PDFViewerApplication = (window as any).PDFViewerApplication
-        console.log(this.PDFJS_PDFViewerApplication)
         this.PDFJS_EventBus = this.PDFJS_PDFViewerApplication.eventBus
         this.$PDFJS_sidebarContainer = this.PDFJS_PDFViewerApplication.appConfig.sidebar.sidebarContainer
         this.$PDFJS_toolbar_container = this.PDFJS_PDFViewerApplication.appConfig.toolbar.container
@@ -78,6 +77,8 @@ class PdfjsAnnotationExtension {
                 this.customCommentRef.current.delAnnotation(id)
             },
             onAnnotationSelected: (annotation, isClick) => {
+                this.toggleComment(true)
+                this.customToolbarRef.current.toggleSidebarBtn(true)
                 this.customCommentRef.current.selectedAnnotation(annotation, isClick)
             },
             onAnnotationChange: (annotation) => {
@@ -141,6 +142,15 @@ class PdfjsAnnotationExtension {
      */
     private addCustomStyle(): void {
         document.body.classList.add('PdfjsAnnotationExtension')
+        this.toggleComment(defaultOptions.setting.DEFAULT_SIDE_BAR_OPEN)
+    }
+
+    private toggleComment(open:boolean): void {
+        if(open) {
+            document.body.classList.remove('PdfjsAnnotationExtension_Comment_hidden')
+        } else {
+            document.body.classList.add('PdfjsAnnotationExtension_Comment_hidden')
+        }
     }
 
     /**
@@ -160,6 +170,9 @@ class PdfjsAnnotationExtension {
                 }}
                 onExport={async () => {
                     await this.exportPdf()
+                }}
+                onSidebarOpen={(isOpen) => {
+                    this.toggleComment(isOpen)
                 }}
             />
         )
@@ -259,7 +272,7 @@ class PdfjsAnnotationExtension {
         )
 
         // 监听文档加载完成事件
-        this.PDFJS_EventBus._on('documentloaded', async (source) => {
+        this.PDFJS_EventBus._on('documentloaded', async () => {
             this.painter.initWebSelection(this.$PDFJS_viewerContainer)
             await this.painter.initAnnotations(await this.getData(), defaultOptions.setting.LOAD_PDF_ANNOTATION)
             if (this.loadEnd) {

@@ -160,7 +160,7 @@ const SignatureTool: React.FC<SignatureToolProps> = props => {
     return (
         <>
             <Popover
-                overlayClassName="SignaturePop"
+                rootClassName="SignaturePop"
                 content={
                     <div>
                         <ul className="SignaturePop-Container">
@@ -204,7 +204,7 @@ const SignatureTool: React.FC<SignatureToolProps> = props => {
                 open={isModalOpen}
                 onOk={handleOk}
                 onCancel={handleCancel}
-                destroyOnClose={true}
+                destroyOnHidden={true}
                 okText={t('normal.ok')}
                 cancelText={t('normal.cancel')}
                 afterOpenChange={afterOpen}

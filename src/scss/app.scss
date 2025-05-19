@@ -22,6 +22,11 @@
         backdrop-filter: blur(8px)
     }
 }
+.PdfjsAnnotationExtension_Comment_hidden{
+    #viewerContainer {
+        right: 0;
+    }
+}
 .PdfjsAnnotationExtension_scalechanging{
     .PdfjsAnnotationExtension_painter_wrapper{
         display: none;

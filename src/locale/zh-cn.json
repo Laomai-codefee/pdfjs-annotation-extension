@@ -1,4 +1,5 @@
 {
+    "anno": "批注",
     "annotations": {
         "select": "选择",
         "highlight": "高亮",
@@ -11,22 +12,10 @@
         "freeText": "文字",
         "signature": "签名",
         "stamp": "盖章",
-        "note": "注释"
+        "note": "注解"
     },
-    "toolbar": {
-        "buttons": {
-            "createSignature": "创建签名"
-        },
-        "message": {
-            "selectPosition": "请选择放置位置",
-            "signatureArea": "签名处"
-        }
-    },
-    "editor": {
-        "text": {
-            "startTyping": "开始输入..."
-        }
-    },
+    "toolbar": { "buttons": { "createSignature": "创建签名" }, "message": { "selectPosition": "请选择放置位置", "signatureArea": "签名处" } },
+    "editor": { "text": { "startTyping": "开始输入..." } },
     "normal": {
         "ok": "确定",
         "cancel": "取消",
@@ -46,11 +35,6 @@
         "unknownUser": "不具名用户",
         "processing": "处理中，请稍候..."
     },
-    "comment": {
-        "total": "共 {{value}} 个注释",
-        "page": "第{{value}}页"
-    },
-    "pdf": {
-        "generationSuccess": "文件已生成！"
-    }
+    "comment": { "total": "共 {{value}} 个注释", "page": "第{{value}}页" },
+    "pdf": { "generationSuccess": "文件已生成！" }
 }
