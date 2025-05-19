@@ -70,8 +70,13 @@ class PdfjsAnnotationExtension {
             onWebSelectionSelected: range => {
                 this.customPopbarRef.current.open(range)
             },
-            onStoreAdd: annotation => {
+            onStoreAdd: (annotation, isOriginal, currentAnnotation) => {
                 this.customCommentRef.current.addAnnotation(annotation)
+                if (isOriginal) return
+                if (currentAnnotation.isOnce) {
+                    this.painter.selectAnnotation(annotation.id)
+                }
+                this.customCommentRef.current.selectedAnnotation(annotation, true)
             },
             onStoreDelete: (id) => {
                 this.customCommentRef.current.delAnnotation(id)
@@ -79,7 +84,10 @@ class PdfjsAnnotationExtension {
             onAnnotationSelected: (annotation, isClick) => {
                 this.toggleComment(true)
                 this.customToolbarRef.current.toggleSidebarBtn(true)
-                this.customCommentRef.current.selectedAnnotation(annotation, isClick)
+                if (isClick) {
+                    this.customCommentRef.current.selectedAnnotation(annotation, isClick)
+                }
+
             },
             onAnnotationChange: (annotation) => {
                 this.customCommentRef.current.updateAnnotation(annotation)
@@ -145,8 +153,8 @@ class PdfjsAnnotationExtension {
         this.toggleComment(defaultOptions.setting.DEFAULT_SIDE_BAR_OPEN)
     }
 
-    private toggleComment(open:boolean): void {
-        if(open) {
+    private toggleComment(open: boolean): void {
+        if (open) {
             document.body.classList.remove('PdfjsAnnotationExtension_Comment_hidden')
         } else {
             document.body.classList.add('PdfjsAnnotationExtension_Comment_hidden')

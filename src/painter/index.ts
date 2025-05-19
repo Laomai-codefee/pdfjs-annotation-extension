@@ -44,7 +44,7 @@ export class Painter {
     private tempDataTransfer: string | null // 临时数据传输
     public readonly setDefaultMode: () => void // 设置默认模式的函数引用
     public readonly onWebSelectionSelected: (range: Range) => void
-    public readonly onStoreAdd: (annotationStore: IAnnotationStore) => void
+    public readonly onStoreAdd: (annotationStore: IAnnotationStore, isOriginal: boolean, currentAnnotation: IAnnotationType) => void
     public readonly onStoreDelete: (id: string) => void
     public readonly onAnnotationSelected: (annotationStore: IAnnotationStore, isClick: boolean) => void
     public readonly onAnnotationChange: (annotationStore: IAnnotationStore) => void
@@ -69,7 +69,7 @@ export class Painter {
         PDFJS_EventBus: EventBus
         setDefaultMode: () => void
         onWebSelectionSelected: (range: Range) => void
-        onStoreAdd: (annotationStore: IAnnotationStore) => void
+        onStoreAdd: (annotationStore: IAnnotationStore, isOriginal: boolean, currentAnnotation: IAnnotationType) => void
         onStoreDelete: (id: string) => void
         onAnnotationSelected: (annotationStore: IAnnotationStore, isClick: boolean) => void
         onAnnotationChange: (annotationStore: IAnnotationStore) => void
@@ -97,10 +97,7 @@ export class Painter {
             onChange: async (id, groupString, rawAnnotationStore, konvaClientRect) => {
                 const editor = this.findEditorForGroupId(id)
                 if (editor) {
-                    this.updateStore(id, {
-                        konvaString: groupString,
-                        konvaClientRect
-                    })
+                    this.updateStore(id, { konvaString: groupString, konvaClientRect })
                 }
             },
             onDelete: id => {
@@ -128,10 +125,6 @@ export class Painter {
                                 annotation: this.currentAnnotation,
                                 onAdd: annotationStore => {
                                     this.saveToStore(annotationStore)
-                                    if (this.currentAnnotation.isOnce) {
-                                        this.setDefaultMode()
-                                        this.selector.select(annotationStore.id)
-                                    }
                                 }
                             },
                             this.currentAnnotation.type
@@ -176,10 +169,7 @@ export class Painter {
         wrapper.setAttribute('data-main-rotation', `${pageView.viewport.rotation}`) // 设置视口旋转角度
         wrapper.classList.add(PAINTER_WRAPPER_PREFIX) // 添加类名
 
-        const { width, height } = {
-            width: pageView.viewport.viewBox[2],
-            height: pageView.viewport.viewBox[3]
-        } // 获取视口宽度和高度
+        const { width, height } = { width: pageView.viewport.viewBox[2], height: pageView.viewport.viewBox[3] } // 获取视口宽度和高度
         const scaleFactor = 'var(--scale-factor)' // 获取缩放因子
         wrapper.style.width = `calc(${scaleFactor} * ${width}px)` // 设置宽度样式
         wrapper.style.height = `calc(${scaleFactor} * ${height}px)` // 设置高度样式
@@ -201,10 +191,7 @@ export class Painter {
             width: viewport.width,
             height: viewport.height,
             rotation: viewport.rotation,
-            scale: {
-                x: viewport.scale,
-                y: viewport.scale
-            }
+            scale: { x: viewport.scale, y: viewport.scale }
         })
 
         const backgroundLayer = new Konva.Layer()
@@ -235,12 +222,7 @@ export class Painter {
         const painterWrapper = this.createPainterWrapper(pageView, pageNumber)
         const konvaStage = this.createKonvaStage(painterWrapper, pageView.viewport)
 
-        this.konvaCanvasStore.set(pageNumber, {
-            pageNumber,
-            konvaStage,
-            wrapper: painterWrapper,
-            isActive: false
-        })
+        this.konvaCanvasStore.set(pageNumber, { pageNumber, konvaStage, wrapper: painterWrapper, isActive: false })
         this.reDrawAnnotation(pageNumber) // 重绘批注
         this.enablePainting() // 启用绘画
     }
@@ -286,7 +268,8 @@ export class Painter {
      * 保存到存储
      */
     private saveToStore(annotationStore: IAnnotationStore, isOriginal: boolean = false) {
-        this.onStoreAdd(this.store.save(annotationStore, isOriginal))
+        const currentAnnotation = annotationDefinitions.find(item => item.pdfjsAnnotationType === annotationStore.pdfjsType)
+        this.onStoreAdd(this.store.save(annotationStore, isOriginal), isOriginal, currentAnnotation)
     }
 
     /**
@@ -351,10 +334,6 @@ export class Painter {
                     annotation,
                     onAdd: annotationStore => {
                         this.saveToStore(annotationStore)
-                        if (annotation.isOnce) {
-                            this.setDefaultMode()
-                            this.selector.select(annotationStore.id)
-                        }
                     }
                 })
                 break
@@ -367,10 +346,6 @@ export class Painter {
                     annotation,
                     onAdd: annotationStore => {
                         this.saveToStore(annotationStore)
-                        if (annotation.isOnce) {
-                            this.setDefaultMode()
-                            this.selector.select(annotationStore.id)
-                        }
                     }
                 })
                 break
@@ -384,10 +359,6 @@ export class Painter {
                     annotation,
                     onAdd: annotationStore => {
                         this.saveToStore(annotationStore)
-                        if (annotation.isOnce) {
-                            this.setDefaultMode()
-                            this.selector.select(annotationStore.id)
-                        }
                     }
                 })
                 break
@@ -400,10 +371,6 @@ export class Painter {
                     annotation,
                     onAdd: annotationStore => {
                         this.saveToStore(annotationStore)
-                        if (annotation.isOnce) {
-                            this.setDefaultMode()
-                            this.selector.select(annotationStore.id)
-                        }
                     }
                 })
                 break
@@ -441,10 +408,6 @@ export class Painter {
                         annotation,
                         onAdd: annotationStore => {
                             this.saveToStore(annotationStore)
-                            if (annotation.isOnce) {
-                                this.setDefaultMode()
-                                this.selector.select(annotationStore.id)
-                            }
                         }
                     },
                     this.tempDataTransfer
@@ -460,10 +423,6 @@ export class Painter {
                         annotation,
                         onAdd: annotationStore => {
                             this.saveToStore(annotationStore)
-                            if (annotation.isOnce) {
-                                this.setDefaultMode()
-                                this.selector.select(annotationStore.id)
-                            }
                         }
                     },
                     this.tempDataTransfer
@@ -528,11 +487,7 @@ export class Painter {
             if (!storeEditor) {
                 // 如果编辑器不存在，启用编辑器
                 const annotationDefinition = annotationDefinitions.find(item => item.type === annotationStore.type)
-                this.enableEditor({
-                    konvaStage: konvaCanvasStore.konvaStage,
-                    pageNumber,
-                    annotation: annotationDefinition
-                })
+                this.enableEditor({ konvaStage: konvaCanvasStore.konvaStage, pageNumber, annotation: annotationDefinition })
                 storeEditor = this.findEditor(pageNumber, annotationStore.type) // 重新查找编辑器
             }
 
@@ -661,6 +616,15 @@ export class Painter {
     public highlightRange(range: Range, annotation: IAnnotationType) {
         this.currentAnnotation = annotation
         this.webSelection.highlight(range)
+    }
+
+    /**
+     * @description 选中对应 ID 批注
+     * @param id
+     */
+    public selectAnnotation(id: string) {
+        this.setDefaultMode()
+        this.selector.select(id)
     }
 
     /**
