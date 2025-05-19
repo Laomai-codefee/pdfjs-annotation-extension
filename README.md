@@ -20,8 +20,12 @@ Site： [https://laomai-codefee.github.io/pdfjs-annotation-extension/](https://l
 --- 
 
 ## 📣 Recent Updates  
+* 🔥🔥 **2025.5.19  Version 2.1.1** – Key features include:  
+  1. **Sidebar Collapse Support** – Added `DEFAULT_SIDE_BAR_OPEN` to control whether the sidebar is shown. It is visible by default.
+  2. **Annotation Filtering Support** – Added annotation filtering functionality, allowing filters by author and annotation type.
+  3. **Improved Annotation Highlighting Logic** – Annotations are now highlighted even when not selected, improving the overall user experience.
 
-* 🔥🔥 **2025.5.16  Version 2.1.0** – Key features include:  
+* **2025.5.16  Version 2.1.0** – Key features include:  
   1. **Added PDF export functionality**: Export drawn annotations to a new PDF file. Supported annotation types: TEXT, HIGHLIGHT, UNDERLINE, STRIKEOUT, SQUARE, CIRCLE, INK, POLYLINE, FREETEXT, STAMP.  
   2. **Signatures and stamps**: Introduced the `ALLOW_REPLY_ON_STAMP` parameter to control whether comments/replies are allowed on stamps (disabled by default).  
   3. **New Note annotation tool**: Corresponds to the PDF Text annotation type.  
