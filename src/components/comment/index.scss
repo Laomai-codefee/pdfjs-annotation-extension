@@ -3,6 +3,21 @@
         display: none;
     }
 }
+.CustomComment_filterContent{
+    ul, li{
+        list-style: none;
+    }
+    li{
+        padding: 3px;
+    }
+    li:hover{
+        background-color: #ddd;
+    }
+    li>label{
+        width: 100%;
+    }
+
+}
 .CustomComment {
     width: 330px;
     position: absolute;
@@ -19,9 +34,15 @@
     }
     .list {
         padding: 5px 5px 25px 5px;
+        .group{
+            margin-bottom: 10px;
+        }
         h3 {
             font-weight: normal;
             font-size: 14px;
+            span{
+                float: right;
+            }
         }
         .comment {
             border: 1px solid var(--toolbar-border-color);

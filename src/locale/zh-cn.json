@@ -33,8 +33,12 @@
         "delete": "删除",
         "confirm": "确认",
         "unknownUser": "不具名用户",
-        "processing": "处理中，请稍候..."
+        "processing": "处理中，请稍候...",
+        "filter": "过滤",
+        "author": "作者",
+        "type": "类型",
+        "selectAll": "全选"
     },
-    "comment": { "total": "共 {{value}} 个注释", "page": "第{{value}}页" },
+    "comment": { "total": " {{value}} 条批注", "page": "第{{value}}页" },
     "pdf": { "generationSuccess": "文件已生成！" }
 }

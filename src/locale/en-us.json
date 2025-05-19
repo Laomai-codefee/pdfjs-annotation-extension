@@ -45,7 +45,11 @@
         "delete": "Delete",
         "confirm": "Confirm",
         "unknownUser": "Unknown User",
-        "processing": "Processing, please wait..."
+        "processing": "Processing, please wait...",
+        "filter": "Filter",
+        "author": "Author",
+        "type": "Type",
+        "selectAll": "Select All"
     },
     "comment": {
         "total": "Comment {{value}}",

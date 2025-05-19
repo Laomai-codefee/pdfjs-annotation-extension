@@ -1,10 +1,11 @@
 import './index.scss'
-import React, { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react'
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { IAnnotationComment, IAnnotationStore, PdfjsAnnotationSubtype, PdfjsAnnotationType } from '../../const/definitions'
 import { useTranslation } from 'react-i18next'
 import { formatPDFDate, formatTimestamp, generateUUID } from '../../utils/utils'
-import { Button, Dropdown, Input } from 'antd'
+import { Button, Checkbox, Divider, Dropdown, Input, MenuProps, Popover, Space, Typography } from 'antd'
 import {
+    FilterOutlined,
     MoreOutlined
 } from '@ant-design/icons';
 import {
@@ -22,6 +23,8 @@ import {
     ExportIcon
 } from '../../const/icon'
 import { defaultOptions } from '../../const/default_options'
+
+const { Text } = Typography;
 
 const iconMapping: Record<PdfjsAnnotationSubtype, React.ReactNode> = {
     Circle: <CircleIcon />,
@@ -79,6 +82,8 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
     const [replyAnnotation, setReplyAnnotation] = useState<IAnnotationStore | null>(null)
     const [currentReply, setCurrentReply] = useState<IAnnotationComment | null>(null)
     const [editAnnotation, setEditAnnotation] = useState<IAnnotationStore | null>(null)
+    const [selectedUsers, setSelectedUsers] = useState<string[]>([])
+    const [selectedTypes, setSelectedTypes] = useState<PdfjsAnnotationSubtype[]>([])
     const { t } = useTranslation()
 
     const annotationRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -136,14 +141,124 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
         setEditAnnotation(null);
     };
 
+    const allUsers = useMemo(() => {
+        const map = new Map<string, number>()
+        annotations.forEach(a => {
+            map.set(a.title, (map.get(a.title) || 0) + 1)
+        })
+        return Array.from(map.entries()) // [title, count]
+    }, [annotations])
 
-    const groupedAnnotations = annotations.reduce((acc, annotation) => {
-        if (!acc[annotation.pageNumber]) {
-            acc[annotation.pageNumber] = []
-        }
-        acc[annotation.pageNumber].push(annotation)
-        return acc
-    }, {} as Record<number, IAnnotationStore[]>)
+    const allTypes = useMemo(() => {
+        const types = new Map<PdfjsAnnotationSubtype, number>()
+        annotations.forEach(a => {
+            types.set(a.subtype, (types.get(a.subtype) || 0) + 1)
+        })
+        return Array.from(types.entries()) // [subtype, count]
+    }, [annotations])
+
+    // ✅ 初始化默认选中所有 username/type
+    useEffect(() => {
+        setSelectedUsers(allUsers.map(([u]) => u))
+    }, [allUsers])
+
+    useEffect(() => {
+        setSelectedTypes(allTypes.map(([t]) => t))
+    }, [allTypes])
+
+    const filteredAnnotations = useMemo(() => {
+        if (selectedUsers.length === 0 || selectedTypes.length === 0) return []
+        return annotations.filter(a =>
+            selectedUsers.includes(a.title) &&
+            selectedTypes.includes(a.subtype)
+        )
+    }, [annotations, selectedUsers, selectedTypes])
+
+    const groupedAnnotations = useMemo(() => {
+        return filteredAnnotations.reduce((acc, annotation) => {
+            if (!acc[annotation.pageNumber]) {
+                acc[annotation.pageNumber] = []
+            }
+            acc[annotation.pageNumber].push(annotation)
+            return acc
+        }, {} as Record<number, IAnnotationStore[]>)
+    }, [filteredAnnotations])
+
+
+
+    const handleUserToggle = (username: string) => {
+        setSelectedUsers(prev =>
+            prev.includes(username)
+                ? prev.filter(u => u !== username)
+                : [...prev, username]
+        )
+    }
+
+    const handleTypeToggle = (type: PdfjsAnnotationSubtype) => {
+        setSelectedTypes(prev =>
+            prev.includes(type)
+                ? prev.filter(t => t !== type)
+                : [...prev, type]
+        )
+    }
+
+    const filterContent = (
+        <div className='CustomComment_filterContent'>
+            <div className='title'>{t('normal.author')}</div>
+            <ul>
+                {allUsers.map(([user, count]) => (
+                    <li key={user}>
+                        <Checkbox
+                            checked={selectedUsers.includes(user)}
+                            onChange={() => handleUserToggle(user)}
+                        >
+                            <Space>
+                                <Text ellipsis style={{ maxWidth: 200 }}>{user}</Text>
+                                <Text type="secondary">({count})</Text>
+                            </Space>
+                        </Checkbox>
+                    </li>
+                ))}
+            </ul>
+            <div className='title'>{t('normal.type')}</div>
+            <ul>
+                {allTypes.map(([type, count]) => (
+                    <li key={type}>
+                        <Checkbox
+                            checked={selectedTypes.includes(type)}
+                            onChange={() => handleTypeToggle(type)}
+                        >
+                            <Space>
+                                <AnnotationIcon subtype={type} />
+                                <Text type="secondary">({count})</Text>
+                            </Space>
+                        </Checkbox>
+                    </li>
+                ))}
+            </ul>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Button
+                    type="link"
+                    onClick={() => {
+                        setSelectedUsers(allUsers.map(([u]) => u))
+                        setSelectedTypes(allTypes.map(([t]) => t))
+                    }}
+                >
+                    {t('normal.selectAll')}
+                </Button>
+                <Button
+                    type="link"
+                    onClick={() => {
+                        setSelectedUsers([])
+                        setSelectedTypes([])
+                    }}
+                >
+                    {t('normal.clear')}
+                </Button>
+            </div>
+        </div>
+    )
+
 
     const handleAnnotationClick = (annotation: IAnnotationStore) => {
         setCurrentAnnotation(annotation)
@@ -260,8 +375,12 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
         const sortedAnnotations = annotationsForPage.sort((a, b) => a.konvaClientRect.y - b.konvaClientRect.y);
 
         return (
-            <div key={pageNumber}>
-                <h3>{t('comment.page', { value: pageNumber })}</h3>
+            <div key={pageNumber} className='group'>
+                <h3>{t('comment.page', { value: pageNumber })}
+                    <span>
+                        {t('comment.total', { value: annotationsForPage.length })}
+                    </span>
+                </h3>
                 {sortedAnnotations.map((annotation) => {
                     const isSelected = annotation.id === currentAnnotation?.id;
                     const commonProps = { className: isSelected ? 'comment selected' : 'comment' };
@@ -312,7 +431,7 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                             {annotation.comments?.map((reply, index) => (
                                 <div className='reply' key={index}>
                                     <div className='title'>
-                                    <div className='username'> {reply.title}</div>
+                                        <div className='username'> {reply.title}</div>
                                         <span className='tool'>{formatPDFDate(reply.date)}
                                             <Dropdown menu={{
                                                 items: [
@@ -357,12 +476,16 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
             </div>
         );
     });
-
-
     return (
         <div className="CustomComment">
             <div className='filters'>
-                {t('comment.total', { value: annotations.length })}
+                <Popover
+                    content={filterContent}
+                    trigger="click"
+                    placement="bottomLeft"
+                >
+                    <Button size='small' icon={<FilterOutlined />} />
+                </Popover>
             </div>
             <div className='list'>{comments}</div>
         </div>
