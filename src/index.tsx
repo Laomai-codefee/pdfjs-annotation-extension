@@ -120,7 +120,7 @@ class PdfjsAnnotationExtension {
             if (outerContainer.dataset.userName) {
                 this.setOption(HASH_PARAMS_USERNAME, outerContainer.dataset.userName)
             }
-            if (outerContainer.dataset.userName) {
+            if (outerContainer.dataset.postPdfUrl) {
                 this.setOption(HASH_PARAMS_POST_PDF_URL, outerContainer.dataset.postPdfUrl)
             }
         }

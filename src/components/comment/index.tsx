@@ -391,7 +391,8 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                                 <div className='username'>{annotation.title}</div>
                                 <span className='tool'>
                                     {formatPDFDate(annotation.date)}
-                                    <Dropdown menu={{
+                                    {(defaultOptions.setting.ALLOW_REPLY_ON || (!defaultOptions.setting.ALLOW_REPLY_ON && annotation.title === props.userName)) && (
+                                        <Dropdown menu={{
                                         items: [
                                             {
                                                 label: t('normal.reply'),
@@ -425,6 +426,7 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                                             <MoreOutlined />
                                         </span>
                                     </Dropdown>
+                                    )}
                                 </span>
                             </div>
                             {commentInput(annotation)}
@@ -465,12 +467,8 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                             <div className='reply-input'>
                                 {replyInput(annotation)}
                                 {(!defaultOptions.setting.ALLOW_REPLY_ON_STAMP && annotation.pdfjsType !== PdfjsAnnotationType.STAMP) && !replyAnnotation && !currentReply && !editAnnotation && currentAnnotation?.id === annotation.id && annotation.title === props.userName && (
-                                   // 改为编辑模式
-                                    // <Button style={{ marginTop: '8px' }} onClick={() => setReplyAnnotation(annotation)} type="primary" block>
-                                    //     {t('normal.reply')}
-                                    // </Button>
-                                    <Button style={{ marginTop: '8px' }} onClick={() => setEditAnnotation(annotation)} type="primary" block>
-                                        {t('normal.edit') }
+                                    <Button style={{ marginTop: '8px' }} onClick={() => defaultOptions.setting.ALLOW_REPLY_ON ? setReplyAnnotation(annotation) : setEditAnnotation(annotation)} type="primary" block>
+                                         {defaultOptions.setting.ALLOW_REPLY_ON ? t('normal.reply') : t('normal.edit')}
                                     </Button>
                                 )}
                             </div>
