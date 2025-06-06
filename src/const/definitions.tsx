@@ -343,3 +343,5 @@ export const HASH_PARAMS_GET_URL = `${HASH_PARAMS_PREFIX}_get_url`
 
 export const HASH_PARAMS_POST_URL = `${HASH_PARAMS_PREFIX}_post_url`
 
+export const HASH_PARAMS_POST_PDF_URL = `${HASH_PARAMS_PREFIX}_post_pdf_url`
+

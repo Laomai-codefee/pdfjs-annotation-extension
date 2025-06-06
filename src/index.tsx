@@ -8,12 +8,12 @@ import { SyncOutlined } from '@ant-design/icons';
 import i18n, { t } from 'i18next'
 import { CustomPopbar, CustomPopbarRef } from './components/popbar'
 import { CustomToolbar, CustomToolbarRef } from './components/toolbar'
-import { annotationDefinitions, HASH_PARAMS_GET_URL, HASH_PARAMS_POST_URL, HASH_PARAMS_USERNAME } from './const/definitions'
+import { annotationDefinitions, HASH_PARAMS_GET_URL, HASH_PARAMS_POST_URL, HASH_PARAMS_POST_PDF_URL, HASH_PARAMS_USERNAME } from './const/definitions'
 import { Painter } from './painter'
 import { CustomComment, CustomCommentRef } from './components/comment'
 import { once, parseQueryString } from './utils/utils'
 import { defaultOptions } from './const/default_options'
-import { exportAnnotationsToPdf } from './annot'
+import {submitAnnotationsToPdf, exportAnnotationsToPdf } from './annot'
 import { Modal, Space } from 'antd'
 
 interface AppOptions {
@@ -32,6 +32,7 @@ class PdfjsAnnotationExtension {
     customCommentRef: React.RefObject<CustomCommentRef>
     painter: Painter // 画笔实例
     appOptions: AppOptions
+    window: Window
     loadEnd: Boolean
 
     constructor() {
@@ -55,6 +56,7 @@ class PdfjsAnnotationExtension {
             [HASH_PARAMS_USERNAME]: i18n.t('normal.unknownUser'), // 默认用户名
             [HASH_PARAMS_GET_URL]: '', // 默认 GET URL
             [HASH_PARAMS_POST_URL]: '', // 默认 POST URL
+            [HASH_PARAMS_POST_PDF_URL]: '', // 默认 POST PDF URL
         };
 
         // 处理地址栏参数
@@ -113,6 +115,15 @@ class PdfjsAnnotationExtension {
      * @returns 
      */
     private parseHashParams() {
+        const outerContainer = document.getElementById('outerContainer');
+        if (outerContainer) {
+            if (outerContainer.dataset.userName) {
+                this.setOption(HASH_PARAMS_USERNAME, outerContainer.dataset.userName)
+            }
+            if (outerContainer.dataset.userName) {
+                this.setOption(HASH_PARAMS_POST_PDF_URL, outerContainer.dataset.postPdfUrl)
+            }
+        }
         const hash = document.location.hash.substring(1);
         if (!hash) {
             console.warn(`HASH_PARAMS is undefined`);
@@ -134,7 +145,6 @@ class PdfjsAnnotationExtension {
         } else {
             console.warn(`${HASH_PARAMS_POST_URL} is undefined`);
         }
-
     }
 
     private setOption(name: string, value: string) {
@@ -175,6 +185,9 @@ class PdfjsAnnotationExtension {
                 }}
                 onSave={() => {
                     this.saveData()
+                }}
+                onSubmit={async () => {
+                    await this.submitPdf()
                 }}
                 onExport={async () => {
                     await this.exportPdf()
@@ -344,6 +357,52 @@ class PdfjsAnnotationExtension {
         }
     }
 
+    private async submitPdf() {
+        const dataToSave = this.painter.getData();
+        const postPdfUrl = this.getOption(HASH_PARAMS_POST_PDF_URL);
+        if (!postPdfUrl) {
+            return;
+        }
+        const modal = Modal.info({
+            title: t('normal.submit'),
+            content: <Space><SyncOutlined spin />{t('normal.processing')}</Space>,
+            closable: false,
+            okButtonProps: {
+                loading: true
+            },
+            okText: t('normal.ok')
+        })
+        const result = await submitAnnotationsToPdf(this.PDFJS_PDFViewerApplication, dataToSave, postPdfUrl)
+        console.log('submitPdf successfully:', result);
+        if (result?.code !== 0) {
+            modal.update({
+                type:'error',
+                title: t('normal.submit'),
+                content: t('pdf.submitFailed'),
+                closable: true,
+                okButtonProps: {
+                    loading: false
+                },
+            }) 
+        } else {
+            modal.update({
+                type:'success',
+                title: t('normal.submit'),
+                content: t('pdf.submitSuccess'),
+                closable: true,
+                okButtonProps: {
+                    loading: false
+                },
+            })
+            // 延时关闭页面
+            setTimeout(() => {
+                if (window.opener) {
+                    window.opener.location.reload();
+                    window.close();
+                }
+            }, 2000);
+        }
+    }
     private async exportPdf() {
         const dataToSave = this.painter.getData();
         const modal = Modal.info({

@@ -28,6 +28,7 @@
         "color": "颜色",
         "export": "导出",
         "save": "保存",
+        "submit": "提交",
         "reply": "回复",
         "edit": "编辑",
         "delete": "删除",
@@ -40,5 +41,9 @@
         "selectAll": "全选"
     },
     "comment": { "total": " {{value}} 条批注", "page": "第{{value}}页" },
-    "pdf": { "generationSuccess": "文件已生成！" }
+    "pdf": {    
+        "submitSuccess": "提交成功！",
+        "submitFailed": "提交失败！",
+        "generationSuccess": "文件已生成！" 
+    }
 }

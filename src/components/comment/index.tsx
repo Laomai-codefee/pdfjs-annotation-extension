@@ -464,9 +464,13 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                             ))}
                             <div className='reply-input'>
                                 {replyInput(annotation)}
-                                {(!defaultOptions.setting.ALLOW_REPLY_ON_STAMP && annotation.pdfjsType !== PdfjsAnnotationType.STAMP) && !replyAnnotation && !currentReply && !editAnnotation && currentAnnotation?.id === annotation.id && (
-                                    <Button style={{ marginTop: '8px' }} onClick={() => setReplyAnnotation(annotation)} type="primary" block>
-                                        {t('normal.reply')}
+                                {(!defaultOptions.setting.ALLOW_REPLY_ON_STAMP && annotation.pdfjsType !== PdfjsAnnotationType.STAMP) && !replyAnnotation && !currentReply && !editAnnotation && currentAnnotation?.id === annotation.id && annotation.title === props.userName && (
+                                   // 改为编辑模式
+                                    // <Button style={{ marginTop: '8px' }} onClick={() => setReplyAnnotation(annotation)} type="primary" block>
+                                    //     {t('normal.reply')}
+                                    // </Button>
+                                    <Button style={{ marginTop: '8px' }} onClick={() => setEditAnnotation(annotation)} type="primary" block>
+                                        {t('normal.edit') }
                                     </Button>
                                 )}
                             </div>

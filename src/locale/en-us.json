@@ -40,6 +40,7 @@
         "color": "Color",
         "export": "Export",
         "save": "Save",
+        "submit": "Submit",
         "reply": "Reply",
         "edit": "Edit",
         "delete": "Delete",
@@ -56,6 +57,8 @@
         "page": "Page {{value}}"
     },
     "pdf": {
+        "submitSuccess": "File has been successfully submit",
+        "submitFailed": "File has been failed submit",
         "generationSuccess": "File has been successfully generated and downloaded"
     }
 }

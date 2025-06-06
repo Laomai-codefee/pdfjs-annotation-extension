@@ -32,8 +32,9 @@ const defaultOptions = {
         STROKE_WIDTH: 2, // 默认线条宽度
         OPACITY: 1, // 默认不透明度
         MAX_CURSOR_SIZE: 96, // 鼠标指针图片最大宽度/高度
-        SAVE_BUTTON: true, // 保存按钮
-        EXPORT_BUTTON: true, // 导出按钮
+        SAVE_BUTTON: false, // 保存按钮
+        SUBMIT_BUTTON: true, // 提交按钮
+        EXPORT_BUTTON: false, // 导出按钮
         LOAD_PDF_ANNOTATION: true, // 是否加载 pdf 原有批注 
         ALLOW_REPLY_ON_STAMP: false, // 是否允许在Stamp类型的批注（签名、盖章）上进行评论，评论在某些阅读器上可能会不显示, 即使显示也只会已 pop 的方式显示最后一条评论
         DEFAULT_SIDE_BAR_OPEN: true, // 侧边栏默认打开

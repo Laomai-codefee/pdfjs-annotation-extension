@@ -71,6 +71,52 @@ function downloadPdf(data: Uint8Array, filename: string) {
     document.body.removeChild(link)
     URL.revokeObjectURL(url)
 }
+function getMetaContent(name: string): string | null {
+  const metaTag = document.querySelector(`meta[name="${name}"]`);
+  if (metaTag) {
+    return metaTag.getAttribute('content');
+  }
+  return null;
+}
+/**
+ * 触发 PDF 上传
+ *
+ * @param data - 保存后的 PDF 数据（Uint8Array）
+ * @param filename - 下载时使用的文件名
+ */
+async function postPdf(data: Uint8Array, filename: string, url: string) {
+    const formData = new FormData();
+    formData.append('file', new Blob([data]), filename);
+
+    const csrfToken = getMetaContent('_csrf'); // 获取 CSRF token 值
+    const csrfHeaderName = getMetaContent('_csrf_header'); // 获取 CSRF header 名称
+
+
+     const headers = new Headers();
+     headers.append(csrfHeaderName, csrfToken); // 使用读取到的 header 名称和 token 值
+     const requestOptions: RequestInit = {
+        method: 'POST',
+        headers: headers,
+        body: formData, // 使用 FormData 作为请求体
+        redirect: 'follow'
+    };
+
+    // 使用fetch发送到后端接口
+   const result = await fetch(url, requestOptions).then(response => {
+        if (!response.ok){
+            console.log("postPdf Error",response);
+            throw new Error(`HTTP error! status: ${response.status}`)
+        };
+        return response.json();
+    }).then(result => {
+      console.log('文件上传成功:', result);
+        return result;
+    }).catch(error => {
+      console.error('文件上传失败:', error);
+    });
+    console.log("postPdf result", result);
+    return result;
+}
 
 /**
  * 从 PDF 中清除所有页面上的原始注解（Annots）
@@ -91,6 +137,40 @@ async function loadFontBuffer(url: string): Promise<ArrayBuffer> {
     const response = await fetch(url)
     if (!response.ok) throw new Error(`Failed to load font at ${url}`)
     return await response.arrayBuffer()
+}
+
+
+/**
+ * 主导函数：加载 PDF，插入所有注解，然后触发提交后台服务器。
+ *
+ * @param url - 要加载的 PDF 文件 URL
+ * @param annotations - 解析后的批注数据数组
+ */
+async function submitAnnotationsToPdf(PDFViewerApplication: PDFViewerApplication, annotations: IAnnotationStore[], postPdfUrl: string) {
+    console.log(PDFViewerApplication)
+    // 加载 PDF 文件为 pdf-lib 可识别的文档对象
+    const response = await fetch(PDFViewerApplication._downloadUrl)
+    const pdfBytes = await response.arrayBuffer()
+    const pdfDoc = await PDFDocument.load(pdfBytes)
+
+    // ✅ 清除原有的所有批注
+    clearAllAnnotations(pdfDoc)
+
+    // 遍历每一个注解并解析应用到对应页面
+    for (const ann of annotations) {
+        const page = pdfDoc.getPages()[ann.pageNumber - 1]
+        await parseAnnotationToPdf(ann, page, pdfDoc)
+    }
+
+    // 保存带注解的 PDF
+    const modifiedPdf = await pdfDoc.save()
+    // 使用 title + 时间戳作为文件名
+    const baseName = PDFViewerApplication._title || 'annotated'
+    const fileName = `${baseName}-${getTimestampString()}.pdf`
+
+    const result = await postPdf(modifiedPdf, fileName, postPdfUrl)
+    console.log("submitAnnotationsToPdf result", result);
+    return result;
 }
 
 /**
@@ -124,4 +204,4 @@ async function exportAnnotationsToPdf(PDFViewerApplication: PDFViewerApplication
     downloadPdf(modifiedPdf, fileName)
 }
 
-export { exportAnnotationsToPdf }
+export {submitAnnotationsToPdf, exportAnnotationsToPdf }
