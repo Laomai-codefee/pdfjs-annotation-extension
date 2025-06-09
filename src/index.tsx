@@ -394,12 +394,14 @@ class PdfjsAnnotationExtension {
                     loading: false
                 },
             })
+            this.PDFJS_PDFViewerApplication.pdfDocument?.annotationStorage.resetModified();
             // 延时关闭页面
             setTimeout(() => {
                 if (window.opener) {
                     window.opener.location.reload();
-                    window.close();
                 }
+                window.open('', '_self', '');
+                window.close();
             }, 2000);
         }
     }
