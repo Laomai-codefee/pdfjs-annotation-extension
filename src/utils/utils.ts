@@ -1,5 +1,7 @@
 import { nanoid } from 'nanoid'
 import { PDFHexString } from 'pdf-lib'
+import i18n from 'i18next'
+
 /**
  * 根据颜色字符串获取 RGB 数组。
  * 支持以下格式：'#RRGGBB'、'rgb(R, G, B)'、'rgba(R, G, B, A)'。
@@ -279,11 +281,11 @@ function formatPDFDate(dateString) {
 
     // 如果是当前年，输出月/日
     if (year === currentYear) {
-        return `${month}/${day}`
+        return i18n.t('dateFormat.dayMonth', { day, month })
     }
 
     // 不是当前年，输出完整日期
-    return `${year}/${month}/${day}`
+    return i18n.t('dateFormat.dayMonthYear', { day, month, year })
 }
 
 function parseQueryString(query: string): Map<string, string> {
