@@ -11,6 +11,7 @@ import { defaultOptions } from '../../const/default_options'
 interface CustomToolbarProps {
     onChange: (annotation: IAnnotationType | null, dataTransfer: string | null) => void
     onSave: () => void
+    onSubmit: () => void
     onExport: () => void
     onSidebarOpen: (open: boolean) => void
 }
@@ -144,6 +145,16 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
                             <SaveIcon />
                         </div>
                         <div className="name">{t('normal.save')}</div>
+                    </li>
+                }
+                {
+                    defaultOptions.setting.SUBMIT_BUTTON && <li title={t('normal.submit')} onClick={() => {
+                        props.onSubmit()
+                    }}>
+                        <div className="icon">
+                            <SaveIcon />
+                        </div>
+                        <div className="name">{t('normal.submit')}</div>
                     </li>
                 }
                 {
