@@ -12,7 +12,8 @@
         "freeText": "Text",
         "signature": "Unterschrift",
         "stamp": "Stempel",
-        "note": "Notiz"
+        "note": "Notiz",
+        "arrow": "Pfeil"
     },
     "toolbar": {
         "buttons": {
