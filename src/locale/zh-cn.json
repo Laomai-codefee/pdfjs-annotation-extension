@@ -40,5 +40,9 @@
         "selectAll": "全选"
     },
     "comment": { "total": " {{value}} 条批注", "page": "第{{value}}页" },
-    "pdf": { "generationSuccess": "文件已生成！" }
+    "pdf": { "generationSuccess": "文件已生成！" },
+    "dateFormat": {
+        "dayMonth": "{{month}}/{{day}}",
+        "dayMonthYear": "{{month}}/{{day}}/{{year}}"
+    }
 }

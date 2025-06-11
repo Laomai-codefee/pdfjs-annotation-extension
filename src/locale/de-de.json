@@ -1,0 +1,65 @@
+{
+    "anno": "Kommentar",
+    "annotations": {
+        "select": "Auswählen",
+        "highlight": "Hervorheben",
+        "strikeout": "Durchstreichen",
+        "underline": "Unterstreichen",
+        "rectangle": "Rechteck",
+        "circle": "Kreis",
+        "freehand": "Freihand",
+        "freeHighlight": "Hervorheben",
+        "freeText": "Text",
+        "signature": "Unterschrift",
+        "stamp": "Stempel",
+        "note": "Notiz"
+    },
+    "toolbar": {
+        "buttons": {
+            "createSignature": "Unterschrift erstellen"
+        },
+        "message": {
+            "selectPosition": "Bitte wählen Sie eine Position",
+            "signatureArea": "Unterschriftbereich"
+        }
+    },
+    "editor": {
+        "text": {
+            "startTyping": "Tippen beginnen…"
+        }
+    },
+    "normal": {
+        "ok": "OK",
+        "cancel": "Abbrechen",
+        "clear": "Löschen",
+        "fileSizeLimit": "Die Dateigröße überschreitet die {{value}}-Grenze",
+        "deleteConfirm": "Sind Sie sicher, dass Sie Folgendes löschen möchten?",
+        "yes": "Ja",
+        "no": "Nein",
+        "example": "z.B. ",
+        "color": "Farbe",
+        "export": "Export",
+        "save": "Speichern",
+        "reply": "Antworten",
+        "edit": "Bearbeiten",
+        "delete": "Löschen",
+        "confirm": "Bestätigen",
+        "unknownUser": "Unbekannter Benutzer",
+        "processing": "Bearbeitung, bitte warten...",
+        "filter": "Filter",
+        "author": "Autor",
+        "type": "Typ",
+        "selectAll": "Alle auswählen"
+    },
+    "comment": {
+        "total": "Kommentare: {{value}}",
+        "page": "Seite {{value}}"
+    },
+    "pdf": {
+        "generationSuccess": "Datei wurde erfolgreich generiert und heruntergeladen"
+    },
+    "dateFormat": {
+        "dayMonth": "{{day}}.{{month}}",
+        "dayMonthYear": "{{day}}.{{month}}.{{year}}"
+    }
+}

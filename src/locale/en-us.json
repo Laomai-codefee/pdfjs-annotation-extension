@@ -57,5 +57,9 @@
     },
     "pdf": {
         "generationSuccess": "File has been successfully generated and downloaded"
+    },
+    "dateFormat": {
+        "dayMonth": "{{month}}/{{day}}",
+        "dayMonthYear": "{{month}}/{{day}}/{{year}}"
     }
 }
