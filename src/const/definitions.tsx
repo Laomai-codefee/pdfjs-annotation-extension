@@ -10,7 +10,8 @@ import {
     StampIcon,
     StrikeoutIcon,
     UnderlineIcon,
-    NoteIcon
+    NoteIcon,
+    ArrowIcon
 } from './icon'
 import { IRect } from 'konva/lib/types'
 import { defaultOptions } from './default_options'
@@ -35,6 +36,7 @@ export type PdfjsAnnotationSubtype =
     | 'Stamp'
     | 'FileAttachment'
     | 'Note'
+    | 'Arrow'
 
 // PDF.js 批注类型
 export enum PdfjsAnnotationType {
@@ -94,7 +96,8 @@ export enum AnnotationType {
     FREE_HIGHLIGHT = 8, // 自由高亮批注
     SIGNATURE = 9, // 签名批注
     STAMP = 10, // 盖章批注
-    NOTE = 11
+    NOTE = 11, // 注释
+    ARROW = 12 // 箭头批注
 }
 
 // 定义批注类型的接口
@@ -257,6 +260,22 @@ export const annotationDefinitions: IAnnotationType[] = [
         draggable: true,
         icon: <NoteIcon />,
         style: {
+        }
+    },
+    {
+        name: 'arrow',
+        type: AnnotationType.ARROW,
+        pdfjsEditorType: PdfjsAnnotationEditorType.INK,
+        pdfjsAnnotationType: PdfjsAnnotationType.LINE,
+        subtype: 'Arrow',
+        isOnce: true,
+        resizable: true,
+        draggable: true,
+        icon: <ArrowIcon />,
+        style: {
+            color: defaultOptions.setting.COLOR, // 默认圆形颜色
+            strokeWidth: defaultOptions.setting.STROKE_WIDTH, // 默认线条宽度
+            opacity: defaultOptions.setting.OPACITY // 默认透明度
         }
     },
     {

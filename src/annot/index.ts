@@ -12,6 +12,7 @@ import { InkParser } from './parse_ink'
 import { getTimestampString } from '../utils/utils'
 import { FreeTextParser } from './parse_freetext'
 import { StampParser } from './parse_stamp'
+import { LineParser } from './parse_line'
 
 // import { HighlightParser } from './parse_highlight' // future
 // import { InkParser } from './parse_ink' // future
@@ -29,7 +30,8 @@ const parserMap: {
     [PdfjsAnnotationType.INK]: InkParser,
     [PdfjsAnnotationType.POLYLINE]: InkParser,
     [PdfjsAnnotationType.FREETEXT]: FreeTextParser,
-    [PdfjsAnnotationType.STAMP]: StampParser
+    [PdfjsAnnotationType.STAMP]: StampParser,
+    [PdfjsAnnotationType.LINE]: LineParser
     // 你可以在这里扩展其他类型的解析器
 }
 
@@ -100,7 +102,6 @@ async function loadFontBuffer(url: string): Promise<ArrayBuffer> {
  * @param annotations - 解析后的批注数据数组
  */
 async function exportAnnotationsToPdf(PDFViewerApplication: PDFViewerApplication, annotations: IAnnotationStore[]) {
-    console.log(PDFViewerApplication)
     // 加载 PDF 文件为 pdf-lib 可识别的文档对象
     const response = await fetch(PDFViewerApplication._downloadUrl)
     const pdfBytes = await response.arrayBuffer()
@@ -108,6 +109,8 @@ async function exportAnnotationsToPdf(PDFViewerApplication: PDFViewerApplication
 
     // ✅ 清除原有的所有批注
     clearAllAnnotations(pdfDoc)
+
+    console.log(annotations)
 
     // 遍历每一个注解并解析应用到对应页面
     for (const ann of annotations) {

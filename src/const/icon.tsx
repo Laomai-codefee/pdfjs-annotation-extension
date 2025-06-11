@@ -144,6 +144,12 @@ const AnnoSvg = () => (
     </svg>
 )
 
+const ArrowSvg = () => (  
+    <svg viewBox="0 0 1024 1024" height="1em"><path d="M820.35259846 337.71374951V646.0663464h134.06634641V109.8009592h-536.2653872v134.06634641h308.35259689L109.8009592 860.57250255l93.84644234 93.84644232 616.70519692-616.70519536z" fill="currentColor"></path></svg>
+)
+
+
+
 const SelectIcon = (props: Partial<CustomIconComponentProps>) => <Icon component={SelectSvg} {...props} />
 
 const HighlightIcon = (props: Partial<CustomIconComponentProps>) => <Icon component={HighlightSvg} {...props} />
@@ -178,6 +184,8 @@ const NoteIcon = (props: Partial<CustomIconComponentProps>) => <Icon component={
 
 const AnnoIcon = (props: Partial<CustomIconComponentProps>) => <Icon component={AnnoSvg} {...props} />
 
+const ArrowIcon = (props: Partial<CustomIconComponentProps>) => <Icon component={ArrowSvg} {...props} />
+
 export {
     CircleIcon,
     FontSizeIcon,
@@ -195,5 +203,6 @@ export {
     SaveIcon,
     ExportIcon,
     NoteIcon,
-    AnnoIcon
+    AnnoIcon,
+    ArrowIcon
 }

@@ -12,7 +12,8 @@
         "freeText": "Text",
         "signature": "Signature",
         "stamp": "Stamp",
-        "note": "Note"
+        "note": "Note",
+        "arrow": "Arrow"
     },
     "toolbar": {
         "buttons": {

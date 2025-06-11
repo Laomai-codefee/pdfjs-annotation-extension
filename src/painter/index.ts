@@ -20,6 +20,7 @@ import { Selector } from './editor/selector'
 import { Store } from './store'
 import { WebSelection } from './webSelection'
 import { Transform } from './transform/transform'
+import { EditorArrow } from './editor/editor_arrow'
 
 // KonvaCanvas 接口定义
 export interface KonvaCanvas {
@@ -349,7 +350,18 @@ export class Painter {
                     }
                 })
                 break
-
+            case AnnotationType.ARROW:
+                editor = new EditorArrow({
+                    userName: this.userName,
+                    pdfViewerApplication: this.pdfViewerApplication,
+                    konvaStage,
+                    pageNumber,
+                    annotation,
+                    onAdd: annotationStore => {
+                        this.saveToStore(annotationStore)
+                    }
+                })
+                break
             case AnnotationType.CIRCLE:
                 editor = new EditorCircle({
                     userName: this.userName,
@@ -592,6 +604,7 @@ export class Painter {
             case AnnotationType.STAMP:
             case AnnotationType.SELECT:
             case AnnotationType.NOTE:
+            case AnnotationType.ARROW:
                 this.setMode('painting') // 设置绘画模式
                 break
 

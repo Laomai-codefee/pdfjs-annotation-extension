@@ -12,7 +12,8 @@
         "freeText": "文字",
         "signature": "签名",
         "stamp": "盖章",
-        "note": "注解"
+        "note": "注解",
+        "arrow": "箭头"
     },
     "toolbar": { "buttons": { "createSignature": "创建签名" }, "message": { "selectPosition": "请选择放置位置", "signatureArea": "签名处" } },
     "editor": { "text": { "startTyping": "开始输入..." } },

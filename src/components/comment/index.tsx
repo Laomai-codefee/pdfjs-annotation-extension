@@ -20,7 +20,8 @@ import {
     UnderlineIcon,
     SignatureIcon,
     NoteIcon,
-    ExportIcon
+    ExportIcon,
+    ArrowIcon
 } from '../../const/icon'
 import { defaultOptions } from '../../const/default_options'
 
@@ -45,7 +46,8 @@ const iconMapping: Record<PdfjsAnnotationSubtype, React.ReactNode> = {
     FileAttachment: <ExportIcon />,
     Popup: <FreehandIcon />,
     Widget: <FreehandIcon />,
-    Note: <NoteIcon />
+    Note: <NoteIcon />,
+    Arrow: <ArrowIcon />
 };
 
 const getIconBySubtype = (subtype: PdfjsAnnotationSubtype): React.ReactNode => {
