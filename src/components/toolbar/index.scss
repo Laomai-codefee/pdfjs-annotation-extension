@@ -192,7 +192,7 @@
     }
 }
 
-@media all and (max-width: 1024px) {
+@media all and (max-width: 1150px) {
     .CustomToolbar {
         .buttons {
             .name {
@@ -210,9 +210,6 @@
         .buttons {
             margin-left: 5px;
             padding-right: 5px;
-        }
-        .right{
-            display: none;
         }
     }
 }

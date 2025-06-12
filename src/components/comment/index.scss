@@ -1,22 +1,22 @@
-.PdfjsAnnotationExtension_Comment_hidden{
+.PdfjsAnnotationExtension_Comment_hidden {
     .CustomComment {
         display: none;
     }
 }
-.CustomComment_filterContent{
-    ul, li{
+.CustomComment_filterContent {
+    ul,
+    li {
         list-style: none;
     }
-    li{
+    li {
         padding: 3px;
     }
-    li:hover{
+    li:hover {
         background-color: #ddd;
     }
-    li>label{
+    li > label {
         width: 100%;
     }
-
 }
 .CustomComment {
     width: 330px;
@@ -34,13 +34,13 @@
     }
     .list {
         padding: 5px 5px 25px 5px;
-        .group{
+        .group {
             margin-bottom: 10px;
         }
         h3 {
             font-weight: normal;
             font-size: 14px;
-            span{
+            span {
                 float: right;
             }
         }
