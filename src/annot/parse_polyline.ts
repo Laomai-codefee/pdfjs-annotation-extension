@@ -3,7 +3,40 @@ import { PDFHexString, PDFName, PDFString, PDFNumber } from 'pdf-lib'
 import { convertKonvaRectToPdfRect, rgbToPdfColor, stringToPDFHexString } from '../utils/utils'
 import { t } from 'i18next'
 
-export class LineParser extends AnnotationParser {
+function parseSvgPathToPoints(data: string): number[] {
+    const commands = data.match(/[a-zA-Z][^a-zA-Z]*/g) || []
+    const points: number[] = []
+    for (const cmd of commands) {
+        const type = cmd[0]
+        const nums = cmd
+            .slice(1)
+            .trim()
+            .split(/[\s,]+/)
+            .map(parseFloat)
+
+        if (type === 'M' || type === 'L') {
+            // MoveTo / LineTo：直接加入坐标
+            for (let i = 0; i < nums.length; i += 2) {
+                points.push(nums[i], nums[i + 1])
+            }
+        } else if (type === 'Q') {
+            // Quadratic curve：控制点忽略，仅取终点
+            if (nums.length >= 4) {
+                points.push(nums[2], nums[3])
+            }
+        } else if (type === 'C') {
+            // Cubic Bezier：同理，取终点
+            if (nums.length >= 6) {
+                points.push(nums[4], nums[5])
+            }
+        } else if (type === 'Z' || type === 'z') {
+            // Close path，忽略
+        }
+    }
+    return points
+}
+
+export class PolylineParser extends AnnotationParser {
     async parse() {
         const { annotation, page, pdfDoc } = this
         const context = pdfDoc.context
@@ -11,7 +44,7 @@ export class LineParser extends AnnotationParser {
 
         const konvaGroup = JSON.parse(annotation.konvaString)
 
-        const lines = konvaGroup.children.filter((item: any) => item.className === 'Arrow')
+        const lines = konvaGroup.children.filter((item: any) => item.className === 'Path')
 
         const groupX = konvaGroup.attrs.x || 0
         const groupY = konvaGroup.attrs.y || 0
@@ -20,7 +53,7 @@ export class LineParser extends AnnotationParser {
 
         const inkList = context.obj(
             lines.map((line: any) => {
-                const points = line.attrs.points as number[]
+                const points = parseSvgPathToPoints(line.attrs.data) as number[]
                 const transformedPoints: number[] = []
 
                 for (let i = 0; i < points.length; i += 2) {
@@ -46,7 +79,6 @@ export class LineParser extends AnnotationParser {
 
         const mainAnn = context.obj({
             Type: PDFName.of('Annot'),
-            // 注意：PDF 的 Ink 注解不支持箭头样式，导出后将仅保留线条
             Subtype: PDFName.of('Ink'),
             Rect: convertKonvaRectToPdfRect(annotation.konvaClientRect, pageHeight),
             InkList: inkList,

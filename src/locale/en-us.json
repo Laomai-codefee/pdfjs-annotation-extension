@@ -13,7 +13,8 @@
         "signature": "Signature",
         "stamp": "Stamp",
         "note": "Note",
-        "arrow": "Arrow"
+        "arrow": "Arrow",
+        "cloud": "Cloud"
     },
     "toolbar": {
         "buttons": {

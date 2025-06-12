@@ -129,7 +129,6 @@ export abstract class Editor {
 
         // Mobile Touch Events
         this.konvaStage.on('touchstart', e => {
-            console.log('touchstart')
             if (e.evt.touches.length === 1) {
                 this.mouseDownHandler(e)
             }

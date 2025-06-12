@@ -8,21 +8,23 @@ export class InkParser extends AnnotationParser {
         const { annotation, page, pdfDoc } = this
         const context = pdfDoc.context
         const pageHeight = page.getHeight()
-
         const konvaGroup = JSON.parse(annotation.konvaString)
         const lines = konvaGroup.children.filter((item: any) => item.className === 'Line')
+
+        const groupX = konvaGroup.attrs.x || 0
+        const groupY = konvaGroup.attrs.y || 0
+        const scaleX = konvaGroup.attrs.scaleX || 1
+        const scaleY = konvaGroup.attrs.scaleY || 1
 
         const inkList = context.obj(
             lines.map((line: any) => {
                 const points = line.attrs.points as number[]
                 const transformedPoints: number[] = []
-
                 for (let i = 0; i < points.length; i += 2) {
-                    const x = points[i]
-                    const y = pageHeight - points[i + 1]
-                    transformedPoints.push(x, y)
+                    const x = groupX + points[i] * scaleX
+                    const y = groupY + points[i + 1] * scaleY
+                    transformedPoints.push(x, pageHeight - y)
                 }
-
                 return context.obj(transformedPoints)
             })
         )

@@ -148,6 +148,9 @@ const ArrowSvg = () => (
     <svg viewBox="0 0 1024 1024" height="1em"><path d="M820.35259846 337.71374951V646.0663464h134.06634641V109.8009592h-536.2653872v134.06634641h308.35259689L109.8009592 860.57250255l93.84644234 93.84644232 616.70519692-616.70519536z" fill="currentColor"></path></svg>
 )
 
+const CloudSvg = () => (  
+    <svg viewBox="0 0 1365 1024" height="1em"><path d="M992 992H392v-2.71999969A319.75999969 319.75999969 0 0 1 193.92000031 393.99999969a400.00000031 400.00000031 0 0 1 790.11999938-41.47999969c2.68000031 0 5.28-0.52000031 8.00000062-0.52000031A319.99999969 319.99999969 0 0 1 992 992z m0-480h-7.99999969a247.99999969 247.99999969 0 0 1-77.28 0H831.99999969v-79.99999969a240 240 0 0 0-480 0v79.99999969a202.87999969 202.87999969 0 0 0-79.99999969 22.56L247.23999969 552.00000031a157.39999969 157.39999969 0 0 0-15.24 15.31999969 54.28000031 54.28000031 0 0 0-9.96 12.48A157.44 157.44 0 0 0 192.00000031 672.00000031a166.36000031 166.36000031 0 0 0 120 159.99999938h679.99999969a160.00000031 160.00000031 0 0 0 0-319.99999969z" fill="currentColor"></path></svg>
+)
 
 
 const SelectIcon = (props: Partial<CustomIconComponentProps>) => <Icon component={SelectSvg} {...props} />
@@ -186,6 +189,8 @@ const AnnoIcon = (props: Partial<CustomIconComponentProps>) => <Icon component={
 
 const ArrowIcon = (props: Partial<CustomIconComponentProps>) => <Icon component={ArrowSvg} {...props} />
 
+const CloudIcon = (props: Partial<CustomIconComponentProps>) => <Icon component={CloudSvg} {...props} />
+
 export {
     CircleIcon,
     FontSizeIcon,
@@ -204,5 +209,6 @@ export {
     ExportIcon,
     NoteIcon,
     AnnoIcon,
-    ArrowIcon
+    ArrowIcon,
+    CloudIcon
 }

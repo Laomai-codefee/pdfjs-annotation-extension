@@ -13,6 +13,7 @@ import { getTimestampString } from '../utils/utils'
 import { FreeTextParser } from './parse_freetext'
 import { StampParser } from './parse_stamp'
 import { LineParser } from './parse_line'
+import { PolylineParser } from './parse_polyline'
 
 // import { HighlightParser } from './parse_highlight' // future
 // import { InkParser } from './parse_ink' // future
@@ -28,7 +29,7 @@ const parserMap: {
     [PdfjsAnnotationType.SQUARE]: SquareParser,
     [PdfjsAnnotationType.CIRCLE]: CircleParser,
     [PdfjsAnnotationType.INK]: InkParser,
-    [PdfjsAnnotationType.POLYLINE]: InkParser,
+    [PdfjsAnnotationType.POLYLINE]: PolylineParser,
     [PdfjsAnnotationType.FREETEXT]: FreeTextParser,
     [PdfjsAnnotationType.STAMP]: StampParser,
     [PdfjsAnnotationType.LINE]: LineParser

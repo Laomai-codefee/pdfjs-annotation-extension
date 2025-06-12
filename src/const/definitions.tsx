@@ -11,7 +11,8 @@ import {
     StrikeoutIcon,
     UnderlineIcon,
     NoteIcon,
-    ArrowIcon
+    ArrowIcon,
+    CloudIcon
 } from './icon'
 import { IRect } from 'konva/lib/types'
 import { defaultOptions } from './default_options'
@@ -97,7 +98,8 @@ export enum AnnotationType {
     SIGNATURE = 9, // 签名批注
     STAMP = 10, // 盖章批注
     NOTE = 11, // 注释
-    ARROW = 12 // 箭头批注
+    ARROW = 12, // 箭头批注
+    CLOUD = 13 // 云线
 }
 
 // 定义批注类型的接口
@@ -268,10 +270,26 @@ export const annotationDefinitions: IAnnotationType[] = [
         pdfjsEditorType: PdfjsAnnotationEditorType.INK,
         pdfjsAnnotationType: PdfjsAnnotationType.LINE,
         subtype: 'Arrow',
-        isOnce: true,
+        isOnce: false,
         resizable: true,
         draggable: true,
         icon: <ArrowIcon />,
+        style: {
+            color: defaultOptions.setting.COLOR, // 默认圆形颜色
+            strokeWidth: defaultOptions.setting.STROKE_WIDTH, // 默认线条宽度
+            opacity: defaultOptions.setting.OPACITY // 默认透明度
+        }
+    },
+    {
+        name: 'cloud',
+        type: AnnotationType.CLOUD,
+        pdfjsEditorType: PdfjsAnnotationEditorType.INK,
+        pdfjsAnnotationType: PdfjsAnnotationType.POLYLINE,
+        subtype: 'PolyLine',
+        isOnce: true,
+        resizable: true,
+        draggable: true,
+        icon: <CloudIcon />,
         style: {
             color: defaultOptions.setting.COLOR, // 默认圆形颜色
             strokeWidth: defaultOptions.setting.STROKE_WIDTH, // 默认线条宽度
@@ -298,8 +316,8 @@ export const annotationDefinitions: IAnnotationType[] = [
         name: 'freeHighlight',
         type: AnnotationType.FREE_HIGHLIGHT,
         pdfjsEditorType: PdfjsAnnotationEditorType.INK,
-        pdfjsAnnotationType: PdfjsAnnotationType.POLYLINE,
-        subtype: 'PolyLine',
+        pdfjsAnnotationType: PdfjsAnnotationType.INK,
+        subtype: 'Highlight',
         isOnce: false,
         resizable: true,
         draggable: true,

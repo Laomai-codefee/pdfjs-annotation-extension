@@ -13,7 +13,8 @@
         "signature": "Unterschrift",
         "stamp": "Stempel",
         "note": "Notiz",
-        "arrow": "Pfeil"
+        "arrow": "Pfeil",
+        "cloud": "Wolke"
     },
     "toolbar": {
         "buttons": {

@@ -207,7 +207,7 @@ export class Selector {
         group.off('dragend')
         const transformer = new Konva.Transformer({
             resizeEnabled: rawAnnotationStore.resizable,
-            rotateEnabled: rawAnnotationStore.resizable,
+            rotateEnabled: false,
             borderStrokeWidth: defaultOptions.chooseSetting.STROKEWIDTH,
             borderStroke: defaultOptions.chooseSetting.COLOR,
             anchorFill: defaultOptions.chooseSetting.COLOR,

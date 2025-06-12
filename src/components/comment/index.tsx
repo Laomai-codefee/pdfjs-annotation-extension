@@ -21,7 +21,8 @@ import {
     SignatureIcon,
     NoteIcon,
     ExportIcon,
-    ArrowIcon
+    ArrowIcon,
+    CloudIcon
 } from '../../const/icon'
 import { defaultOptions } from '../../const/default_options'
 
@@ -39,7 +40,7 @@ const iconMapping: Record<PdfjsAnnotationSubtype, React.ReactNode> = {
     Line: <FreehandIcon />,
     Square: <RectangleIcon />,
     Polygon: <FreehandIcon />,
-    PolyLine: <FreeHighlightIcon />,
+    PolyLine: <CloudIcon />,
     Caret: <SignatureIcon />,
     Link: <FreehandIcon />,
     Text: <NoteIcon />,
