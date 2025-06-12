@@ -11,7 +11,7 @@ import { CustomToolbar, CustomToolbarRef } from './components/toolbar'
 import { annotationDefinitions, HASH_PARAMS_GET_URL, HASH_PARAMS_POST_URL, HASH_PARAMS_USERNAME } from './const/definitions'
 import { Painter } from './painter'
 import { CustomComment, CustomCommentRef } from './components/comment'
-import { once, parseQueryString } from './utils/utils'
+import { once, parseQueryString, hashArrayOfObjects } from './utils/utils'
 import { defaultOptions } from './const/default_options'
 import { exportAnnotationsToPdf } from './annot'
 import { Modal, Space } from 'antd'
@@ -33,9 +33,11 @@ class PdfjsAnnotationExtension {
     painter: Painter // 画笔实例
     appOptions: AppOptions
     loadEnd: Boolean
+    initialDataHash: number
 
     constructor() {
         this.loadEnd = false
+        this.initialDataHash = null
         // 初始化 PDF.js 对象和相关属性
         this.PDFJS_PDFViewerApplication = (window as any).PDFViewerApplication
         this.PDFJS_EventBus = this.PDFJS_PDFViewerApplication.eventBus
@@ -282,7 +284,9 @@ class PdfjsAnnotationExtension {
         // 监听文档加载完成事件
         this.PDFJS_EventBus._on('documentloaded', async () => {
             this.painter.initWebSelection(this.$PDFJS_viewerContainer)
-            await this.painter.initAnnotations(await this.getData(), defaultOptions.setting.LOAD_PDF_ANNOTATION)
+            const data = await this.getData()
+            this.initialDataHash = hashArrayOfObjects(data)
+            await this.painter.initAnnotations(data, defaultOptions.setting.LOAD_PDF_ANNOTATION)
             if (this.loadEnd) {
                 this.updatePdfjs()
             }
@@ -338,6 +342,7 @@ class PdfjsAnnotationExtension {
             }
 
             const result = await response.json();
+            this.initialDataHash = hashArrayOfObjects(dataToSave)
             console.log('Saved successfully:', result);
         } catch (error) {
             console.error('Error while saving data:', error);
@@ -367,6 +372,16 @@ class PdfjsAnnotationExtension {
         })
     }
 
+    public hasUnsavedChanges(): boolean {
+        return hashArrayOfObjects(this.painter.getData()) !== this.initialDataHash
+    }
+
 }
 
-new PdfjsAnnotationExtension()
+declare global {
+    interface Window {
+        pdfjsAnnotationExtensionInstance: PdfjsAnnotationExtension
+    }
+}
+
+window.pdfjsAnnotationExtensionInstance = new PdfjsAnnotationExtension()

@@ -359,6 +359,29 @@ function getTimestampString(date: Date = new Date()): string {
     return `${year}${month}${day}_${hour}${minute}${second}`
 }
 
+function hashArrayOfObjects<T extends Record<string, any>>(arr: T[]): number {
+    const jsonString = JSON.stringify(arr, (key, value) => {
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+            return Object.keys(value).sort().reduce((sortedObject: Record<string, any>, k) => {
+                sortedObject[k] = value[k]
+                return sortedObject
+            }, {});
+        }
+        return value
+    });
+
+    let hash = 0
+    if (jsonString.length === 0) {
+        return hash
+    }
+    for (let i = 0; i < jsonString.length; i++) {
+        const char = jsonString.charCodeAt(i)
+        hash = ((hash << 5) - hash) + char
+        hash |= 0
+    }
+    return hash
+}
+
 export {
     base64ToImageBitmap,
     formatFileSize,
@@ -379,5 +402,6 @@ export {
     once,
     convertKonvaRectToPdfRect,
     stringToPDFHexString,
-    getTimestampString
+    getTimestampString,
+    hashArrayOfObjects
 }
