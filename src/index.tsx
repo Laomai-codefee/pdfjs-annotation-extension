@@ -83,16 +83,18 @@ class PdfjsAnnotationExtension {
                 if (currentAnnotation.isOnce) {
                     this.painter.selectAnnotation(annotation.id)
                 }
-                this.customCommentRef.current.selectedAnnotation(annotation, true)
+                if (this.isCommentOpen()) {
+                    // 如果评论栏已打开，则选中批注
+                    this.customCommentRef.current.selectedAnnotation(annotation, true)
+                }
             },
             onStoreDelete: (id) => {
                 this.customCommentRef.current.delAnnotation(id)
             },
             onAnnotationSelected: (annotation, isClick, selectorRect) => {
                 this.customerAnnotationMenuRef.current.open(annotation, selectorRect)
-                this.toggleComment(true)
-                this.customToolbarRef.current.toggleSidebarBtn(true)
-                if (isClick) {
+                if (isClick && this.isCommentOpen()) {
+                    // 如果是点击事件并且评论栏已打开，则选中批注
                     this.customCommentRef.current.selectedAnnotation(annotation, isClick)
                 }
             },
@@ -167,12 +169,24 @@ class PdfjsAnnotationExtension {
         this.toggleComment(defaultOptions.setting.DEFAULT_SIDE_BAR_OPEN)
     }
 
+    /**
+     * @description 切换评论栏的显示状态
+     * @param open 
+     */
     private toggleComment(open: boolean): void {
         if (open) {
             document.body.classList.remove('PdfjsAnnotationExtension_Comment_hidden')
         } else {
             document.body.classList.add('PdfjsAnnotationExtension_Comment_hidden')
         }
+    }
+
+    /**
+     * @description 检查评论栏是否打开
+     * @returns 
+     */
+    private isCommentOpen(): boolean {
+        return !document.body.classList.contains('PdfjsAnnotationExtension_Comment_hidden')
     }
 
     /**
@@ -226,7 +240,11 @@ class PdfjsAnnotationExtension {
             <CustomAnnotationMenu
                 ref={this.customerAnnotationMenuRef}
                 onOpenComment={(currentAnnotation) => {
-                    console.log('%c [ currentAnnotation ]', 'font-size:13px; background:#d10d00; color:#ff5144;', currentAnnotation)
+                    this.toggleComment(true)
+                    this.customToolbarRef.current.toggleSidebarBtn(true)
+                    setTimeout(() => {
+                        this.customCommentRef.current.selectedAnnotation(currentAnnotation, true)
+                    }, 100)
                 }}
                 onChangeStyle={(currentAnnotation) => {
                     console.log('%c [ currentAnnotation ]', 'font-size:13px; background:#d10d00; color:#ff5144;', currentAnnotation)

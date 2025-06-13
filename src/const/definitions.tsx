@@ -115,6 +115,7 @@ export interface IAnnotationType {
     draggable: boolean // 是否可拖动位置
     icon?: React.JSX.Element // 可选的图标，用于表示批注类型
     style?: IAnnotationStyle // 可选的样式配置对象
+    styleEditable: boolean // 是否可编辑样式
 }
 
 // 批注的样式配置接口
@@ -172,7 +173,8 @@ export const annotationDefinitions: IAnnotationType[] = [
         isOnce: false, // 是否只绘制一次
         resizable: false,
         draggable: false,
-        icon: <SelectIcon /> // 图标
+        icon: <SelectIcon />, // 图标
+        styleEditable: false, // 是否可编辑样式
     },
     {
         name: 'highlight',
@@ -187,7 +189,8 @@ export const annotationDefinitions: IAnnotationType[] = [
         style: {
             color: defaultOptions.setting.HIGHLIGHT_COLOR, // 默认高亮颜色
             opacity: 0.5 // 默认透明度
-        }
+        },
+        styleEditable: true, // 是否可编辑样式
     },
     {
         name: 'strikeout',
@@ -202,7 +205,8 @@ export const annotationDefinitions: IAnnotationType[] = [
         style: {
             color: defaultOptions.setting.STRIKEOUT_COLOR, // 默认删除线颜色
             opacity: defaultOptions.setting.OPACITY // 默认透明度
-        }
+        },
+        styleEditable: true // 是否可编辑样式
     },
     {
         name: 'underline',
@@ -217,7 +221,8 @@ export const annotationDefinitions: IAnnotationType[] = [
         style: {
             color: defaultOptions.setting.UNDERLINE_COLOR, // 默认下划线颜色
             opacity: defaultOptions.setting.OPACITY // 默认透明度
-        }
+        },
+        styleEditable: true // 是否可编辑样式
     },
     {
         name: 'rectangle',
@@ -233,7 +238,8 @@ export const annotationDefinitions: IAnnotationType[] = [
             color: defaultOptions.setting.COLOR, // 默认矩形颜色
             strokeWidth: defaultOptions.setting.STROKE_WIDTH, // 默认线条宽度
             opacity: defaultOptions.setting.OPACITY // 默认透明度
-        }
+        },
+        styleEditable: true // 是否可编辑样式
     },
     {
         name: 'circle',
@@ -249,7 +255,8 @@ export const annotationDefinitions: IAnnotationType[] = [
             color: defaultOptions.setting.COLOR, // 默认圆形颜色
             strokeWidth: defaultOptions.setting.STROKE_WIDTH, // 默认线条宽度
             opacity: defaultOptions.setting.OPACITY // 默认透明度
-        }
+        },
+        styleEditable: true // 是否可编辑样式
     },
     {
         name: 'note',
@@ -262,7 +269,8 @@ export const annotationDefinitions: IAnnotationType[] = [
         draggable: true,
         icon: <NoteIcon />,
         style: {
-        }
+        },
+        styleEditable: false // 是否可编辑样式
     },
     {
         name: 'arrow',
@@ -270,7 +278,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         pdfjsEditorType: PdfjsAnnotationEditorType.INK,
         pdfjsAnnotationType: PdfjsAnnotationType.LINE,
         subtype: 'Arrow',
-        isOnce: false,
+        isOnce: true,
         resizable: true,
         draggable: true,
         icon: <ArrowIcon />,
@@ -278,7 +286,8 @@ export const annotationDefinitions: IAnnotationType[] = [
             color: defaultOptions.setting.COLOR, // 默认圆形颜色
             strokeWidth: defaultOptions.setting.STROKE_WIDTH, // 默认线条宽度
             opacity: defaultOptions.setting.OPACITY // 默认透明度
-        }
+        },
+        styleEditable: true // 是否可编辑样式
     },
     {
         name: 'cloud',
@@ -294,7 +303,8 @@ export const annotationDefinitions: IAnnotationType[] = [
             color: defaultOptions.setting.COLOR, // 默认圆形颜色
             strokeWidth: defaultOptions.setting.STROKE_WIDTH, // 默认线条宽度
             opacity: defaultOptions.setting.OPACITY // 默认透明度
-        }
+        },
+        styleEditable: true // 是否可编辑样式
     },
     {
         name: 'freehand',
@@ -302,7 +312,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         pdfjsEditorType: PdfjsAnnotationEditorType.INK,
         pdfjsAnnotationType: PdfjsAnnotationType.INK,
         subtype: 'Ink',
-        isOnce: false,
+        isOnce: true,
         resizable: true,
         draggable: true,
         icon: <FreehandIcon />,
@@ -310,7 +320,8 @@ export const annotationDefinitions: IAnnotationType[] = [
             color: defaultOptions.setting.COLOR, // 默认自由绘制颜色
             strokeWidth: defaultOptions.setting.STROKE_WIDTH, // 默认线条宽度
             opacity: defaultOptions.setting.OPACITY // 默认透明度
-        }
+        },
+        styleEditable: true // 是否可编辑样式
     },
     {
         name: 'freeHighlight',
@@ -318,7 +329,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         pdfjsEditorType: PdfjsAnnotationEditorType.INK,
         pdfjsAnnotationType: PdfjsAnnotationType.INK,
         subtype: 'Highlight',
-        isOnce: false,
+        isOnce: true,
         resizable: true,
         draggable: true,
         icon: <FreeHighlightIcon />,
@@ -326,7 +337,8 @@ export const annotationDefinitions: IAnnotationType[] = [
             color: defaultOptions.setting.COLOR, // 默认自由高亮颜色
             strokeWidth: 10, // 默认线条宽度
             opacity: 0.5 // 默认透明度
-        }
+        },
+        styleEditable: true // 是否可编辑样式
     },
     {
         name: 'freeText',
@@ -342,7 +354,8 @@ export const annotationDefinitions: IAnnotationType[] = [
             color: defaultOptions.setting.COLOR, // 默认文字颜色
             fontSize: defaultOptions.setting.FONT_SIZE, // 默认字体大小
             opacity: defaultOptions.setting.OPACITY // 默认透明度
-        }
+        },
+        styleEditable: false // 是否可编辑样式
     },
     {
         name: 'signature',
@@ -357,7 +370,8 @@ export const annotationDefinitions: IAnnotationType[] = [
         style: {
             strokeWidth: 3, // 默认线条宽度
             opacity: 1 // 默认不透明度
-        }
+        },
+        styleEditable: false // 是否可编辑样式
     },
     {
         name: 'stamp',
@@ -368,7 +382,8 @@ export const annotationDefinitions: IAnnotationType[] = [
         isOnce: true,
         resizable: true,
         draggable: true,
-        icon: <StampIcon />
+        icon: <StampIcon />,
+        styleEditable: false // 是否可编辑样式
     }
 ]
 
