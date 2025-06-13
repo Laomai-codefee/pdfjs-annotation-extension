@@ -3,11 +3,8 @@ import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo
 import { IAnnotationComment, IAnnotationStore, PdfjsAnnotationSubtype, PdfjsAnnotationType } from '../../const/definitions'
 import { useTranslation } from 'react-i18next'
 import { formatPDFDate, formatTimestamp, generateUUID } from '../../utils/utils'
-import { Button, Checkbox, Divider, Dropdown, Input, MenuProps, Popover, Space, Typography } from 'antd'
-import {
-    FilterOutlined,
-    MoreOutlined
-} from '@ant-design/icons';
+import { Button, Checkbox, Dropdown, Input, Popover, Space, Typography } from 'antd'
+import { FilterOutlined, MoreOutlined } from '@ant-design/icons'
 import {
     CircleIcon,
     FreehandIcon,
@@ -27,7 +24,7 @@ import {
 import { defaultOptions } from '../../const/default_options'
 import Paragraph from 'antd/es/typography/Paragraph'
 
-const { Text } = Typography;
+const { Text } = Typography
 
 const iconMapping: Record<PdfjsAnnotationSubtype, React.ReactNode> = {
     Circle: <CircleIcon />,
@@ -50,16 +47,16 @@ const iconMapping: Record<PdfjsAnnotationSubtype, React.ReactNode> = {
     Widget: <FreehandIcon />,
     Note: <NoteIcon />,
     Arrow: <ArrowIcon />
-};
+}
 
 const getIconBySubtype = (subtype: PdfjsAnnotationSubtype): React.ReactNode => {
-    return iconMapping[subtype] || null;
-};
+    return iconMapping[subtype] || null
+}
 
 const AnnotationIcon: React.FC<{ subtype: PdfjsAnnotationSubtype }> = ({ subtype }) => {
-    const Icon = getIconBySubtype(subtype);
-    return Icon ? <span className="annotation-icon">{Icon}</span> : null;
-};
+    const Icon = getIconBySubtype(subtype)
+    return Icon ? <span className="annotation-icon">{Icon}</span> : null
+}
 
 const { TextArea } = Input
 
@@ -90,13 +87,13 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
     const [selectedTypes, setSelectedTypes] = useState<PdfjsAnnotationSubtype[]>([])
     const { t } = useTranslation()
 
-    const annotationRefs = useRef<Record<string, HTMLDivElement | null>>({});
+    const annotationRefs = useRef<Record<string, HTMLDivElement | null>>({})
 
     useImperativeHandle(ref, () => ({
         addAnnotation,
         delAnnotation,
         selectedAnnotation,
-        updateAnnotation,
+        updateAnnotation
     }))
 
     const addAnnotation = (annotation: IAnnotationStore) => {
@@ -105,38 +102,37 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
     }
 
     const delAnnotation = (id: string) => {
-        setAnnotations(prevAnnotations => prevAnnotations.filter(annotation => annotation.id !== id));
+        setAnnotations(prevAnnotations => prevAnnotations.filter(annotation => annotation.id !== id))
         if (currentAnnotation?.id === id) {
-            setCurrentAnnotation(null);
+            setCurrentAnnotation(null)
         }
         if (replyAnnotation?.id === id) {
-            setReplyAnnotation(null);
+            setReplyAnnotation(null)
         }
-        setCurrentReply(null);
-    };
+        setCurrentReply(null)
+    }
 
     const selectedAnnotation = (annotation: IAnnotationStore, isClick: boolean) => {
-        setCurrentAnnotation(annotation);
+        setCurrentAnnotation(annotation)
 
-        if (!isClick) return;
+        if (!isClick) return
 
-        const isOwn = annotation.title === props.userName;
-        const isEmptyComment = annotation.contentsObj.text === '';
+        const isOwn = annotation.title === props.userName
+        const isEmptyComment = annotation.contentsObj.text === ''
 
         // 👇 根据批注归属与内容决定打开评论或回复
         if (isOwn && isEmptyComment) {
-            setEditAnnotation(annotation);
+            setEditAnnotation(annotation)
         } else {
-            setReplyAnnotation(annotation);
+            setReplyAnnotation(annotation)
         }
 
         // 👇 滚动至目标批注 DOM 元素
-        const element = annotationRefs.current[annotation.id];
+        const element = annotationRefs.current[annotation.id]
         if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' })
         }
-    };
-
+    }
 
     const updateAnnotation = (updatedAnnotation: IAnnotationStore) => {
         setAnnotations(prevAnnotations =>
@@ -146,17 +142,17 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                     const newAnnotation = {
                         ...annotation,
                         konvaClientRect: updatedAnnotation.konvaClientRect,
-                        date: formatTimestamp(Date.now()), // 更新最后修改时间
-                    };
-                    return newAnnotation;
+                        date: formatTimestamp(Date.now()) // 更新最后修改时间
+                    }
+                    return newAnnotation
                 }
-                return annotation;
+                return annotation
             })
-        );
+        )
 
         // 清除当前编辑的批注
-        setEditAnnotation(null);
-    };
+        setEditAnnotation(null)
+    }
 
     const allUsers = useMemo(() => {
         const map = new Map<string, number>()
@@ -185,66 +181,52 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
 
     const filteredAnnotations = useMemo(() => {
         if (selectedUsers.length === 0 || selectedTypes.length === 0) return []
-        return annotations.filter(a =>
-            selectedUsers.includes(a.title) &&
-            selectedTypes.includes(a.subtype)
-        )
+        return annotations.filter(a => selectedUsers.includes(a.title) && selectedTypes.includes(a.subtype))
     }, [annotations, selectedUsers, selectedTypes])
 
     const groupedAnnotations = useMemo(() => {
-        return filteredAnnotations.reduce((acc, annotation) => {
-            if (!acc[annotation.pageNumber]) {
-                acc[annotation.pageNumber] = []
-            }
-            acc[annotation.pageNumber].push(annotation)
-            return acc
-        }, {} as Record<number, IAnnotationStore[]>)
+        return filteredAnnotations.reduce(
+            (acc, annotation) => {
+                if (!acc[annotation.pageNumber]) {
+                    acc[annotation.pageNumber] = []
+                }
+                acc[annotation.pageNumber].push(annotation)
+                return acc
+            },
+            {} as Record<number, IAnnotationStore[]>
+        )
     }, [filteredAnnotations])
 
-
-
     const handleUserToggle = (username: string) => {
-        setSelectedUsers(prev =>
-            prev.includes(username)
-                ? prev.filter(u => u !== username)
-                : [...prev, username]
-        )
+        setSelectedUsers(prev => (prev.includes(username) ? prev.filter(u => u !== username) : [...prev, username]))
     }
 
     const handleTypeToggle = (type: PdfjsAnnotationSubtype) => {
-        setSelectedTypes(prev =>
-            prev.includes(type)
-                ? prev.filter(t => t !== type)
-                : [...prev, type]
-        )
+        setSelectedTypes(prev => (prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]))
     }
 
     const filterContent = (
-        <div className='CustomComment_filterContent'>
-            <div className='title'>{t('normal.author')}</div>
+        <div className="CustomComment_filterContent">
+            <div className="title">{t('normal.author')}</div>
             <ul>
                 {allUsers.map(([user, count]) => (
                     <li key={user}>
-                        <Checkbox
-                            checked={selectedUsers.includes(user)}
-                            onChange={() => handleUserToggle(user)}
-                        >
+                        <Checkbox checked={selectedUsers.includes(user)} onChange={() => handleUserToggle(user)}>
                             <Space>
-                                <Text ellipsis style={{ maxWidth: 200 }}>{user}</Text>
+                                <Text ellipsis style={{ maxWidth: 200 }}>
+                                    {user}
+                                </Text>
                                 <Text type="secondary">({count})</Text>
                             </Space>
                         </Checkbox>
                     </li>
                 ))}
             </ul>
-            <div className='title'>{t('normal.type')}</div>
+            <div className="title">{t('normal.type')}</div>
             <ul>
                 {allTypes.map(([type, count]) => (
                     <li key={type}>
-                        <Checkbox
-                            checked={selectedTypes.includes(type)}
-                            onChange={() => handleTypeToggle(type)}
-                        >
+                        <Checkbox checked={selectedTypes.includes(type)} onChange={() => handleTypeToggle(type)}>
                             <Space>
                                 <AnnotationIcon subtype={type} />
                                 <Text type="secondary">({count})</Text>
@@ -276,7 +258,6 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
         </div>
     )
 
-
     const handleAnnotationClick = (annotation: IAnnotationStore) => {
         setCurrentAnnotation(annotation)
         props.onSelected(annotation)
@@ -305,140 +286,216 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
     }
 
     const deleteAnnotation = (annotation: IAnnotationStore) => {
-        setAnnotations(prevAnnotations =>
-            prevAnnotations.filter(item => item.id !== annotation.id)
-        );
+        setAnnotations(prevAnnotations => prevAnnotations.filter(item => item.id !== annotation.id))
         if (currentAnnotation?.id === annotation.id) {
-            setCurrentAnnotation(null);
+            setCurrentAnnotation(null)
         }
         if (replyAnnotation?.id === annotation.id) {
-            setReplyAnnotation(null);
+            setReplyAnnotation(null)
         }
-        setCurrentReply(null);
+        setCurrentReply(null)
         props.onDelete(annotation.id)
     }
 
     const deleteReply = (annotation: IAnnotationStore, reply: IAnnotationComment) => {
-        let updatedAnnotation: IAnnotationStore | null = null;
+        let updatedAnnotation: IAnnotationStore | null = null
 
         setAnnotations(prevAnnotations =>
             prevAnnotations.map(item => {
                 if (item.id === annotation.id) {
-                    const updatedComments = item.comments.filter(comment => comment.id !== reply.id);
-                    updatedAnnotation = { ...item, comments: updatedComments };
-                    return updatedAnnotation;
+                    const updatedComments = item.comments.filter(comment => comment.id !== reply.id)
+                    updatedAnnotation = { ...item, comments: updatedComments }
+                    return updatedAnnotation
                 }
-                return item;
+                return item
             })
-        );
+        )
         if (currentReply?.id === reply.id) {
-            setCurrentReply(null);
+            setCurrentReply(null)
         }
         if (updatedAnnotation) {
-            props.onUpdate(updatedAnnotation);
+            props.onUpdate(updatedAnnotation)
         }
-    };
+    }
 
     // Comment 编辑框
-    const commentInput = useCallback((annotation: IAnnotationStore) => {
-        let comment = ''
-        if (editAnnotation && currentAnnotation?.id === annotation.id) {
-            return (
-                <>
-                    <TextArea defaultValue={annotation.contentsObj.text} autoFocus rows={4} style={{ marginBottom: '8px' }} onBlur={() => setEditAnnotation(null)} onChange={(e) => comment = e.target.value} />
-                    <Button type="primary" block onMouseDown={() => {
-                        updateComment(annotation, comment)
-                    }}>{t('normal.confirm')}</Button>
-                </>
-            )
-        }
-        return <Paragraph ellipsis={{ rows: 3, expandable: true, symbol: t('normal.more') }}>{annotation.contentsObj.text}</Paragraph>
-    }, [editAnnotation, currentAnnotation])
+    const commentInput = useCallback(
+        (annotation: IAnnotationStore) => {
+            let comment = ''
+            if (editAnnotation && currentAnnotation?.id === annotation.id) {
+                const handleSubmit = () => {
+                    updateComment(annotation, comment)
+                    setEditAnnotation(null)
+                }
+                return (
+                    <>
+                        commentInput
+                        <TextArea
+                            defaultValue={annotation.contentsObj.text}
+                            autoFocus
+                            rows={4}
+                            style={{ marginBottom: '8px' }}
+                            onBlur={() => setEditAnnotation(null)}
+                            onChange={e => (comment = e.target.value)}
+                            onKeyDown={e => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault()
+                                    handleSubmit()
+                                }
+                            }}
+                        />
+                        <Button
+                            type="primary"
+                            block
+                            onMouseDown={handleSubmit}
+                        >
+                            {t('normal.confirm')}
+                        </Button>
+                    </>
+                )
+            }
+            return <Paragraph ellipsis={{ rows: 3, expandable: true, symbol: t('normal.more') }}>{annotation.contentsObj.text}</Paragraph>
+        },
+        [editAnnotation, currentAnnotation]
+    )
 
     // 回复框
-    const replyInput = useCallback((annotation: IAnnotationStore) => {
-        let comment = ''
-        if (replyAnnotation && currentAnnotation?.id === annotation.id) {
-            return (
-                <>
-                    <TextArea autoFocus rows={4} style={{ marginBottom: '8px', marginTop: '8px' }} onBlur={() => setReplyAnnotation(null)} onChange={(e) => comment = e.target.value} />
-                    <Button type="primary" block onMouseDown={() => {
-                        addReply(annotation, comment)
-                    }}>{t('normal.confirm')}</Button>
-                </>
-            )
-        }
-        return null
-    }, [replyAnnotation, currentAnnotation])
+    const replyInput = useCallback(
+        (annotation: IAnnotationStore) => {
+            let comment = ''
+            if (replyAnnotation && currentAnnotation?.id === annotation.id) {
+                const handleSubmit = () => {
+                    addReply(annotation, comment)
+                    setReplyAnnotation(null)
+                }
+                return (
+                    <>
+                        <TextArea
+                            autoFocus
+                            rows={4}
+                            style={{ marginBottom: '8px', marginTop: '8px' }}
+                            onBlur={() => setReplyAnnotation(null)}
+                            onChange={e => (comment = e.target.value)}
+                            onKeyDown={e => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault()
+                                    handleSubmit()
+                                }
+                            }}
+                        />
+                        <Button
+                            type="primary"
+                            block
+                            onMouseDown={handleSubmit}
+                        >
+                            {t('normal.confirm')}
+                        </Button>
+                    </>
+                )
+            }
+            return null
+        },
+        [replyAnnotation, currentAnnotation]
+    )
 
     // 编辑回复框
-    const editReplyInput = useCallback((annotation: IAnnotationStore, reply: IAnnotationComment) => {
-        let comment = ''
-        if (currentReply && currentReply?.id === reply.id) {
-            return (
-                <>
-                    <TextArea defaultValue={currentReply.content} autoFocus rows={4} style={{ marginBottom: '8px' }} onBlur={() => setCurrentReply(null)} onChange={(e) => comment = e.target.value} />
-                    <Button type="primary" block onMouseDown={() => {
-                        updateReply(annotation, reply, comment)
-                    }}>{t('normal.confirm')}</Button>
-                </>
-            )
-        }
-        return <p>{reply.content}</p>
-    }, [replyAnnotation, currentReply])
+    const editReplyInput = useCallback(
+        (annotation: IAnnotationStore, reply: IAnnotationComment) => {
+            let comment = ''
+            if (currentReply && currentReply.id === reply.id) {
+                const handleSubmit = () => {
+                    updateReply(annotation, reply, comment)
+                    setCurrentReply(null)
+                }
+                return (
+                    <>
+                        <TextArea
+                            defaultValue={currentReply.content}
+                            autoFocus
+                            rows={4}
+                            style={{ marginBottom: '8px' }}
+                            onBlur={() => setCurrentReply(null)}
+                            onChange={e => (comment = e.target.value)}
+                            onKeyDown={e => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault()
+                                    handleSubmit()
+                                }
+                            }}
+                        />
+                        <Button type="primary" block onMouseDown={handleSubmit}>
+                            {t('normal.confirm')}
+                        </Button>
+                    </>
+                )
+            }
+
+            return <p>{reply.content}</p>
+        },
+        [replyAnnotation, currentReply]
+    )
 
     const comments = Object.entries(groupedAnnotations).map(([pageNumber, annotationsForPage]) => {
         // 根据 konvaClientRect.y 对 annotationsForPage 进行排序
-        const sortedAnnotations = annotationsForPage.sort((a, b) => a.konvaClientRect.y - b.konvaClientRect.y);
+        const sortedAnnotations = annotationsForPage.sort((a, b) => a.konvaClientRect.y - b.konvaClientRect.y)
 
         return (
-            <div key={pageNumber} className='group'>
-                <h3>{t('comment.page', { value: pageNumber })}
-                    <span>
-                        {t('comment.total', { value: annotationsForPage.length })}
-                    </span>
+            <div key={pageNumber} className="group">
+                <h3>
+                    {t('comment.page', { value: pageNumber })}
+                    <span>{t('comment.total', { value: annotationsForPage.length })}</span>
                 </h3>
-                {sortedAnnotations.map((annotation) => {
-                    const isSelected = annotation.id === currentAnnotation?.id;
-                    const commonProps = { className: isSelected ? 'comment selected' : 'comment' };
+                {sortedAnnotations.map(annotation => {
+                    const isSelected = annotation.id === currentAnnotation?.id
+                    const commonProps = { className: isSelected ? 'comment selected' : 'comment' }
                     return (
-                        <div {...commonProps} key={annotation.id} onClick={() => handleAnnotationClick(annotation)} ref={el => (annotationRefs.current[annotation.id] = el)} >
-                            <div className='title'>
+                        <div
+                            {...commonProps}
+                            key={annotation.id}
+                            onClick={() => handleAnnotationClick(annotation)}
+                            ref={el => (annotationRefs.current[annotation.id] = el)}
+                        >
+                            <div className="title">
                                 <AnnotationIcon subtype={annotation.subtype} />
-                                <div className='username'>{annotation.title}</div>
-                                <span className='tool'>
+                                <div className="username">{annotation.title}</div>
+                                <span className="tool">
                                     {formatPDFDate(annotation.date)}
-                                    <Dropdown menu={{
-                                        items: [
-                                            {
-                                                label: t('normal.reply'),
-                                                key: '0',
-                                                disabled: !defaultOptions.setting.ALLOW_REPLY_ON_STAMP && annotation.pdfjsType === PdfjsAnnotationType.STAMP,
-                                                onClick: (e) => {
-                                                    e.domEvent.stopPropagation();
-                                                    setReplyAnnotation(annotation);
+                                    <Dropdown
+                                        menu={{
+                                            items: [
+                                                {
+                                                    label: t('normal.reply'),
+                                                    key: '0',
+                                                    disabled:
+                                                        !defaultOptions.setting.ALLOW_REPLY_ON_STAMP && annotation.pdfjsType === PdfjsAnnotationType.STAMP,
+                                                    onClick: e => {
+                                                        e.domEvent.stopPropagation()
+                                                        setReplyAnnotation(annotation)
+                                                    }
+                                                },
+                                                {
+                                                    label: t('normal.edit'),
+                                                    key: '1',
+                                                    disabled:
+                                                        !defaultOptions.setting.ALLOW_REPLY_ON_STAMP && annotation.pdfjsType === PdfjsAnnotationType.STAMP,
+                                                    onClick: e => {
+                                                        e.domEvent.stopPropagation()
+                                                        setEditAnnotation(annotation)
+                                                    }
+                                                },
+                                                {
+                                                    label: t('normal.delete'),
+                                                    key: '3',
+                                                    onClick: e => {
+                                                        e.domEvent.stopPropagation()
+                                                        deleteAnnotation(annotation)
+                                                    }
                                                 }
-                                            },
-                                            {
-                                                label: t('normal.edit'),
-                                                key: '1',
-                                                disabled: !defaultOptions.setting.ALLOW_REPLY_ON_STAMP && annotation.pdfjsType === PdfjsAnnotationType.STAMP,
-                                                onClick: (e) => {
-                                                    e.domEvent.stopPropagation();
-                                                    setEditAnnotation(annotation);
-                                                }
-                                            },
-                                            {
-                                                label: t('normal.delete'),
-                                                key: '3',
-                                                onClick: (e) => {
-                                                    e.domEvent.stopPropagation();
-                                                    deleteAnnotation(annotation);
-                                                }
-                                            },
-                                        ]
-                                    }} trigger={['click']}>
-                                        <span className='icon'>
+                                            ]
+                                        }}
+                                        trigger={['click']}
+                                    >
+                                        <span className="icon">
                                             <MoreOutlined />
                                         </span>
                                     </Dropdown>
@@ -446,31 +503,35 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                             </div>
                             {commentInput(annotation)}
                             {annotation.comments?.map((reply, index) => (
-                                <div className='reply' key={index}>
-                                    <div className='title'>
-                                        <div className='username'> {reply.title}</div>
-                                        <span className='tool'>{formatPDFDate(reply.date)}
-                                            <Dropdown menu={{
-                                                items: [
-                                                    {
-                                                        label: t('normal.edit'),
-                                                        key: '1',
-                                                        onClick: (e) => {
-                                                            e.domEvent.stopPropagation();
-                                                            setCurrentReply(reply);
+                                <div className="reply" key={index}>
+                                    <div className="title">
+                                        <div className="username"> {reply.title}</div>
+                                        <span className="tool">
+                                            {formatPDFDate(reply.date)}
+                                            <Dropdown
+                                                menu={{
+                                                    items: [
+                                                        {
+                                                            label: t('normal.edit'),
+                                                            key: '1',
+                                                            onClick: e => {
+                                                                e.domEvent.stopPropagation()
+                                                                setCurrentReply(reply)
+                                                            }
+                                                        },
+                                                        {
+                                                            label: t('normal.delete'),
+                                                            key: '2',
+                                                            onClick: e => {
+                                                                e.domEvent.stopPropagation()
+                                                                deleteReply(annotation, reply)
+                                                            }
                                                         }
-                                                    },
-                                                    {
-                                                        label: t('normal.delete'),
-                                                        key: '2',
-                                                        onClick: (e) => {
-                                                            e.domEvent.stopPropagation();
-                                                            deleteReply(annotation, reply);
-                                                        }
-                                                    },
-                                                ]
-                                            }} trigger={['click']}>
-                                                <span className='icon'>
+                                                    ]
+                                                }}
+                                                trigger={['click']}
+                                            >
+                                                <span className="icon">
                                                     <MoreOutlined />
                                                 </span>
                                             </Dropdown>
@@ -479,32 +540,33 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                                     {editReplyInput(annotation, reply)}
                                 </div>
                             ))}
-                            <div className='reply-input'>
+                            <div className="reply-input">
                                 {replyInput(annotation)}
-                                {(!defaultOptions.setting.ALLOW_REPLY_ON_STAMP && annotation.pdfjsType !== PdfjsAnnotationType.STAMP) && !replyAnnotation && !currentReply && !editAnnotation && currentAnnotation?.id === annotation.id && (
-                                    <Button style={{ marginTop: '8px' }} onClick={() => setReplyAnnotation(annotation)} type="primary" block>
-                                        {t('normal.reply')}
-                                    </Button>
-                                )}
+                                {!defaultOptions.setting.ALLOW_REPLY_ON_STAMP &&
+                                    annotation.pdfjsType !== PdfjsAnnotationType.STAMP &&
+                                    !replyAnnotation &&
+                                    !currentReply &&
+                                    !editAnnotation &&
+                                    currentAnnotation?.id === annotation.id && (
+                                        <Button style={{ marginTop: '8px' }} onClick={() => setReplyAnnotation(annotation)} type="primary" block>
+                                            {t('normal.reply')}
+                                        </Button>
+                                    )}
                             </div>
                         </div>
-                    );
+                    )
                 })}
             </div>
-        );
-    });
+        )
+    })
     return (
         <div className="CustomComment">
-            <div className='filters'>
-                <Popover
-                    content={filterContent}
-                    trigger="click"
-                    placement="bottomLeft"
-                >
-                    <Button size='small' icon={<FilterOutlined />} />
+            <div className="filters">
+                <Popover content={filterContent} trigger="click" placement="bottomLeft">
+                    <Button size="small" icon={<FilterOutlined />} />
                 </Popover>
             </div>
-            <div className='list'>{comments}</div>
+            <div className="list">{comments}</div>
         </div>
     )
 })
