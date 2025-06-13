@@ -39,7 +39,8 @@
         "filter": "过滤",
         "author": "作者",
         "type": "类型",
-        "selectAll": "全选"
+        "selectAll": "全选",
+        "more": "更多"
     },
     "comment": { "total": " {{value}} 条批注", "page": "第{{value}}页" },
     "pdf": { "generationSuccess": "文件已生成！" },

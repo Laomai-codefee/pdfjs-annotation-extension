@@ -87,7 +87,6 @@ class PdfjsAnnotationExtension {
             },
             onStoreDelete: (id) => {
                 this.customCommentRef.current.delAnnotation(id)
-                console.log('%c [ onStoreDelete ]', 'font-size:13px; background:#d10d00; color:#ff5144;', id)
             },
             onAnnotationSelected: (annotation, isClick, selectorRect) => {
                 this.customerAnnotationMenuRef.current.open(annotation, selectorRect)

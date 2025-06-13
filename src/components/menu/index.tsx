@@ -2,7 +2,7 @@ import './index.scss'
 
 import { computePosition, flip } from '@floating-ui/dom'
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react'
-import { IAnnotationStore, IAnnotationType } from '../../const/definitions'
+import { IAnnotationStore } from '../../const/definitions'
 import { IRect } from 'konva/lib/types'
 import { AnnoIcon, DeleteIcon, PaletteIcon } from '../../const/icon'
 

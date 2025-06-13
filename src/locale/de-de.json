@@ -51,7 +51,8 @@
         "filter": "Filter",
         "author": "Autor",
         "type": "Typ",
-        "selectAll": "Alle auswählen"
+        "selectAll": "Alle auswählen",
+        "more": "Mehr"
     },
     "comment": {
         "total": "Kommentare: {{value}}",

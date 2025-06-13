@@ -25,6 +25,7 @@ import {
     CloudIcon
 } from '../../const/icon'
 import { defaultOptions } from '../../const/default_options'
+import Paragraph from 'antd/es/typography/Paragraph'
 
 const { Text } = Typography;
 
@@ -115,14 +116,27 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
     };
 
     const selectedAnnotation = (annotation: IAnnotationStore, isClick: boolean) => {
-        setCurrentAnnotation(annotation)
-        if (!isClick) return
-        // 滚动到对应的注释
+        setCurrentAnnotation(annotation);
+
+        if (!isClick) return;
+
+        const isOwn = annotation.title === props.userName;
+        const isEmptyComment = annotation.contentsObj.text === '';
+
+        // 👇 根据批注归属与内容决定打开评论或回复
+        if (isOwn && isEmptyComment) {
+            setEditAnnotation(annotation);
+        } else {
+            setReplyAnnotation(annotation);
+        }
+
+        // 👇 滚动至目标批注 DOM 元素
         const element = annotationRefs.current[annotation.id];
         if (element) {
             element.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
-    }
+    };
+
 
     const updateAnnotation = (updatedAnnotation: IAnnotationStore) => {
         setAnnotations(prevAnnotations =>
@@ -338,7 +352,7 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                 </>
             )
         }
-        return <p>{annotation.contentsObj.text}</p>
+        return <Paragraph ellipsis={{ rows: 3, expandable: true, symbol: t('normal.more') }}>{annotation.contentsObj.text}</Paragraph>
     }, [editAnnotation, currentAnnotation])
 
     // 回复框
