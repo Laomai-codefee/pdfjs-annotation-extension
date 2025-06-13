@@ -13,8 +13,9 @@ import { defaultOptions } from '../../const/default_options'
 export interface ISelectorOptions {
     konvaCanvasStore: Map<number, KonvaCanvas> // 存储各个页面的 Konva 画布实例
     getAnnotationStore: (id: string) => IAnnotationStore // 获取注解存储的方法
-    onSelected: (id: string, isClick: boolean) => void // 选中回调
-    onChange: (id: string, konvaGroupString: string, rawAnnotationStore: IAnnotationStore, konvaClientRect: IRect) => void // 注解变化时的回调
+    onSelected: (id: string, isClick: boolean, transformerRect: IRect) => void // 选中回调
+    onCancel: () => void
+    onChanged: (id: string, konvaGroupString: string, rawAnnotationStore: IAnnotationStore, konvaClientRect: IRect, transformerRect: IRect) => void // 注解变化时的回调
     onDelete: (id: string) => void // 删除注解时的回调
 }
 
@@ -22,9 +23,10 @@ export interface ISelectorOptions {
  * 定义选择器类
  */
 export class Selector {
-    public readonly onSelected: (id: string, isClick: boolean) => void
-    public readonly onChange: (id: string, konvaGroupString: string, rawAnnotationStore: IAnnotationStore, konvaClientRect: IRect) => void
+    public readonly onSelected: (id: string, isClick: boolean, clientRect: IRect) => void
+    public readonly onChanged: (id: string, konvaGroupString: string, rawAnnotationStore: IAnnotationStore, konvaClientRect: IRect, transformerRect: IRect) => void
     public readonly onDelete: (id: string) => void
+    public readonly onCancel: () => void
     private transformerStore: Map<string, Konva.Transformer> = new Map() // 存储变换器实例
     private getAnnotationStore: (id: string) => IAnnotationStore // 获取注解存储的方法
     private konvaCanvasStore: Map<number, KonvaCanvas> // 存储各个页面的 Konva 画布实例
@@ -34,12 +36,13 @@ export class Selector {
     private selectedId: string | null = null
 
     // 构造函数，初始化选择器类
-    constructor({ konvaCanvasStore, getAnnotationStore, onChange, onDelete, onSelected }: ISelectorOptions) {
+    constructor({ konvaCanvasStore, getAnnotationStore, onDelete, onSelected, onCancel, onChanged }: ISelectorOptions) {
         this.konvaCanvasStore = konvaCanvasStore
         this.getAnnotationStore = getAnnotationStore
-        this.onChange = onChange
         this.onDelete = onDelete
         this.onSelected = onSelected
+        this.onCancel = onCancel
+        this.onChanged = onChanged
     }
 
     // 获取当前激活的变换器ID
@@ -139,20 +142,22 @@ export class Selector {
      * @param konvaStage - 形状所在的 Konva Stage。
      */
     private bindShapeEvents(shape: Konva.Shape, konvaStage: Konva.Stage): void {
-        shape.on('pointerdblclick', () => {
-            Modal.confirm({
-                title: i18n.t('normal.deleteConfirm'),
-                type: 'warn',
-                destroyOnClose: true,
-                centered: true,
-                okText: i18n.t('normal.yes'),
-                cancelText: i18n.t('normal.no'),
-                onOk: () => {
-                    this.onDelete(this.currentTransformerId)
-                    this.clearTransformers()
-                }
+        if (defaultOptions.setting.DB_CLICK_DELETE) {
+            shape.on('pointerdblclick', () => {
+                Modal.confirm({
+                    title: i18n.t('normal.deleteConfirm'),
+                    type: 'warn',
+                    destroyOnClose: true,
+                    centered: true,
+                    okText: i18n.t('normal.yes'),
+                    cancelText: i18n.t('normal.no'),
+                    onOk: () => {
+                        this.onDelete(this.currentTransformerId)
+                        this.clearTransformers()
+                    }
+                })
             })
-        })
+        }
 
         shape.on('pointerclick', e => {
             if (e.evt.button === 0) {
@@ -186,11 +191,12 @@ export class Selector {
      */
     private handleShapeClick(shape: Konva.Shape, konvaStage: Konva.Stage, isClick: boolean = false): void {
         const group = shape.findAncestor(`.${SHAPE_GROUP_NAME}`) as Konva.Group
+
         if (!group) return
-        this.onSelected(group.id(), isClick)
         this.clearTransformers() // 清除之前的变换器
         this.createTransformer(group, konvaStage, !isClick)
-        this.bindGlobalEvents() // 绑定全局事件
+        const selectorRect = this.transformerStore.get(group.id()).getClientRect()
+        this.onSelected(group.id(), isClick, selectorRect)
     }
 
     /**
@@ -227,12 +233,20 @@ export class Selector {
         }
         group.draggable(rawAnnotationStore.draggable)
         transformer.off('transformend')
+        transformer.off('transformstart')
         transformer.on('transformend', () => {
-            this.onChange(group.id(), group.toJSON(), { ...rawAnnotationStore }, Konva.Node.create(group.toJSON()).getClientRect())
+            this.onChanged(group.id(), group.toJSON(), { ...rawAnnotationStore }, Konva.Node.create(group.toJSON()).getClientRect(), transformer.getClientRect())
+        })
+        transformer.on('transformstart', () => {
+            this.onCancel()
+        })
+
+        transformer.on('dragstart', () => {
+            this.onCancel()
         })
 
         transformer.on('dragend', () => {
-            this.onChange(group.id(), group.toJSON(), { ...rawAnnotationStore }, Konva.Node.create(group.toJSON()).getClientRect())
+            this.onChanged(group.id(), group.toJSON(), { ...rawAnnotationStore }, Konva.Node.create(group.toJSON()).getClientRect(), transformer.getClientRect())
         })
 
         transformer.on('dragmove', () => {
@@ -267,7 +281,7 @@ export class Selector {
         transformer.nodes([group])
         this.getBackgroundLayer(konvaStage).add(transformer)
         this.transformerStore.set(groupId, transformer)
-        if(flash){
+        if (flash) {
             this.flashNodeWithTransformer(group, transformer);
         }
     }
@@ -275,10 +289,10 @@ export class Selector {
         let flashCount = 0;
         const maxFlashes = 0;
         const fadeDuration = 0.1;
-    
+
         const originalStroke = transformer.borderStroke();
         const highlightStroke = 'red'; // 你也可以自定义颜色
-    
+
         const fadeOut = () => {
             const groupTween = new Konva.Tween({
                 node: group,
@@ -292,7 +306,7 @@ export class Selector {
             });
             groupTween.play();
         };
-    
+
         const fadeIn = () => {
             const groupTween = new Konva.Tween({
                 node: group,
@@ -301,7 +315,7 @@ export class Selector {
                 onFinish: () => {
                     transformer.borderStroke(originalStroke); // 恢复原颜色
                     transformer.getLayer()?.batchDraw();
-    
+
                     flashCount++;
                     if (flashCount < maxFlashes) {
                         setTimeout(fadeOut, 100);
@@ -310,10 +324,10 @@ export class Selector {
             });
             groupTween.play();
         };
-    
+
         fadeOut(); // 启动第一轮
     }
-    
+
 
 
     /**
@@ -368,7 +382,6 @@ export class Selector {
      */
     private clearTransformers(): void {
         this.toggleCursorStyle(false)
-        this.removeGlobalEvents()
         this.transformerStore.forEach(transformer => {
             if (transformer) {
                 transformer.nodes().forEach(group => {
@@ -381,6 +394,7 @@ export class Selector {
         })
         this.transformerStore.clear()
         this.currentTransformerId = null
+        this.onCancel()
     }
 
     /**
@@ -414,31 +428,6 @@ export class Selector {
                     }
                 })
             }
-        }
-    }
-
-    /**
-     * 绑定全局事件。
-     */
-    private bindGlobalEvents(): void {
-        // window.addEventListener('keyup', this.globalKeyUpHandler)
-    }
-
-    /**
-     * 移除全局事件。
-     */
-    private removeGlobalEvents(): void {
-        // window.removeEventListener('keyup', this.globalKeyUpHandler)
-    }
-
-    /**
-     * 全局键盘抬起事件处理器。
-     * @param e - 键盘事件。
-     */
-    private globalKeyUpHandler = (e: KeyboardEvent): void => {
-        if (e.code === 'Backspace' || e.code === 'Delete') {
-            this.onDelete(this.currentTransformerId)
-            this.clearTransformers()
         }
     }
 

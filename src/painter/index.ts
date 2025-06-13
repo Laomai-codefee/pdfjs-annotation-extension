@@ -22,6 +22,7 @@ import { WebSelection } from './webSelection'
 import { Transform } from './transform/transform'
 import { EditorArrow } from './editor/editor_arrow'
 import { EditorCloud } from './editor/editor_cloud'
+import { IRect } from 'konva/lib/types'
 
 // KonvaCanvas 接口定义
 export interface KonvaCanvas {
@@ -48,9 +49,10 @@ export class Painter {
     public readonly onWebSelectionSelected: (range: Range) => void
     public readonly onStoreAdd: (annotationStore: IAnnotationStore, isOriginal: boolean, currentAnnotation: IAnnotationType) => void
     public readonly onStoreDelete: (id: string) => void
-    public readonly onAnnotationSelected: (annotationStore: IAnnotationStore, isClick: boolean) => void
+    public readonly onAnnotationSelected: (annotationStore: IAnnotationStore, isClick: boolean, selectorRect: IRect) => void
     public readonly onAnnotationChange: (annotationStore: IAnnotationStore) => void
-
+    public readonly onAnnotationChanging: () => void // 批注正在更改的回调函数
+    public readonly onAnnotationChanged: (annotationStore: IAnnotationStore, selectorRect: IRect) => void // 批注已更改的回调函数
     /**
      * 构造函数，初始化 PDFViewerApplication, EventBus, 和 WebSelection
      * @param params - 包含 PDFViewerApplication 和 EventBus 的对象
@@ -64,7 +66,9 @@ export class Painter {
         onStoreAdd,
         onStoreDelete,
         onAnnotationSelected,
-        onAnnotationChange
+        onAnnotationChange,
+        onAnnotationChanging,
+        onAnnotationChanged
     }: {
         userName: string
         PDFViewerApplication: PDFViewerApplication
@@ -73,8 +77,10 @@ export class Painter {
         onWebSelectionSelected: (range: Range) => void
         onStoreAdd: (annotationStore: IAnnotationStore, isOriginal: boolean, currentAnnotation: IAnnotationType) => void
         onStoreDelete: (id: string) => void
-        onAnnotationSelected: (annotationStore: IAnnotationStore, isClick: boolean) => void
+        onAnnotationSelected: (annotationStore: IAnnotationStore, isClick: boolean, selectorRect: IRect) => void
         onAnnotationChange: (annotationStore: IAnnotationStore) => void
+        onAnnotationChanging: () => void
+        onAnnotationChanged: (annotationStore: IAnnotationStore, selectorRect: IRect) => void
     }) {
         this.userName = userName
         this.pdfViewerApplication = PDFViewerApplication // 初始化 PDFViewerApplication
@@ -85,6 +91,8 @@ export class Painter {
         this.onStoreDelete = onStoreDelete
         this.onAnnotationSelected = onAnnotationSelected
         this.onAnnotationChange = onAnnotationChange
+        this.onAnnotationChanging = onAnnotationChanging // 批注正在更改的回调函数
+        this.onAnnotationChanged = onAnnotationChanged // 批注已更改的回调函数
         this.store = new Store({ PDFViewerApplication }) // 初始化存储实例
         this.selector = new Selector({
             // 初始化选择器实例
@@ -92,15 +100,18 @@ export class Painter {
             getAnnotationStore: (id: string) => {
                 return this.store.annotation(id)
             },
-            onSelected: (id, isClick) => {
-                this.onAnnotationSelected(this.store.annotation(id), isClick)
+            onSelected: (id, isClick, transformerRect) => {
+                this.onAnnotationSelected(this.store.annotation(id), isClick, transformerRect)
             },
-            // eslint-disable-next-line prettier/prettier
-            onChange: async (id, groupString, rawAnnotationStore, konvaClientRect) => {
+            onChanged: async (id, groupString, _rawAnnotationStore, konvaClientRect, transformerRect) => {
                 const editor = this.findEditorForGroupId(id)
                 if (editor) {
                     this.updateStore(id, { konvaString: groupString, konvaClientRect })
                 }
+                this.onAnnotationChanged(this.store.annotation(id), transformerRect)
+            },
+            onCancel: () => {
+                this.onAnnotationChanging() // 批注正在更改的回调
             },
             onDelete: id => {
                 this.deleteAnnotation(id, true)
@@ -693,9 +704,9 @@ export class Painter {
      * @description 删除 annotation
      * @param id
      */
-    public delete(id: string) {
+    public delete(id: string, emit: boolean = false) {
         this.selector.delete()
-        this.deleteAnnotation(id)
+        this.deleteAnnotation(id, emit)
     }
 
     /**

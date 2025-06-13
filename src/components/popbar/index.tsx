@@ -89,7 +89,6 @@ const CustomPopbar = forwardRef<CustomPopbarRef, CustomPopbarProps>(function Cus
         return (
             <li key={index} onMouseDown={() => handleAnnotationClick(annotation)}>
                 <div className="icon">{annotation.icon}</div>
-                <div className="name">{t(`annotations.${annotation.name}`)}</div>
             </li>
         )
     })

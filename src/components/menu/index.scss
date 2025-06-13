@@ -1,4 +1,4 @@
-.CustomPopbar {
+.CustomAnnotationMenu {
     position: absolute;
     top: 0;
     left: 0;
@@ -13,33 +13,40 @@
     border-radius: 6px;
     font: message-box;
     padding: 4px; // 增加基础内边距避免按钮贴边
+
     &.show {
         display: block;
+    }
+
+    &.hide {
+        display: none;
     }
 
     .buttons {
         display: flex;
         gap: 4px;
-        padding: 0;
         margin: 0;
+        padding: 0;
         list-style: none;
         user-select: none;
 
         li {
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             width: 40px; // ✅ 固定宽度（可按实际图标宽度调整）
             height: 32px;
-            padding: 0;
-            border: 1px solid transparent;
+            padding: 0; // ✅ 去掉额外 padding，保证统一尺寸
             color: var(--main-color);
-            cursor: pointer;
+            border: 1px solid transparent;
             border-radius: 4px;
-            transition: background-color 0.2s ease;
+            cursor: pointer;
+            transition:
+                background-color 0.2s ease,
+                opacity 0.2s ease;
 
             .icon {
-                font-size: 14px;
+                font-size: 16px;
                 line-height: 1;
             }
 

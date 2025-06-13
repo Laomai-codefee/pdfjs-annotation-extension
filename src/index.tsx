@@ -15,6 +15,7 @@ import { once, parseQueryString, hashArrayOfObjects } from './utils/utils'
 import { defaultOptions } from './const/default_options'
 import { exportAnnotationsToPdf } from './annot'
 import { Modal, Space } from 'antd'
+import { CustomAnnotationMenu, CustomAnnotationMenuRef } from './components/menu'
 
 interface AppOptions {
     [key: string]: string;
@@ -23,12 +24,14 @@ interface AppOptions {
 class PdfjsAnnotationExtension {
     PDFJS_PDFViewerApplication: PDFViewerApplication // PDF.js 的 PDFViewerApplication 对象
     PDFJS_EventBus: EventBus // PDF.js 的 EventBus 对象
+    $PDFJS_outerContainer: HTMLDivElement
     $PDFJS_mainContainer: HTMLDivElement
     $PDFJS_sidebarContainer: HTMLDivElement // PDF.js 侧边栏容器
     $PDFJS_toolbar_container: HTMLDivElement // PDF.js 工具栏容器
     $PDFJS_viewerContainer: HTMLDivElement // PDF.js 页面视图容器
     customToolbarRef: React.RefObject<CustomToolbarRef> // 自定义工具栏的引用
     customPopbarRef: React.RefObject<CustomPopbarRef>
+    customerAnnotationMenuRef: React.RefObject<CustomAnnotationMenuRef> // 自定义批注菜单的引用
     customCommentRef: React.RefObject<CustomCommentRef>
     painter: Painter // 画笔实例
     appOptions: AppOptions
@@ -45,9 +48,11 @@ class PdfjsAnnotationExtension {
         this.$PDFJS_toolbar_container = this.PDFJS_PDFViewerApplication.appConfig.toolbar.container
         this.$PDFJS_viewerContainer = this.PDFJS_PDFViewerApplication.appConfig.viewerContainer
         this.$PDFJS_mainContainer = this.PDFJS_PDFViewerApplication.appConfig.mainContainer
+        this.$PDFJS_outerContainer = this.PDFJS_PDFViewerApplication.appConfig.sidebar.outerContainer
         // 使用 createRef 方法创建 React 引用
         this.customToolbarRef = createRef<CustomToolbarRef>()
         this.customPopbarRef = createRef<CustomPopbarRef>()
+        this.customerAnnotationMenuRef = createRef<CustomAnnotationMenuRef>()
         this.customCommentRef = createRef<CustomCommentRef>()
         // 加载多语言
         initializeI18n(this.PDFJS_PDFViewerApplication.l10n.getLanguage())
@@ -82,18 +87,25 @@ class PdfjsAnnotationExtension {
             },
             onStoreDelete: (id) => {
                 this.customCommentRef.current.delAnnotation(id)
+                console.log('%c [ onStoreDelete ]', 'font-size:13px; background:#d10d00; color:#ff5144;', id)
             },
-            onAnnotationSelected: (annotation, isClick) => {
+            onAnnotationSelected: (annotation, isClick, selectorRect) => {
+                this.customerAnnotationMenuRef.current.open(annotation, selectorRect)
                 this.toggleComment(true)
                 this.customToolbarRef.current.toggleSidebarBtn(true)
                 if (isClick) {
                     this.customCommentRef.current.selectedAnnotation(annotation, isClick)
                 }
-
             },
             onAnnotationChange: (annotation) => {
                 this.customCommentRef.current.updateAnnotation(annotation)
-            }
+            },
+            onAnnotationChanging: () => {
+                this.customerAnnotationMenuRef?.current?.close()
+            },
+            onAnnotationChanged: (annotation, selectorRect) => {
+                this.customerAnnotationMenuRef?.current?.open(annotation, selectorRect)
+            },
         })
         // 初始化操作
         this.init()
@@ -107,6 +119,7 @@ class PdfjsAnnotationExtension {
         this.bindPdfjsEvents()
         this.renderToolbar()
         this.renderPopBar()
+        this.renderAnnotationMenu()
         this.renderComment()
     }
 
@@ -205,6 +218,28 @@ class PdfjsAnnotationExtension {
     }
 
     /**
+     * @description 渲染自定义弹出工具条
+     */
+    private renderAnnotationMenu(): void {
+        const annotationMenu = document.createElement('div')
+        this.$PDFJS_outerContainer.insertAdjacentElement('afterend', annotationMenu)
+        createRoot(annotationMenu).render(
+            <CustomAnnotationMenu
+                ref={this.customerAnnotationMenuRef}
+                onOpenComment={(currentAnnotation) => {
+                    console.log('%c [ currentAnnotation ]', 'font-size:13px; background:#d10d00; color:#ff5144;', currentAnnotation)
+                }}
+                onChangeStyle={(currentAnnotation) => {
+                    console.log('%c [ currentAnnotation ]', 'font-size:13px; background:#d10d00; color:#ff5144;', currentAnnotation)
+                }}
+                onDelete={(currentAnnotation) => {
+                    this.painter.delete(currentAnnotation.id, true)
+                }}
+            />
+        )
+    }
+
+    /**
      * @description 渲染自定义留言条
      */
     private renderComment(): void {
@@ -272,6 +307,12 @@ class PdfjsAnnotationExtension {
         const setLoadEnd = once(() => {
             this.loadEnd = true
         })
+
+        // 视图更新时隐藏菜单
+        this.PDFJS_EventBus._on('updateviewarea', () => {
+            this.customerAnnotationMenuRef.current?.close()
+        })
+
         // 监听页面渲染完成事件
         this.PDFJS_EventBus._on(
             'pagerendered',
