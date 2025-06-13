@@ -102,7 +102,7 @@ const SignatureTool: React.FC<SignatureToolProps> = props => {
 
                 lastLine = new Konva.Line({
                     stroke: colorRef.current, // 使用最新的颜色
-                    strokeWidth: props.annotation.style.strokeWidth || 3, // 线条宽度
+                    strokeWidth: 3, // 线条宽度
                     globalCompositeOperation: 'source-over',
                     lineCap: 'round',
                     lineJoin: 'round',

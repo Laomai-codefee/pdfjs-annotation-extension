@@ -329,7 +329,6 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                 }
                 return (
                     <>
-                        commentInput
                         <TextArea
                             defaultValue={annotation.contentsObj.text}
                             autoFocus
@@ -466,8 +465,6 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                                                 {
                                                     label: t('normal.reply'),
                                                     key: '0',
-                                                    disabled:
-                                                        !defaultOptions.setting.ALLOW_REPLY_ON_STAMP && annotation.pdfjsType === PdfjsAnnotationType.STAMP,
                                                     onClick: e => {
                                                         e.domEvent.stopPropagation()
                                                         setReplyAnnotation(annotation)
@@ -476,8 +473,6 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                                                 {
                                                     label: t('normal.edit'),
                                                     key: '1',
-                                                    disabled:
-                                                        !defaultOptions.setting.ALLOW_REPLY_ON_STAMP && annotation.pdfjsType === PdfjsAnnotationType.STAMP,
                                                     onClick: e => {
                                                         e.domEvent.stopPropagation()
                                                         setEditAnnotation(annotation)
@@ -542,8 +537,7 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                             ))}
                             <div className="reply-input">
                                 {replyInput(annotation)}
-                                {!defaultOptions.setting.ALLOW_REPLY_ON_STAMP &&
-                                    annotation.pdfjsType !== PdfjsAnnotationType.STAMP &&
+                                {
                                     !replyAnnotation &&
                                     !currentReply &&
                                     !editAnnotation &&

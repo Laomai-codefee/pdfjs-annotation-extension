@@ -188,7 +188,6 @@ export const annotationDefinitions: IAnnotationType[] = [
         icon: <HighlightIcon />,
         style: {
             color: defaultOptions.setting.HIGHLIGHT_COLOR, // 默认高亮颜色
-            opacity: 0.5 // 默认透明度
         },
         styleEditable: true, // 是否可编辑样式
     },
@@ -204,7 +203,6 @@ export const annotationDefinitions: IAnnotationType[] = [
         icon: <StrikeoutIcon />,
         style: {
             color: defaultOptions.setting.STRIKEOUT_COLOR, // 默认删除线颜色
-            opacity: defaultOptions.setting.OPACITY // 默认透明度
         },
         styleEditable: true // 是否可编辑样式
     },
@@ -220,7 +218,6 @@ export const annotationDefinitions: IAnnotationType[] = [
         icon: <UnderlineIcon />,
         style: {
             color: defaultOptions.setting.UNDERLINE_COLOR, // 默认下划线颜色
-            opacity: defaultOptions.setting.OPACITY // 默认透明度
         },
         styleEditable: true // 是否可编辑样式
     },
@@ -268,8 +265,6 @@ export const annotationDefinitions: IAnnotationType[] = [
         resizable: false,
         draggable: true,
         icon: <NoteIcon />,
-        style: {
-        },
         styleEditable: false // 是否可编辑样式
     },
     {
@@ -353,7 +348,6 @@ export const annotationDefinitions: IAnnotationType[] = [
         style: {
             color: defaultOptions.setting.COLOR, // 默认文字颜色
             fontSize: defaultOptions.setting.FONT_SIZE, // 默认字体大小
-            opacity: defaultOptions.setting.OPACITY // 默认透明度
         },
         styleEditable: false // 是否可编辑样式
     },
@@ -367,10 +361,6 @@ export const annotationDefinitions: IAnnotationType[] = [
         resizable: true,
         draggable: true,
         icon: <SignatureIcon />,
-        style: {
-            strokeWidth: 3, // 默认线条宽度
-            opacity: 1 // 默认不透明度
-        },
         styleEditable: false // 是否可编辑样式
     },
     {

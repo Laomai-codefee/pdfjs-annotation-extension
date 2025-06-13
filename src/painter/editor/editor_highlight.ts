@@ -103,7 +103,7 @@ export class EditorHighLight extends Editor {
             y,
             width,
             height,
-            opacity: this.currentAnnotation.style.opacity || 0.5,
+            opacity: 0.5,
             fill: this.currentAnnotation.style.color
         })
     }
@@ -122,7 +122,7 @@ export class EditorHighLight extends Editor {
             y: height + y - 2,
             width,
             stroke: this.currentAnnotation.style.color,
-            opacity: this.currentAnnotation.style.opacity,
+            opacity: 1,
             strokeWidth: 1,
             hitStrokeWidth: 10,
             height: 1
@@ -143,7 +143,7 @@ export class EditorHighLight extends Editor {
             y: y + height / 2,
             width,
             stroke: this.currentAnnotation.style.color,
-            opacity: this.currentAnnotation.style.opacity,
+            opacity: 1,
             strokeWidth: 1,
             hitStrokeWidth: 10,
             height: 1
