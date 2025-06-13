@@ -2,7 +2,7 @@ import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 import { PDFViewerApplication } from 'pdfjs'
 
-import { AnnotationType, IAnnotationContentsObj, IAnnotationStore, IAnnotationType } from '../../const/definitions'
+import { AnnotationType, IAnnotationContentsObj, IAnnotationStore, IAnnotationStyle, IAnnotationType } from '../../const/definitions'
 import { formatTimestamp, generateUUID } from '../../utils/utils'
 import { SHAPE_GROUP_NAME } from '../const'
 
@@ -22,6 +22,8 @@ export interface IEditorOptions {
      * @param annotationContent 注解内容，可选
      */
     onAdd: (annotationStore: IAnnotationStore) => void
+
+    onChange:(id: string, updates: Partial<IAnnotationStore>) => void // 更改回调函数
 }
 
 /**
@@ -43,6 +45,7 @@ export abstract class Editor {
     protected pdfViewerApplication: PDFViewerApplication
     public readonly id: string // 编辑器实例的唯一标识符
     public readonly onAdd: (annotationStore: IAnnotationStore) => void // 添加形状组的回调函数
+    public readonly onChange: (id: string, updates: Partial<IAnnotationStore>) => void // 更改回调函数
     protected konvaStage: Konva.Stage // Konva Stage对象
     protected readonly pageNumber: number // 页面编号
     protected currentAnnotation: IAnnotationType | null // 当前注解对象，可以为 null
@@ -56,7 +59,7 @@ export abstract class Editor {
      * Editor 类的构造函数。
      * @param options 初始化编辑器的选项
      */
-    constructor({ userName, konvaStage, pageNumber, annotation, onAdd, editorType, pdfViewerApplication }: IEditorOptions & { editorType: AnnotationType }) {
+    constructor({ userName, konvaStage, pageNumber, annotation, onAdd, editorType, pdfViewerApplication, onChange }: IEditorOptions & { editorType: AnnotationType }) {
         this.userName = userName
         this.pdfViewerApplication = pdfViewerApplication
         this.id = `${pageNumber}_${editorType}` // 构造唯一标识符
@@ -66,6 +69,7 @@ export abstract class Editor {
         this.isPainting = false // 初始化绘制状态为 false
         this.currentShapeGroup = null // 初始化当前形状组为 null
         this.onAdd = onAdd // 初始化添加形状组的回调函数
+        this.onChange = onChange || (() => {}) // 初始更改回调函数，如果未提供则使用默认空函数
         this.disableEditMode() // 禁用编辑模式
         this.enableEditMode() // 启用编辑模式
     }
@@ -107,6 +111,13 @@ export abstract class Editor {
             draggable: annotation.draggable
         }
         this.onAdd(annotationStore) // 调用 onAdd 回调函数
+    }
+
+    /**
+     * @description 分发样式更改事件，输出样式更改的日志。
+     */
+    private dispatchChangedEvent(id: string, updates: Partial<IAnnotationStore>) {
+        this.onChange(id, updates) // 调用 onStyleChanged 回调函数
     }
 
     /**
@@ -181,6 +192,17 @@ export abstract class Editor {
     }
 
     /**
+     * @description 获取指定 ID 的形状组。
+     * @param id
+     * @returns
+     */
+    protected getShapeGroupById(id: string): Konva.Group {
+        console.log(this.konvaStage)
+        const group = this.konvaStage.findOne(node => node.getType() === 'Group' && node.id() === id) // 查找对应 ID 的 Konva.Group 对象
+        return group as Konva.Group // 返回找到的 Konva.Group 对象
+    }
+
+    /**
      * 设置指定 ID 的形状组为已完成状态，并触发添加事件。
      * @protected
      */
@@ -206,6 +228,13 @@ export abstract class Editor {
                 fontSize
             }) // 触发添加事件
         }
+    }
+
+    /**
+     * @description 设置指定 ID 的形状组的更改状态，并触发更改事件。
+     */
+    protected setChanged(id: string, updates: Partial<IAnnotationStore>) {
+        this.dispatchChangedEvent(id, updates)
     }
 
     /**
@@ -300,11 +329,18 @@ export abstract class Editor {
     protected abstract mouseUpHandler(e: KonvaEventObject<MouseEvent | TouchEvent>): void
 
     /**
+     * @description 更新指定注解对象的样式。
+     * @param annotationStore 
+     * @param style
+     */
+    protected abstract changeStyle(annotationStore: IAnnotationStore, style: IAnnotationStyle): void // 抽象方法，子类需实现具体样式更新逻辑
+
+    /**
      * 激活编辑器，重新设置 Konva Stage和当前注解对象，并启用编辑模式。
      * @param konvaStage 新的 Konva Stage对象
      * @param annotation 新的注解对象
      */
-    public activate(konvaStage: Konva.Stage, annotation: IAnnotationType) {
+    public activate(konvaStage: Konva.Stage, annotation: IAnnotationType) {        
         this.konvaStage = konvaStage // 更新 Konva Stage对象
         this.currentAnnotation = annotation // 更新当前注解对象
         this.isPainting = false // 重置绘制状态
@@ -318,10 +354,11 @@ export abstract class Editor {
      * @param konvaString 序列化的 Konva.Group 字符串表示
      */
     public addSerializedGroupToLayer(konvaStage: Konva.Stage, konvaString: string) {
+        this.konvaStage = konvaStage // 更新 Konva Stage对象
         const ghostGroup = Konva.Node.create(konvaString) // 根据序列化字符串创建 Konva.Group 对象
         const id = ghostGroup.id()
         this.getBgLayer(konvaStage).add(ghostGroup) // 将 Konva.Group 对象添加到背景图层
-        if(this.shapeGroupStore.has(id)) return
+        if (this.shapeGroupStore.has(id)) return
         const shapeGroup: IShapeGroup = {
             // 创建形状组对象
             id,
@@ -329,7 +366,7 @@ export abstract class Editor {
             pageNumber: this.pageNumber,
             isDone: true
         }
-        this.shapeGroupStore.set(id, shapeGroup) 
+        this.shapeGroupStore.set(id, shapeGroup)
     }
 
     /**
@@ -339,6 +376,15 @@ export abstract class Editor {
     public deleteGroup(id: string, konvaStage: Konva.Stage) {
         this.konvaStage = konvaStage
         this.delShapeGroup(id) // 调用 delShapeGroup 方法删除指定 ID 的形状组
+    }
+
+    /**
+     * @description 更新指定 ID 的形状组的样式。
+     * @param annotationStore 
+     * @param style 
+     */
+    public updateStyle(annotationStore: IAnnotationStore, style: IAnnotationStyle) {
+        this.changeStyle(annotationStore, style) // 调用子类实现的样式更新方法
     }
 
     /**

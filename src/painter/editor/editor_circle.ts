@@ -1,7 +1,7 @@
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 
-import { AnnotationType } from '../../const/definitions'
+import { AnnotationType, IAnnotationStore, IAnnotationStyle } from '../../const/definitions'
 import { Editor, IEditorOptions } from './editor'
 
 /**
@@ -115,8 +115,7 @@ export class EditorCircle extends Editor {
             contentsObj: {
                 text: ''
             }
-        }
-        )
+        })
         this.ellipse = null // 重置当前椭圆对象为 null
     }
 
@@ -137,5 +136,26 @@ export class EditorCircle extends Editor {
     private isTooSmall(): boolean {
         const { width, height } = this.ellipse.size()
         return Math.max(width, height) < Editor.MinSize
+    }
+
+    /**
+     * @description 更改注释样式
+     * @param annotationStore
+     * @param styles
+     */
+    protected changeStyle(annotationStore: IAnnotationStore, styles: IAnnotationStyle): void {
+        const id = annotationStore.id
+        const group = this.getShapeGroupById(id)
+        if (group) {
+            group.getChildren().forEach(shape => {
+                if (shape instanceof Konva.Ellipse) {
+                    shape.stroke(styles.color)
+                }
+            })
+            this.setChanged(id, {
+                konvaString: group.toJSON(),
+                color: styles.color
+            })
+        }
     }
 }

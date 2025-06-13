@@ -1,6 +1,6 @@
 import Konva from 'konva'
 
-import { AnnotationType } from '../../const/definitions'
+import { AnnotationType, IAnnotationStore, IAnnotationStyle } from '../../const/definitions'
 import { Editor, IEditorOptions } from './editor'
 
 /**
@@ -165,4 +165,36 @@ export class EditorHighLight extends Editor {
      */
     protected mouseUpHandler() {}
 
+    /**
+     * @description 更改注释样式
+     * @param annotationStore 
+     * @param styles 
+     */
+    protected changeStyle(annotationStore: IAnnotationStore, styles: IAnnotationStyle): void {
+        const id = annotationStore.id
+        const group = this.getShapeGroupById(id)
+        if (group) {
+            group.getChildren().forEach(shape => {
+                if (annotationStore.type === AnnotationType.HIGHLIGHT) {
+                    if (shape instanceof Konva.Rect) {
+                        shape.fill(styles.color)
+                    }
+                }
+                if (annotationStore.type === AnnotationType.UNDERLINE) {
+                    if (shape instanceof Konva.Rect) {
+                        shape.stroke(styles.color)
+                    }
+                }
+                if (annotationStore.type === AnnotationType.STRIKEOUT) {
+                    if (shape instanceof Konva.Rect) {
+                        shape.stroke(styles.color)
+                    }
+                }
+            })
+            this.setChanged(id, {
+                konvaString: group.toJSON(),
+                color: styles.color
+            })
+        }
+    }
 }

@@ -9,7 +9,7 @@
     box-shadow:
         0 1px 5px var(--doorhanger-border-color),
         0 0 0 1px var(--doorhanger-border-color);
-    border: var(--doorhanger-border-color-whcm);
+    border: var(--toolbar-border-color);
     border-radius: 6px;
     font: message-box;
     padding: 4px; // 增加基础内边距避免按钮贴边
@@ -20,6 +20,40 @@
 
     &.hide {
         display: none;
+    }
+
+    .styleContainer {
+        .colorPalette {
+            display: flex;
+            flex-wrap: wrap; // 允许换行
+            gap: 8px 10px; // 行间距8px，列间距10px
+            margin: 8px;
+            max-width: calc((22px + 10px) * 5); // 控制一行最多放5个，考虑cell宽度和间距
+
+            .cell {
+                cursor: pointer;
+                width: 22px;
+                height: 22px;
+                border-radius: 100px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 1px solid transparent;
+                span {
+                    width: 12px;
+                    height: 12px;
+                    display: inline-block;
+                    border-radius: 100px;
+                }
+            }
+            .cell:hover {
+                border: 1px solid var(--button-hover-color);
+            }
+
+            .cell.active {
+                border: 1px solid #bbb;
+            }
+        }
     }
 
     .buttons {

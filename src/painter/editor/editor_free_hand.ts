@@ -1,7 +1,7 @@
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 
-import { AnnotationType } from '../../const/definitions'
+import { AnnotationType, IAnnotationStore, IAnnotationStyle } from '../../const/definitions'
 import { Editor, IEditorOptions } from './editor'
 
 /**
@@ -91,15 +91,13 @@ export class EditorFreeHand extends Editor {
             // 如果曲线太小，则销毁曲线对象并延时保存形状组状态
             this.line.destroy()
             Editor.TimerStart(this.pageNumber, () => {
-                this.setShapeGroupDone(
-                    {
-                        id: group.id(),
-                        color: this.currentAnnotation.style.color,
-                        contentsObj: {
-                            text: ''
-                        }
+                this.setShapeGroupDone({
+                    id: group.id(),
+                    color: this.currentAnnotation.style.color,
+                    contentsObj: {
+                        text: ''
                     }
-                )
+                })
                 this.currentShapeGroup = null
             })
             return
@@ -107,15 +105,13 @@ export class EditorFreeHand extends Editor {
 
         // 否则，延时保存形状组状态
         Editor.TimerStart(this.pageNumber, () => {
-            this.setShapeGroupDone(
-                {
-                    id: group.id(),
-                    color: this.currentAnnotation.style.color,
-                    contentsObj: {
-                        text: ''
-                    }
+            this.setShapeGroupDone({
+                id: group.id(),
+                color: this.currentAnnotation.style.color,
+                contentsObj: {
+                    text: ''
                 }
-            )
+            })
             this.currentShapeGroup = null
         })
 
@@ -138,5 +134,26 @@ export class EditorFreeHand extends Editor {
      */
     private isTooSmall(): boolean {
         return this.line.points().length < Editor.MinSize
+    }
+
+    /**
+     * @description 更改注释样式
+     * @param annotationStore
+     * @param styles
+     */
+    protected changeStyle(annotationStore: IAnnotationStore, styles: IAnnotationStyle): void {
+        const id = annotationStore.id
+        const group = this.getShapeGroupById(id)
+        if (group) {
+            group.getChildren().forEach(shape => {
+                if (shape instanceof Konva.Line) {
+                    shape.stroke(styles.color)
+                }
+            })
+            this.setChanged(id, {
+                konvaString: group.toJSON(),
+                color: styles.color
+            })
+        }
     }
 }

@@ -50,6 +50,9 @@
             border-radius: 8px;
             padding: 10px;
             line-height: 200%;
+            .ant-typography{
+                color: var(--main-color) !important;
+            }
             p {
                 white-space: pre-wrap;
                 line-height: 150%;
@@ -95,7 +98,8 @@
             background-color: var(--doorhanger-hover-bg-color);
         }
         .selected {
-            border-color: red;
+            border-color: #1677ff72;
+            background-color: var(--doorhanger-hover-bg-color);            
         }
         h3,
         .comment {

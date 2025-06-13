@@ -164,4 +164,6 @@ export class EditorSignature extends Editor {
     // 下面是未实现的抽象方法的空实现
     protected mouseMoveHandler() {}
     protected mouseUpHandler() {}
+
+    protected changeStyle(): void {}
 }

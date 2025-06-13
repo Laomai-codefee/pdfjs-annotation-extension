@@ -159,6 +159,7 @@ export class Selector {
             })
         }
 
+
         shape.on('pointerclick', e => {
             if (e.evt.button === 0) {
                 this.handleShapeClick(shape, konvaStage, true)

@@ -1,7 +1,7 @@
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 
-import { AnnotationType } from '../../const/definitions'
+import { AnnotationType, IAnnotationStore, IAnnotationStyle } from '../../const/definitions'
 import { Editor, IEditorOptions } from './editor'
 
 /**
@@ -90,15 +90,13 @@ export class EditorRectangle extends Editor {
             this.rect = null
             return
         }
-        this.setShapeGroupDone(
-            {
-                id: group.id(),
-                color: this.currentAnnotation.style.color,
-                contentsObj: {
-                    text: ''
-                }
+        this.setShapeGroupDone({
+            id: group.id(),
+            color: this.currentAnnotation.style.color,
+            contentsObj: {
+                text: ''
             }
-        ) // 更新 PDF.js 注解存储
+        }) // 更新 PDF.js 注解存储
         this.rect = null
     }
 
@@ -119,5 +117,26 @@ export class EditorRectangle extends Editor {
     private isTooSmall(): boolean {
         const { width, height } = this.rect.size() // 获取矩形的宽度和高度
         return Math.max(width, height) < Editor.MinSize // 判断宽度和高度的最大值是否小于最小允许大小
+    }
+
+    /**
+     * @description 更改注释样式
+     * @param annotationStore
+     * @param styles
+     */
+    protected changeStyle(annotationStore: IAnnotationStore, styles: IAnnotationStyle): void {
+        const id = annotationStore.id
+        const group = this.getShapeGroupById(id)
+        if (group) {
+            group.getChildren().forEach(shape => {
+                if (shape instanceof Konva.Rect) {
+                    shape.stroke(styles.color)
+                }
+            })
+            this.setChanged(id, {
+                konvaString: group.toJSON(),
+                color: styles.color
+            })
+        }
     }
 }

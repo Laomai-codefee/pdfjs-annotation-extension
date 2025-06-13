@@ -246,8 +246,8 @@ class PdfjsAnnotationExtension {
                         this.customCommentRef.current.selectedAnnotation(currentAnnotation, true)
                     }, 100)
                 }}
-                onChangeStyle={(currentAnnotation) => {
-                    console.log('%c [ currentAnnotation ]', 'font-size:13px; background:#d10d00; color:#ff5144;', currentAnnotation)
+                onChangeStyle={(currentAnnotation, style) => {
+                    this.painter.updateAnnotationStyle(currentAnnotation, style)
                 }}
                 onDelete={(currentAnnotation) => {
                     this.painter.delete(currentAnnotation.id, true)

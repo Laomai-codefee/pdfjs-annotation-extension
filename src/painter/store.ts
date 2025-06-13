@@ -23,7 +23,7 @@ export class Store {
         return (id: string) => this.annotationStore.get(id)
     }
 
-    get annotaions() {
+    get annotations() {
         return Array.from(this.annotationStore.values());
     }
 

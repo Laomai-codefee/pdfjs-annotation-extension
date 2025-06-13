@@ -171,4 +171,6 @@ export class EditorStamp extends Editor {
     // 以下是未实现的抽象方法的空实现
     protected mouseMoveHandler() { }
     protected mouseUpHandler() { }
+
+    protected changeStyle(): void {}
 }

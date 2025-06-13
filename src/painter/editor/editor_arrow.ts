@@ -1,7 +1,7 @@
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 
-import { AnnotationType } from '../../const/definitions'
+import { AnnotationType, IAnnotationStore, IAnnotationStyle } from '../../const/definitions'
 import { Editor, IEditorOptions } from './editor'
 
 /**
@@ -99,5 +99,27 @@ export class EditorArrow extends Editor {
         const dx = points[2] - points[0]
         const dy = points[3] - points[1]
         return Math.hypot(dx, dy) < Editor.MinSize
+    }
+
+    /**
+     * @description 更改注释样式
+     * @param annotationStore
+     * @param styles
+     */
+    protected changeStyle(annotationStore: IAnnotationStore, styles: IAnnotationStyle): void {
+        const id = annotationStore.id
+        const group = this.getShapeGroupById(id)
+        if (group) {
+            group.getChildren().forEach(shape => {
+                if (shape instanceof Konva.Arrow) {
+                    shape.stroke(styles.color)
+                    shape.fill(styles.color)
+                }
+            })
+            this.setChanged(id, {
+                konvaString: group.toJSON(),
+                color: styles.color
+            })
+        }
     }
 }

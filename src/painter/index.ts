@@ -3,7 +3,7 @@ import './index.scss' // 导入画笔样式文件
 import Konva from 'konva'
 import { EventBus, PageViewport, PDFPageView, PDFViewerApplication } from 'pdfjs'
 
-import { annotationDefinitions, AnnotationType, IAnnotationStore, IAnnotationType } from '../const/definitions'
+import { annotationDefinitions, AnnotationType, IAnnotationStore, IAnnotationStyle, IAnnotationType } from '../const/definitions'
 import { isElementInDOM, removeCssCustomProperty } from '../utils/utils'
 import { CURSOR_CSS_PROPERTY, PAINTER_IS_PAINTING_STYLE, PAINTER_PAINTING_TYPE, PAINTER_WRAPPER_PREFIX } from './const'
 import { Editor } from './editor/editor'
@@ -129,21 +129,27 @@ export class Painter {
                     const canvas = this.konvaCanvasStore.get(pageNumber)
                     if (canvas) {
                         const { konvaStage, wrapper } = canvas
-                        const editor = new EditorHighLight(
-                            {
-                                userName: this.userName,
-                                pdfViewerApplication: this.pdfViewerApplication,
-                                konvaStage,
-                                pageNumber,
-                                annotation: this.currentAnnotation,
-                                onAdd: annotationStore => {
-                                    this.saveToStore(annotationStore)
-                                }
-                            },
-                            this.currentAnnotation.type
-                        )
-                        this.editorStore.set(editor.id, editor)
-                        editor.convertTextSelection(elements, wrapper)
+                        let storeEditor = this.findEditor(pageNumber, this.currentAnnotation.type) as EditorHighLight
+                        if (!storeEditor) {
+                            storeEditor = new EditorHighLight(
+                                {
+                                    userName: this.userName,
+                                    pdfViewerApplication: this.pdfViewerApplication,
+                                    konvaStage,
+                                    pageNumber,
+                                    annotation: this.currentAnnotation,
+                                    onAdd: annotationStore => {
+                                        this.saveToStore(annotationStore)
+                                    },
+                                    onChange: (id, updates) => {
+                                        this.updateStore(id, updates) // 更新存储
+                                    }
+                                },
+                                this.currentAnnotation.type
+                            )
+                            this.editorStore.set(storeEditor.id, storeEditor)
+                        }
+                        storeEditor.convertTextSelection(elements, wrapper)
                     }
                 })
             }
@@ -347,7 +353,8 @@ export class Painter {
                     annotation,
                     onAdd: annotationStore => {
                         this.saveToStore(annotationStore)
-                    }
+                    },
+                    onChange: () => {}
                 })
                 break
             case AnnotationType.RECTANGLE:
@@ -359,6 +366,9 @@ export class Painter {
                     annotation,
                     onAdd: annotationStore => {
                         this.saveToStore(annotationStore)
+                    },
+                    onChange: (id, updates) => {
+                        this.updateStore(id, updates) // 更新存储
                     }
                 })
                 break
@@ -371,6 +381,9 @@ export class Painter {
                     annotation,
                     onAdd: annotationStore => {
                         this.saveToStore(annotationStore)
+                    },
+                    onChange: (id, updates) => {
+                        this.updateStore(id, updates) // 更新存储
                     }
                 })
                 break
@@ -383,6 +396,9 @@ export class Painter {
                     annotation,
                     onAdd: annotationStore => {
                         this.saveToStore(annotationStore)
+                    },
+                    onChange: (id, updates) => {
+                        this.updateStore(id, updates) // 更新存储
                     }
                 })
                 break
@@ -395,6 +411,9 @@ export class Painter {
                     annotation,
                     onAdd: annotationStore => {
                         this.saveToStore(annotationStore)
+                    },
+                    onChange: (id, updates) => {
+                        this.updateStore(id, updates) // 更新存储
                     }
                 })
                 break
@@ -407,7 +426,8 @@ export class Painter {
                     annotation,
                     onAdd: annotationStore => {
                         this.saveToStore(annotationStore)
-                    }
+                    },
+                    onChange: () => {}
                 })
                 break
             case AnnotationType.FREEHAND:
@@ -419,6 +439,9 @@ export class Painter {
                     annotation,
                     onAdd: annotationStore => {
                         this.saveToStore(annotationStore)
+                    },
+                    onChange: (id, updates) => {
+                        this.updateStore(id, updates) // 更新存储
                     }
                 })
                 break
@@ -431,6 +454,9 @@ export class Painter {
                     annotation,
                     onAdd: annotationStore => {
                         this.saveToStore(annotationStore)
+                    },
+                    onChange: (id, updates) => {
+                        this.updateStore(id, updates) // 更新存储
                     }
                 })
                 break
@@ -444,7 +470,8 @@ export class Painter {
                         annotation,
                         onAdd: annotationStore => {
                             this.saveToStore(annotationStore)
-                        }
+                        },
+                        onChange: () => {}
                     },
                     this.tempDataTransfer
                 )
@@ -459,7 +486,8 @@ export class Painter {
                         annotation,
                         onAdd: annotationStore => {
                             this.saveToStore(annotationStore)
-                        }
+                        },
+                        onChange: () => {}
                     },
                     this.tempDataTransfer
                 )
@@ -476,6 +504,9 @@ export class Painter {
                         annotation,
                         onAdd: annotationStore => {
                             this.saveToStore(annotationStore)
+                        },
+                        onChange: (id, updates) => {
+                            this.updateStore(id, updates) // 更新存储
                         }
                     },
                     annotation.type
@@ -750,6 +781,20 @@ export class Painter {
     }
 
     public getData() {
-        return this.store.annotaions
+        return this.store.annotations
+    }
+
+    /**
+     * @description 更新样式
+     * @param annotationStore
+     * @param styles
+     */
+    public updateAnnotationStyle(annotationStore: IAnnotationStore, style: IAnnotationStyle) {
+        const editor = this.findEditorForGroupId(annotationStore.id)
+        console.log(this.editorStore)
+        console.log('%c [ editor ]-769-「undefined」', 'font-size:13px; background:#bda24a; color:#ffe68e;', editor)
+        if (editor) {
+            editor.updateStyle(annotationStore, style) // 更新编辑器样式
+        }
     }
 }

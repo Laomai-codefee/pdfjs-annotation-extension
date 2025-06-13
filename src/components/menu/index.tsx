@@ -2,13 +2,14 @@ import './index.scss'
 
 import { computePosition, flip } from '@floating-ui/dom'
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react'
-import { annotationDefinitions, IAnnotationStore } from '../../const/definitions'
+import { annotationDefinitions, IAnnotationStore, IAnnotationStyle } from '../../const/definitions'
 import { IRect } from 'konva/lib/types'
 import { AnnoIcon, DeleteIcon, PaletteIcon } from '../../const/icon'
+import { defaultOptions } from '../../const/default_options'
 
 interface CustomAnnotationMenuProps {
     onOpenComment: (annotation: IAnnotationStore) => void
-    onChangeStyle: (annotation: IAnnotationStore) => void
+    onChangeStyle: (annotation: IAnnotationStore, styles: IAnnotationStyle) => void
     onDelete: (annotation: IAnnotationStore) => void
 }
 
@@ -23,6 +24,8 @@ export interface CustomAnnotationMenuRef {
 const CustomAnnotationMenu = forwardRef<CustomAnnotationMenuRef, CustomAnnotationMenuProps>(function CustomAnnotationMenu(props, ref) {
     const [show, setShow] = useState(false)
     const [currentAnnotation, setCurrentAnnotation] = useState<IAnnotationStore | null>(null)
+
+    const [showStyle, setShowStyle] = useState(false)
 
     const containerRef = useRef<HTMLDivElement | null>(null)
 
@@ -79,6 +82,7 @@ const CustomAnnotationMenu = forwardRef<CustomAnnotationMenuRef, CustomAnnotatio
     const close = () => {
         setShow(false)
         setCurrentAnnotation(null)
+        setShowStyle(false)
     }
 
     const isStyleSupported = currentAnnotation
@@ -87,42 +91,66 @@ const CustomAnnotationMenu = forwardRef<CustomAnnotationMenuRef, CustomAnnotatio
 
     return (
         <div className={`CustomAnnotationMenu ${show ? 'show' : 'hide'}`} ref={containerRef}>
-            <ul className="buttons">
-                <li onMouseDown={() => {
-                    if (currentAnnotation) {
-                        props.onOpenComment(currentAnnotation)
-                        close()
-                    }
-                }}>
-                    <div className="icon">
-                        <AnnoIcon />
-                    </div>
-                </li>
 
-                {isStyleSupported && (
-                    <li onMouseDown={() => {
-                        if (currentAnnotation) {
-                            props.onChangeStyle(currentAnnotation)
-                            close()
-                        }
-                    }}>
-                        <div className="icon">
-                            <PaletteIcon />
+            {
+                showStyle && currentAnnotation && (
+                    <div className="styleContainer">
+                        <div className="colorPalette">
+                            {defaultOptions.colors.map(color => (
+                                <div key={color} className='cell' onMouseDown={() => {
+                                    props.onChangeStyle(currentAnnotation, {
+                                        color
+                                    })
+                                }}>
+                                    <span style={{ backgroundColor: color }}></span>
+                                </div>
+                            ))}
                         </div>
-                    </li>
-                )}
-
-                <li onMouseDown={() => {
-                    if (currentAnnotation) {
-                        props.onDelete(currentAnnotation)
-                        close()
-                    }
-                }}>
-                    <div className="icon">
-                        <DeleteIcon />
                     </div>
-                </li>
-            </ul>
+                )
+            }
+
+            {
+                !showStyle && currentAnnotation && (
+                    <ul className="buttons">
+                        <li onMouseDown={() => {
+                            if (currentAnnotation) {
+                                props.onOpenComment(currentAnnotation)
+                                close()
+                            }
+                        }}>
+                            <div className="icon">
+                                <AnnoIcon />
+                            </div>
+                        </li>
+
+                        {isStyleSupported && (
+                            <li onMouseDown={() => {
+                                if (currentAnnotation) {
+                                    setShowStyle(true)
+                                }
+                            }}>
+                                <div className="icon">
+                                    <PaletteIcon />
+                                </div>
+                            </li>
+                        )}
+
+                        <li onMouseDown={() => {
+                            if (currentAnnotation) {
+                                props.onDelete(currentAnnotation)
+                                close()
+                            }
+                        }}>
+                            <div className="icon">
+                                <DeleteIcon />
+                            </div>
+                        </li>
+                    </ul>
+                )
+            }
+
+
         </div>
     )
 })

@@ -200,4 +200,6 @@ export class EditorFreeText extends Editor {
             )
     }
 
+    protected changeStyle(): void {}
+
 }
