@@ -10,7 +10,7 @@
     font-weight: normal;
     font-style: normal;
 }
-.PdfjsAnnotationExtension_Comment_hidden{
+.PdfjsAnnotationExtension_Comment_hidden {
     .CustomToolbar::after {
         display: none;
     }
@@ -88,13 +88,13 @@
 
 .SignatureTool {
     margin: 0 auto;
-    .show{
+    .show {
         display: block;
     }
-    .hide{
+    .hide {
         display: none;
     }
-    &-Header{
+    &-Header {
         padding: 10px;
     }
     &-Container {
@@ -102,7 +102,7 @@
         border: 1px solid #ccc;
         position: relative;
         margin: 0 auto;
-        input{
+        input {
             background-color: transparent;
             border: none;
             margin: 0 auto;
@@ -111,7 +111,7 @@
             width: 100%;
             outline: none;
         }
-        input::-webkit-input-placeholder{
+        input::-webkit-input-placeholder {
             color: #ccc;
         }
         .konvajs-content {
@@ -130,6 +130,21 @@
             transform: translateY(-50%);
             text-align: center;
         }
+    }
+
+    &-ImagePreview {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        overflow: hidden;
+        position: relative;
+    }
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
     }
 
     &-Toolbar {

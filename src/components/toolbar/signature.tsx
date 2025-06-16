@@ -1,5 +1,7 @@
 import './index.scss'
-import { Button, Modal, Popover, Radio } from 'antd'
+import { Button, Modal, Popover, Radio, Upload } from 'antd'
+import type { UploadChangeParam } from 'antd/es/upload'
+import type { UploadFile } from 'antd/es/upload/interface'
 import Konva from 'konva'
 import React, {
     useCallback,
@@ -11,6 +13,7 @@ import { PlusCircleOutlined } from '@ant-design/icons'
 import { IAnnotationType } from '../../const/definitions'
 import { useTranslation } from 'react-i18next'
 import { defaultOptions } from '../../const/default_options'
+import Dragger from 'antd/es/upload/Dragger'
 
 interface SignatureToolProps {
     annotation: IAnnotationType
@@ -34,6 +37,9 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
     const [typedSignature, setTypedSignature] = useState('')
     const fontFamily = i18n.language === 'zh' ? 'Zhi Mang Xing' : 'Lavishly_Yours'
 
+    const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null)
+
+
     useEffect(() => {
         colorRef.current = currentColor
     }, [currentColor])
@@ -42,10 +48,7 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
         onAdd(signature)
         setIsPopoverOpen(false)
     }
-    /**
-     * @description 生成签名图片
-     * @returns 
-     */
+
     const generateTypedSignatureImage = (): string | null => {
         if (!typedSignature.trim()) return null
 
@@ -78,6 +81,14 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
     }
 
     const handleOk = () => {
+        if (signatureType === 'Upload') {
+            if (uploadedImageUrl) {
+                setSignatures(prev => [...prev, uploadedImageUrl])
+                handleAdd(uploadedImageUrl)
+                setIsModalOpen(false)
+            }
+            return
+        }
         if (signatureType === 'Enter') {
             const dataUrl = generateTypedSignatureImage()
             if (dataUrl) {
@@ -85,25 +96,30 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
                 handleAdd(dataUrl)
                 setIsModalOpen(false)
             }
-        } else {
+            return
+        }
+        if (signatureType === 'Draw') {
             const dataUrl = konvaStageRef.current?.toDataURL()
             if (dataUrl) {
                 setSignatures(prev => [...prev, dataUrl])
                 handleAdd(dataUrl)
                 setIsModalOpen(false)
             }
+            return
         }
     }
 
-    const handleClearDrawing = () => {
+    const handleClear = () => {
         const stage = konvaStageRef.current
         if (stage) {
             stage.clear()
             stage.getLayers().forEach(layer => layer.destroyChildren())
             setIsOKButtonDisabled(true)
         }
+        setTypedSignature('')
+        setUploadedImageUrl(null)
     }
-    
+
     const initializeKonvaStage = () => {
         if (!containerRef.current) return
 
@@ -174,21 +190,40 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
         allLines.forEach(line => (line as Konva.Line).stroke(color))
     }
 
+    const handleUploadChange = (info: UploadChangeParam<UploadFile>) => {
+        const file = info.fileList[0]?.originFileObj
+        if (!file || !file.type.startsWith('image/')) return
+
+        const reader = new FileReader()
+        reader.onload = e => {
+            const result = e.target?.result
+            if (typeof result === 'string') {
+                setUploadedImageUrl(result) // 不关闭窗口，显示图片
+                setIsOKButtonDisabled(false)
+            }
+        }
+        reader.readAsDataURL(file)
+    }
+
     useEffect(() => {
+        setTypedSignature('')
+        setUploadedImageUrl(null)
         if (signatureType === 'Enter') {
-            setTypedSignature('')
+            3
+            setIsOKButtonDisabled(true) // 直到用户输入
+        } else if (signatureType === 'Draw') {
+            setIsOKButtonDisabled(true) // 直到用户绘制
+        } else if (signatureType === 'Upload') {
+            setIsOKButtonDisabled(true) // 直到上传成功
         }
     }, [signatureType])
 
-    useEffect(() => {
-        if (signatureType === 'Enter') {
-            setIsOKButtonDisabled(typedSignature.trim().length === 0)
-        }
-    }, [typedSignature, signatureType])
+
 
     useEffect(() => {
         if (isModalOpen) {
             setTypedSignature('')
+            setUploadedImageUrl(null)
             setSignatureType(defaultOptions.signature.TYPE)
         }
     }, [isModalOpen])
@@ -242,6 +277,7 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
                             options={[
                                 { label: t('normal.draw'), value: 'Draw' },
                                 { label: t('normal.enter'), value: 'Enter' },
+                                { label: t('normal.upload'), value: 'Upload' }
                             ]}
                             optionType="button"
                             value={signatureType}
@@ -250,7 +286,7 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
                     </div>
 
                     <div className="SignatureTool-Container" style={{ width: defaultOptions.signature.WIDTH }}>
-                        {signatureType === 'Enter' ? (
+                        {signatureType === 'Enter' && (
                             <input
                                 autoFocus
                                 type="text"
@@ -266,7 +302,8 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
                                     lineHeight: `${BASE_FONT_SIZE}px`,
                                 }}
                             />
-                        ) : (
+                        )}
+                        {signatureType === 'Draw' && (
                             <>
                                 <div className="SignatureTool-Container-info">{t('toolbar.message.signatureArea')}</div>
                                 <div
@@ -278,21 +315,56 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
                                 />
                             </>
                         )}
+                        {signatureType === 'Upload' && (
+                            <div style={{
+                                height: defaultOptions.signature.HEIGHT,
+                                width: defaultOptions.signature.WIDTH,
+                            }}>
+                                {uploadedImageUrl ? (
+                                    <div className="SignatureTool-ImagePreview" style={{
+                                        height: defaultOptions.signature.HEIGHT,
+                                        width: defaultOptions.signature.WIDTH,
+                                    }}>
+                                        <img src={uploadedImageUrl} alt="preview" />
+                                    </div>
+                                ) : (
+                                    <Dragger
+                                        accept={defaultOptions.signature.ACCEPT}
+                                        beforeUpload={() => false}
+                                        showUploadList={false}
+                                        onChange={handleUploadChange}
+                                        style={{
+                                            height: defaultOptions.signature.HEIGHT,
+                                            width: defaultOptions.signature.WIDTH,
+                                        }}
+                                    >
+                                        <p className="ant-upload-drag-icon" />
+                                        <p className="ant-upload-text">{t('toolbar.message.uploadArea')}</p>
+                                        <p className="ant-upload-hint">{t('toolbar.message.uploadHint', { format: defaultOptions.signature.ACCEPT })}</p>
+                                    </Dragger>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     <div className="SignatureTool-Toolbar" style={{ width: defaultOptions.signature.WIDTH }}>
                         <div className="colorPalette">
-                            {defaultOptions.signature.COLORS.map(color => (
-                                <div key={color} onClick={() => changeColor(color)} className={`cell ${color === currentColor ? 'active' : ''}`}>
-                                    <span style={{ backgroundColor: color }} />
-                                </div>
-                            ))}
+                            {
+                                signatureType !== 'Upload' &&
+                                <>
+                                    {
+                                        defaultOptions.signature.COLORS.map(color => (
+                                            <div key={color} onClick={() => changeColor(color)} className={`cell ${color === currentColor ? 'active' : ''}`}>
+                                                <span style={{ backgroundColor: color }} />
+                                            </div>
+                                        ))
+                                    }
+                                </>
+                            }
                         </div>
-                        {signatureType === 'Draw' && (
-                            <div className="clear" onClick={handleClearDrawing}>
-                                {t('normal.clear')}
-                            </div>
-                        )}
+                        <div className="clear" onClick={handleClear}>
+                            {t('normal.clear')}
+                        </div>
                     </div>
                 </div>
             </Modal>

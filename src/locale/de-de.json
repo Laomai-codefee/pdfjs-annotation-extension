@@ -18,11 +18,14 @@
     },
     "toolbar": {
         "buttons": {
-            "createSignature": "Unterschrift erstellen"
+            "createSignature": "Unterschrift erstellen",
+            "uploadImage": "Bild hochladen"
         },
         "message": {
             "selectPosition": "Bitte wählen Sie eine Position",
-            "signatureArea": "Unterschriftbereich"
+            "signatureArea": "Unterschriftbereich",
+            "uploadArea": "Hochladebereich",
+            "uploadHint": "Klicken Sie zum Hochladen oder ziehen Sie die Bilddatei in diese Zone {{format}}"
         }
     },
     "editor": {
@@ -54,7 +57,8 @@
         "selectAll": "Alle auswählen",
         "more": "Mehr",
         "draw": "Zeichnen",
-        "enter": "Eingeben"
+        "enter": "Eingeben",
+        "upload": "Hochladen"
     },
     "comment": {
         "total": "Kommentare: {{value}}",

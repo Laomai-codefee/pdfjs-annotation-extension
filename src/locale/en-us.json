@@ -18,11 +18,14 @@
     },
     "toolbar": {
         "buttons": {
-            "createSignature": "Create signature"
+            "createSignature": "Create signature",
+            "uploadImage": "Upload Image"
         },
         "message": {
             "selectPosition": "Please select a position",
-            "signatureArea": "Signature Area"
+            "signatureArea": "Signature Area",
+            "uploadArea": "Upload Area",
+            "uploadHint": "Click to upload or drag and drop to here {{format}}"
         }
     },
     "editor": {
@@ -54,7 +57,8 @@
         "selectAll": "Select All",
         "more": "More",
         "draw": "Draw",
-        "enter": "Enter"
+        "enter": "Enter",
+        "upload": "Upload"
     },
     "comment": {
         "total": "Comment {{value}}",

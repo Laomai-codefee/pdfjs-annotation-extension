@@ -16,8 +16,23 @@
         "arrow": "箭头",
         "cloud": "云线"
     },
-    "toolbar": { "buttons": { "createSignature": "创建签名" }, "message": { "selectPosition": "请选择放置位置", "signatureArea": "签名处" } },
-    "editor": { "text": { "startTyping": "开始输入..." } },
+    "toolbar": {
+        "buttons": {
+            "createSignature": "创建签名",
+            "uploadImages": "上传图片"
+        },
+        "message": {
+            "selectPosition": "请选择放置位置",
+            "signatureArea": "签名处",
+            "uploadArea": "上传区域",
+            "uploadHint": "点击上传或请将图片拖拽到此处 {{format}}"
+        }
+    },
+    "editor": {
+        "text": {
+            "startTyping": "开始输入..."
+        }
+    },
     "normal": {
         "ok": "确定",
         "cancel": "取消",
@@ -42,10 +57,16 @@
         "selectAll": "全选",
         "more": "更多",
         "draw": "绘制",
-        "enter": "输入"
+        "enter": "输入",
+        "upload": "上传"
     },
-    "comment": { "total": " {{value}} 条批注", "page": "第{{value}}页" },
-    "pdf": { "generationSuccess": "文件已生成！" },
+    "comment": {
+        "total": " {{value}} 条批注",
+        "page": "第{{value}}页"
+    },
+    "pdf": {
+        "generationSuccess": "文件已生成！"
+    },
     "dateFormat": {
         "dayMonth": "{{month}}/{{day}}",
         "dayMonthYear": "{{month}}/{{day}}/{{year}}"
