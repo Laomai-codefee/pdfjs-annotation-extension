@@ -12,7 +12,8 @@ const defaultOptions = {
     signature : {
         COLORS: ['#000000', '#ff0000'],
         WIDTH: 366,
-        HEIGHT: 200
+        HEIGHT: 200,
+        TYPE: 'Draw', // Draw 绘制， Enter 输入， 默认签名模式
     },
     // 盖章默认配置
     stamp : {

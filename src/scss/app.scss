@@ -1,5 +1,5 @@
 .PdfjsAnnotationExtension {
-    .toolbar{
+    .toolbar {
         z-index: 99;
     }
     .textLayer {
@@ -15,25 +15,25 @@
     #toolbarContainer {
         height: 107px;
     }
-    .ant-message{
+    .ant-message {
         z-index: 9999999;
     }
-    .ant-modal-mask{
-        backdrop-filter: blur(8px)
+    .ant-modal-mask {
+        backdrop-filter: blur(8px);
     }
 }
-.PdfjsAnnotationExtension_Comment_hidden{
+.PdfjsAnnotationExtension_Comment_hidden {
     #viewerContainer {
         right: 0 !important;
     }
 }
-.PdfjsAnnotationExtension_scalechanging{
-    .PdfjsAnnotationExtension_painter_wrapper{
+.PdfjsAnnotationExtension_scalechanging {
+    .PdfjsAnnotationExtension_painter_wrapper {
         display: none;
     }
 }
 .pdfPresentationMode {
-    .PdfjsAnnotationExtension_painter_wrapper{
+    .PdfjsAnnotationExtension_painter_wrapper {
         display: block;
     }
 }

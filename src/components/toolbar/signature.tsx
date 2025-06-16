@@ -1,21 +1,23 @@
 import './index.scss' // 导入样式
 
-import { Button, Modal, Popover } from 'antd' // 导入 antd 组件
+import { Button, Modal, Popover, Radio } from 'antd' // 导入 antd 组件
 import Konva from 'konva' // 导入 Konva 库
 import React, { useCallback, useEffect, useRef, useState } from 'react' // 导入 React 和相关 Hooks
-import {
-    PlusCircleOutlined
-} from '@ant-design/icons';
+import { PlusCircleOutlined } from '@ant-design/icons'
 import { IAnnotationType } from '../../const/definitions' // 导入自定义类型和默认设置
 import { useTranslation } from 'react-i18next'
-import { defaultOptions } from '../../const/default_options';
+import { defaultOptions } from '../../const/default_options'
 
 interface SignatureToolProps {
     annotation: IAnnotationType // 签名工具的注释类型
     onAdd: (signatureDataUrl: string) => void // 回调函数，当签名被添加时调用
 }
 
+const BASE_FONT_SIZE = 64
+
 const SignatureTool: React.FC<SignatureToolProps> = props => {
+
+    const { t, i18n } = useTranslation()
     const [isPopoverOpen, setIsPopoverOpen] = useState(false) // 控制 Popover 的显示状态
     const [isModalOpen, setIsModalOpen] = useState(false) // 控制 Modal 的显示状态
     const [currentColor, setCurrentColor] = useState(defaultOptions.signature.COLORS[0]) // 当前选择的颜色
@@ -27,7 +29,16 @@ const SignatureTool: React.FC<SignatureToolProps> = props => {
 
     const [signatures, setSignatures] = useState<string[]>([]) // 存储所有签名的数组
 
-    const { t } = useTranslation()
+    const [signatureType, setSignatureType] = useState<string | null>(defaultOptions.signature.TYPE) // 当前签名类型
+
+    const [fontFamily] = useState(i18n.language === 'zh' ? 'Zhi Mang Xing' : 'Lavishly_Yours') // 设置默认签名字体
+
+
+    // 文字签名
+    const [typedSignature, setTypedSignature] = useState('')
+
+    
+
 
     // 更新 colorRef 当 currentColor 改变时
     useEffect(() => {
@@ -58,12 +69,63 @@ const SignatureTool: React.FC<SignatureToolProps> = props => {
 
     // 点击确定按钮后的操作
     const handleOk = () => {
-        // 获取当前绘制的签名数据 URL
-        const signatureDataUrl = konvaStageRef.current?.toDataURL()
-        setIsModalOpen(false)
-        if (signatureDataUrl) {
-            handleSignaturesChange(signatureDataUrl)
-            props.onAdd(signatureDataUrl)
+        if (signatureType === 'Enter') {
+            if (typedSignature.trim()) {
+                // 创建 canvas 生成签名字体图像
+                const canvas = document.createElement('canvas')
+                canvas.width = defaultOptions.signature.WIDTH / 1.1
+                canvas.height = defaultOptions.signature.HEIGHT
+                const ctx = canvas.getContext('2d')
+
+                if (ctx) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+                    // 设置基础字体大小和样式
+
+                    const padding = 20
+                    ctx.font = `${BASE_FONT_SIZE}px "${fontFamily}", cursive, sans-serif`
+
+                    // 根据文字宽度自动缩放字体
+                    let textWidth = ctx.measureText(typedSignature).width
+                    let scale = 1
+                    if (textWidth + padding * 2 > canvas.width) {
+                        scale = (canvas.width - padding * 2) / textWidth
+                    }
+                    const finalFontSize = BASE_FONT_SIZE * scale
+                    ctx.font = `${finalFontSize}px "${fontFamily}", cursive, sans-serif`
+
+                    // 设置文字渲染属性
+                    ctx.textAlign = 'center'
+                    ctx.textBaseline = 'middle'
+                    ctx.imageSmoothingEnabled = true
+
+                    // 添加“墨迹”阴影效果
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.1)' // 阴影颜色
+                    ctx.shadowBlur = 2
+                    ctx.shadowOffsetX = 1
+                    ctx.shadowOffsetY = 1
+
+                    // 设置签名字体颜色
+                    ctx.fillStyle = currentColor
+
+                    // 绘制文字
+                    ctx.fillText(typedSignature, canvas.width / 2, canvas.height / 2)
+
+                    // 输出图片并提交
+                    const dataUrl = canvas.toDataURL('image/png')
+                    handleSignaturesChange(dataUrl)
+                    setIsModalOpen(false)
+                    props.onAdd(dataUrl)
+                }
+            }
+        } else {
+            // 获取当前绘制的签名数据 URL
+            const signatureDataUrl = konvaStageRef.current?.toDataURL()
+            setIsModalOpen(false)
+            if (signatureDataUrl) {
+                handleSignaturesChange(signatureDataUrl)
+                props.onAdd(signatureDataUrl)
+            }
         }
     }
 
@@ -136,6 +198,8 @@ const SignatureTool: React.FC<SignatureToolProps> = props => {
             stage.on('mouseup touchend', stopDrawing)
             stage.on('mousemove touchmove', draw)
 
+            setIsOKButtonDisabled(true)
+
             // 在组件卸载或状态变化时清理 Konva.Stage 的事件和实例
             return () => {
                 stage.off('mousedown touchstart', startDrawing)
@@ -156,6 +220,27 @@ const SignatureTool: React.FC<SignatureToolProps> = props => {
             line.stroke(color)
         })
     }
+
+    useEffect(() => {
+        afterOpen(signatureType === 'Draw')
+        if (signatureType === 'Enter') {
+            setTypedSignature('')
+        }
+    }, [signatureType])
+
+    useEffect(() => {
+        if (signatureType === 'Enter') {
+            const isValid = typedSignature.trim().length > 0
+            setIsOKButtonDisabled(!isValid)
+        }
+    }, [typedSignature, signatureType])
+
+    useEffect(() => {
+        if (isModalOpen) {
+            setTypedSignature('')
+            setSignatureType(defaultOptions.signature.TYPE)
+        }
+    }, [isModalOpen])
 
     return (
         <>
@@ -212,10 +297,48 @@ const SignatureTool: React.FC<SignatureToolProps> = props => {
                 className="SignatureTool"
             >
                 <div>
-                    <div className="SignatureTool-Container" style={{ width: defaultOptions.signature.WIDTH }}>
-                        <div className="SignatureTool-Container-info">{t('toolbar.message.signatureArea')}</div>
-                        <div ref={containerRef} style={{ height: defaultOptions.signature.HEIGHT, width: defaultOptions.signature.WIDTH }}></div>
+                    <div className="SignatureTool-Header">
+                        <Radio.Group
+                            block
+                            options={[
+                                { label: t('normal.draw'), value: 'Draw' },
+                                { label: t('normal.enter'), value: 'Enter' }
+                            ]}
+                            defaultValue={signatureType}
+                            optionType="button"
+                            onChange={e => {
+                                setSignatureType(e.target.value)
+                            }}
+                        />
                     </div>
+
+                    {signatureType === 'Enter' ? (
+                        <div className="SignatureTool-Container" style={{ width: defaultOptions.signature.WIDTH }}>
+                            <div style={{ height: defaultOptions.signature.HEIGHT, width: defaultOptions.signature.WIDTH }}>
+                                <input
+                                    autoFocus
+                                    type="text"
+                                    value={typedSignature}
+                                    placeholder={t('toolbar.message.signatureArea')}
+                                    onChange={e => setTypedSignature(e.target.value)}
+                                    style={{
+                                        height: defaultOptions.signature.HEIGHT,
+                                        width: defaultOptions.signature.WIDTH / 1.1,
+                                        color: currentColor,
+                                        fontFamily: `'${fontFamily}', cursive`,
+                                        lineHeight: `${BASE_FONT_SIZE}px`,
+                                        fontSize: `${BASE_FONT_SIZE}px`
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="SignatureTool-Container" style={{ width: defaultOptions.signature.WIDTH }}>
+                            <div className="SignatureTool-Container-info">{t('toolbar.message.signatureArea')}</div>
+                            <div ref={containerRef} style={{ height: defaultOptions.signature.HEIGHT, width: defaultOptions.signature.WIDTH }}></div>
+                        </div>
+                    )}
+
                     <div className="SignatureTool-Toolbar" style={{ width: defaultOptions.signature.WIDTH }}>
                         <div className="colorPalette">
                             {defaultOptions.signature.COLORS.map(color => (

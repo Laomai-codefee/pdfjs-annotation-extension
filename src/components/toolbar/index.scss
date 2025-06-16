@@ -1,3 +1,15 @@
+@font-face {
+    font-family: 'Zhi Mang Xing';
+    src: url('./fonts/ZhiMangXing-Regular/ZhiMangXing-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Lavishly_Yours';
+    src: url('./fonts/Lavishly_Yours/LavishlyYours-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
 .PdfjsAnnotationExtension_Comment_hidden{
     .CustomToolbar::after {
         display: none;
@@ -76,12 +88,32 @@
 
 .SignatureTool {
     margin: 0 auto;
-
+    .show{
+        display: block;
+    }
+    .hide{
+        display: none;
+    }
+    &-Header{
+        padding: 10px;
+    }
     &-Container {
         background-color: #eee;
         border: 1px solid #ccc;
         position: relative;
         margin: 0 auto;
+        input{
+            background-color: transparent;
+            border: none;
+            margin: 0 auto;
+            text-align: center;
+            display: block;
+            width: 100%;
+            outline: none;
+        }
+        input::-webkit-input-placeholder{
+            color: #ccc;
+        }
         .konvajs-content {
             z-index: 99;
             cursor: crosshair;

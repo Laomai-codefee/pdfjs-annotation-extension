@@ -52,7 +52,9 @@
         "author": "Autor",
         "type": "Typ",
         "selectAll": "Alle auswählen",
-        "more": "Mehr"
+        "more": "Mehr",
+        "draw": "Zeichnen",
+        "enter": "Eingeben"
     },
     "comment": {
         "total": "Kommentare: {{value}}",

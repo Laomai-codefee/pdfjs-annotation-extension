@@ -1,6 +1,6 @@
 import './index.scss'
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
-import { IAnnotationComment, IAnnotationStore, PdfjsAnnotationSubtype, PdfjsAnnotationType } from '../../const/definitions'
+import { IAnnotationComment, IAnnotationStore, PdfjsAnnotationSubtype } from '../../const/definitions'
 import { useTranslation } from 'react-i18next'
 import { formatPDFDate, formatTimestamp, generateUUID } from '../../utils/utils'
 import { Button, Checkbox, Dropdown, Input, Popover, Space, Typography } from 'antd'
@@ -21,7 +21,6 @@ import {
     ArrowIcon,
     CloudIcon
 } from '../../const/icon'
-import { defaultOptions } from '../../const/default_options'
 import Paragraph from 'antd/es/typography/Paragraph'
 
 const { Text } = Typography
