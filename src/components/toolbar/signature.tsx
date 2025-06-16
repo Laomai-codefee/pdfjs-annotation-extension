@@ -1,228 +1,180 @@
-import './index.scss' // 导入样式
-
-import { Button, Modal, Popover, Radio } from 'antd' // 导入 antd 组件
-import Konva from 'konva' // 导入 Konva 库
-import React, { useCallback, useEffect, useRef, useState } from 'react' // 导入 React 和相关 Hooks
+import './index.scss'
+import { Button, Modal, Popover, Radio } from 'antd'
+import Konva from 'konva'
+import React, {
+    useCallback,
+    useEffect,
+    useRef,
+    useState,
+} from 'react'
 import { PlusCircleOutlined } from '@ant-design/icons'
-import { IAnnotationType } from '../../const/definitions' // 导入自定义类型和默认设置
+import { IAnnotationType } from '../../const/definitions'
 import { useTranslation } from 'react-i18next'
 import { defaultOptions } from '../../const/default_options'
 
 interface SignatureToolProps {
-    annotation: IAnnotationType // 签名工具的注释类型
-    onAdd: (signatureDataUrl: string) => void // 回调函数，当签名被添加时调用
+    annotation: IAnnotationType
+    onAdd: (signatureDataUrl: string) => void
 }
 
-const BASE_FONT_SIZE = 64
+const BASE_FONT_SIZE = 80
 
-const SignatureTool: React.FC<SignatureToolProps> = props => {
-
+const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
     const { t, i18n } = useTranslation()
-    const [isPopoverOpen, setIsPopoverOpen] = useState(false) // 控制 Popover 的显示状态
-    const [isModalOpen, setIsModalOpen] = useState(false) // 控制 Modal 的显示状态
-    const [currentColor, setCurrentColor] = useState(defaultOptions.signature.COLORS[0]) // 当前选择的颜色
-    const containerRef = useRef<HTMLDivElement | null>(null) // 引用签名容器的 DOM 节点
-    const konvaStageRef = useRef<Konva.Stage | null>(null) // 引用 Konva.Stage 实例
-    const colorRef = useRef(currentColor) // 用于追踪 currentColor 的最新值
+    const containerRef = useRef<HTMLDivElement>(null)
+    const konvaStageRef = useRef<Konva.Stage | null>(null)
+    const colorRef = useRef(defaultOptions.signature.COLORS[0])
 
-    const [isOKButtonDisabled, setIsOKButtonDisabled] = useState(true) // 初始状态下禁用 OK 按钮
-
-    const [signatures, setSignatures] = useState<string[]>([]) // 存储所有签名的数组
-
-    const [signatureType, setSignatureType] = useState<string | null>(defaultOptions.signature.TYPE) // 当前签名类型
-
-    const [fontFamily] = useState(i18n.language === 'zh' ? 'Zhi Mang Xing' : 'Lavishly_Yours') // 设置默认签名字体
-
-
-    // 文字签名
+    const [isPopoverOpen, setIsPopoverOpen] = useState(false)
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [currentColor, setCurrentColor] = useState(colorRef.current)
+    const [isOKButtonDisabled, setIsOKButtonDisabled] = useState(true)
+    const [signatures, setSignatures] = useState<string[]>([])
+    const [signatureType, setSignatureType] = useState<string>(defaultOptions.signature.TYPE)
     const [typedSignature, setTypedSignature] = useState('')
+    const fontFamily = i18n.language === 'zh' ? 'Zhi Mang Xing' : 'Lavishly_Yours'
 
-    
-
-
-    // 更新 colorRef 当 currentColor 改变时
     useEffect(() => {
         colorRef.current = currentColor
     }, [currentColor])
 
-    // 处理 Popover 打开的状态变化
-    const handleOpenChange = (newOpen: boolean) => {
-        setIsPopoverOpen(newOpen)
+    const handleAdd = (signature: string) => {
+        onAdd(signature)
+        setIsPopoverOpen(false)
+    }
+    /**
+     * @description 生成签名图片
+     * @returns 
+     */
+    const generateTypedSignatureImage = (): string | null => {
+        if (!typedSignature.trim()) return null
+
+        const canvas = document.createElement('canvas')
+        canvas.width = defaultOptions.signature.WIDTH / 1.1
+        canvas.height = defaultOptions.signature.HEIGHT
+        const ctx = canvas.getContext('2d')
+
+        if (!ctx) return null
+
+        const padding = 20
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        ctx.font = `${BASE_FONT_SIZE}px "${fontFamily}", cursive, sans-serif`
+
+        let textWidth = ctx.measureText(typedSignature).width
+        const scale = textWidth + padding * 2 > canvas.width ? (canvas.width - padding * 2) / textWidth : 1
+        ctx.font = `${BASE_FONT_SIZE * scale}px "${fontFamily}", cursive, sans-serif`
+
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        ctx.imageSmoothingEnabled = true
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.1)'
+        ctx.shadowBlur = 2
+        ctx.shadowOffsetX = 1
+        ctx.shadowOffsetY = 1
+        ctx.fillStyle = currentColor
+        ctx.fillText(typedSignature, canvas.width / 2, canvas.height / 2)
+
+        return canvas.toDataURL('image/png')
     }
 
-    // 处理签名的变化，将新的签名添加到签名列表中
-    const handleSignaturesChange = (signature: string) => {
-        setSignatures([...signatures, signature])
-    }
-
-    // 打开 Modal 窗口
-    const openModal = () => {
-        handleOpenChange(false)
-        setIsModalOpen(true)
-    }
-
-    // 处理签名的添加
-    const handleAdd = (signatureDataUrl: string) => {
-        props.onAdd(signatureDataUrl)
-        handleOpenChange(false)
-    }
-
-    // 点击确定按钮后的操作
     const handleOk = () => {
         if (signatureType === 'Enter') {
-            if (typedSignature.trim()) {
-                // 创建 canvas 生成签名字体图像
-                const canvas = document.createElement('canvas')
-                canvas.width = defaultOptions.signature.WIDTH / 1.1
-                canvas.height = defaultOptions.signature.HEIGHT
-                const ctx = canvas.getContext('2d')
-
-                if (ctx) {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-                    // 设置基础字体大小和样式
-
-                    const padding = 20
-                    ctx.font = `${BASE_FONT_SIZE}px "${fontFamily}", cursive, sans-serif`
-
-                    // 根据文字宽度自动缩放字体
-                    let textWidth = ctx.measureText(typedSignature).width
-                    let scale = 1
-                    if (textWidth + padding * 2 > canvas.width) {
-                        scale = (canvas.width - padding * 2) / textWidth
-                    }
-                    const finalFontSize = BASE_FONT_SIZE * scale
-                    ctx.font = `${finalFontSize}px "${fontFamily}", cursive, sans-serif`
-
-                    // 设置文字渲染属性
-                    ctx.textAlign = 'center'
-                    ctx.textBaseline = 'middle'
-                    ctx.imageSmoothingEnabled = true
-
-                    // 添加“墨迹”阴影效果
-                    ctx.shadowColor = 'rgba(0, 0, 0, 0.1)' // 阴影颜色
-                    ctx.shadowBlur = 2
-                    ctx.shadowOffsetX = 1
-                    ctx.shadowOffsetY = 1
-
-                    // 设置签名字体颜色
-                    ctx.fillStyle = currentColor
-
-                    // 绘制文字
-                    ctx.fillText(typedSignature, canvas.width / 2, canvas.height / 2)
-
-                    // 输出图片并提交
-                    const dataUrl = canvas.toDataURL('image/png')
-                    handleSignaturesChange(dataUrl)
-                    setIsModalOpen(false)
-                    props.onAdd(dataUrl)
-                }
+            const dataUrl = generateTypedSignatureImage()
+            if (dataUrl) {
+                setSignatures(prev => [...prev, dataUrl])
+                handleAdd(dataUrl)
+                setIsModalOpen(false)
             }
         } else {
-            // 获取当前绘制的签名数据 URL
-            const signatureDataUrl = konvaStageRef.current?.toDataURL()
-            setIsModalOpen(false)
-            if (signatureDataUrl) {
-                handleSignaturesChange(signatureDataUrl)
-                props.onAdd(signatureDataUrl)
+            const dataUrl = konvaStageRef.current?.toDataURL()
+            if (dataUrl) {
+                setSignatures(prev => [...prev, dataUrl])
+                handleAdd(dataUrl)
+                setIsModalOpen(false)
             }
         }
     }
 
-    // 点击取消按钮后的操作
-    const handleCancel = () => {
-        setIsModalOpen(false)
-    }
-
-    // 处理 Modal 打开后的操作
-    const afterOpen = useCallback((open: boolean) => {
-        if (!open && konvaStageRef.current) {
-            // 如果 Modal 关闭且 Konva 实例存在，则销毁 Konva.Stage 实例
-            konvaStageRef.current.destroy()
-            konvaStageRef.current = null
-            return
-        }
-        if (containerRef.current) {
-            // 创建新的 Konva.Stage 实例并附加到容器中
-            const stage = new Konva.Stage({
-                container: containerRef.current, // 容器节点
-                width: defaultOptions.signature.WIDTH, // 宽度
-                height: defaultOptions.signature.HEIGHT // 高度
-            })
-            const layer = new Konva.Layer() // 创建新的图层
-            stage.add(layer) // 将图层添加到舞台
-            konvaStageRef.current = stage // 将实例引用保存到 konvaStageRef 中
-
-            let isPainting = false // 标记当前是否正在绘制
-            let lastLine: Konva.Line | null = null // 保存最后绘制的线条
-
-            // 开始绘制的事件处理函数
-            const startDrawing = () => {
-                isPainting = true
-                const pos = stage.getPointerPosition() // 获取当前指针位置
-                if (!pos) return
-
-                lastLine = new Konva.Line({
-                    stroke: colorRef.current, // 使用最新的颜色
-                    strokeWidth: 3, // 线条宽度
-                    globalCompositeOperation: 'source-over',
-                    lineCap: 'round',
-                    lineJoin: 'round',
-                    points: [pos.x, pos.y] // 初始点
-                })
-                layer.add(lastLine) // 将线条添加到图层
-            }
-
-            // 停止绘制的事件处理函数
-            const stopDrawing = () => {
-                isPainting = false
-                lastLine = null
-            }
-
-            // 绘制过程中的事件处理函数
-            const draw = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
-                if (!isPainting) return
-                e.evt.preventDefault()
-
-                const pos = stage.getPointerPosition() // 获取当前指针位置
-                if (!pos || !lastLine) return
-
-                // 添加新的点到当前线条
-                const newPoints = lastLine.points().concat([pos.x, pos.y])
-                lastLine.points(newPoints)
-                setIsOKButtonDisabled(false) // 使 OK 按钮可用
-            }
-
-            // 添加 Konva.Stage 的事件监听
-            stage.on('mousedown touchstart', startDrawing)
-            stage.on('mouseup touchend', stopDrawing)
-            stage.on('mousemove touchmove', draw)
-
+    const handleClearDrawing = () => {
+        const stage = konvaStageRef.current
+        if (stage) {
+            stage.clear()
+            stage.getLayers().forEach(layer => layer.destroyChildren())
             setIsOKButtonDisabled(true)
-
-            // 在组件卸载或状态变化时清理 Konva.Stage 的事件和实例
-            return () => {
-                stage.off('mousedown touchstart', startDrawing)
-                stage.off('mouseup touchend', stopDrawing)
-                stage.off('mousemove touchmove', draw)
-                stage.destroy()
-                konvaStageRef.current = null
-            }
         }
-    }, [])
+    }
+    
+    const initializeKonvaStage = () => {
+        if (!containerRef.current) return
 
-    // 更新当前颜色的状态
+        const stage = new Konva.Stage({
+            container: containerRef.current,
+            width: defaultOptions.signature.WIDTH,
+            height: defaultOptions.signature.HEIGHT,
+        })
+
+        const layer = new Konva.Layer()
+        stage.add(layer)
+        konvaStageRef.current = stage
+
+        let isPainting = false
+        let lastLine: Konva.Line | null = null
+
+        const start = () => {
+            isPainting = true
+            const pos = stage.getPointerPosition()
+            if (!pos) return
+
+            lastLine = new Konva.Line({
+                stroke: colorRef.current,
+                strokeWidth: 3,
+                globalCompositeOperation: 'source-over',
+                lineCap: 'round',
+                lineJoin: 'round',
+                points: [pos.x, pos.y],
+            })
+            layer.add(lastLine)
+        }
+
+        const draw = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
+            if (!isPainting || !lastLine) return
+            e.evt.preventDefault()
+            const pos = stage.getPointerPosition()
+            if (!pos) return
+
+            const newPoints = lastLine.points().concat([pos.x, pos.y])
+            lastLine.points(newPoints)
+            setIsOKButtonDisabled(false)
+        }
+
+        const end = () => {
+            isPainting = false
+            lastLine = null
+        }
+
+        stage.on('mousedown touchstart', start)
+        stage.on('mouseup touchend', end)
+        stage.on('mousemove touchmove', draw)
+    }
+
+    const afterOpenChange = useCallback((open: boolean) => {
+        if (open && signatureType === 'Draw') {
+            initializeKonvaStage()
+        } else {
+            konvaStageRef.current?.destroy()
+            konvaStageRef.current = null
+        }
+    }, [signatureType])
+
     const changeColor = (color: string) => {
         setCurrentColor(color)
-        // 获取所有的线条，并更新它们的颜色
-        const allLine = konvaStageRef.current?.getLayers()[0].getChildren((node: Konva.Node) => node.getClassName() === 'Line') || []
-        allLine.forEach((line: Konva.Line) => {
-            line.stroke(color)
-        })
+        const allLines = konvaStageRef.current?.getLayers()[0]
+            .getChildren(node => node.getClassName() === 'Line') || []
+
+        allLines.forEach(line => (line as Konva.Line).stroke(color))
     }
 
     useEffect(() => {
-        afterOpen(signatureType === 'Draw')
         if (signatureType === 'Enter') {
             setTypedSignature('')
         }
@@ -230,8 +182,7 @@ const SignatureTool: React.FC<SignatureToolProps> = props => {
 
     useEffect(() => {
         if (signatureType === 'Enter') {
-            const isValid = typedSignature.trim().length > 0
-            setIsOKButtonDisabled(!isValid)
+            setIsOKButtonDisabled(typedSignature.trim().length === 0)
         }
     }, [typedSignature, signatureType])
 
@@ -249,25 +200,14 @@ const SignatureTool: React.FC<SignatureToolProps> = props => {
                 content={
                     <div>
                         <ul className="SignaturePop-Container">
-                            {signatures.map((signature, index) => {
-                                return (
-                                    <li key={index}>
-                                        <img
-                                            onClick={() => {
-                                                handleAdd(signature) // 选择一个签名进行添加
-                                            }}
-                                            src={signature}
-                                            height={40}
-                                        />
-                                        {/* <span>
-                                            <DeleteOutlined /> // 签名删除按钮，未启用
-                                        </span> */}
-                                    </li>
-                                )
-                            })}
+                            {signatures.map((s, idx) => (
+                                <li key={idx}>
+                                    <img onClick={() => handleAdd(s)} src={s} height={40} />
+                                </li>
+                            ))}
                         </ul>
                         <div className="SignaturePop-Toolbar">
-                            <Button block type="link" onClick={openModal} icon={<PlusCircleOutlined />}>
+                            <Button block type="link" onClick={() => { setIsPopoverOpen(false); setIsModalOpen(true) }} icon={<PlusCircleOutlined />}>
                                 {t('toolbar.buttons.createSignature')}
                             </Button>
                         </div>
@@ -275,25 +215,24 @@ const SignatureTool: React.FC<SignatureToolProps> = props => {
                 }
                 trigger="click"
                 open={isPopoverOpen}
-                onOpenChange={handleOpenChange}
+                onOpenChange={setIsPopoverOpen}
                 placement="bottom"
                 arrow={false}
             >
-                <>
-                    <div className="icon">{props.annotation.icon}</div>
-                    <div className="name">{t(`annotations.${props.annotation.name}`)}</div>
-                </>
+                <div className="icon">{annotation.icon}</div>
+                <div className="name">{t(`annotations.${annotation.name}`)}</div>
             </Popover>
+
             <Modal
                 title={t('toolbar.buttons.createSignature')}
                 open={isModalOpen}
                 onOk={handleOk}
-                onCancel={handleCancel}
-                destroyOnHidden={true}
+                onCancel={() => setIsModalOpen(false)}
+                destroyOnHidden
+                afterOpenChange={afterOpenChange}
+                okButtonProps={{ disabled: isOKButtonDisabled }}
                 okText={t('normal.ok')}
                 cancelText={t('normal.cancel')}
-                afterOpenChange={afterOpen}
-                okButtonProps={{ disabled: isOKButtonDisabled }}
                 className="SignatureTool"
             >
                 <div>
@@ -302,64 +241,58 @@ const SignatureTool: React.FC<SignatureToolProps> = props => {
                             block
                             options={[
                                 { label: t('normal.draw'), value: 'Draw' },
-                                { label: t('normal.enter'), value: 'Enter' }
+                                { label: t('normal.enter'), value: 'Enter' },
                             ]}
-                            defaultValue={signatureType}
                             optionType="button"
-                            onChange={e => {
-                                setSignatureType(e.target.value)
-                            }}
+                            value={signatureType}
+                            onChange={e => setSignatureType(e.target.value)}
                         />
                     </div>
 
-                    {signatureType === 'Enter' ? (
-                        <div className="SignatureTool-Container" style={{ width: defaultOptions.signature.WIDTH }}>
-                            <div style={{ height: defaultOptions.signature.HEIGHT, width: defaultOptions.signature.WIDTH }}>
-                                <input
-                                    autoFocus
-                                    type="text"
-                                    value={typedSignature}
-                                    placeholder={t('toolbar.message.signatureArea')}
-                                    onChange={e => setTypedSignature(e.target.value)}
+                    <div className="SignatureTool-Container" style={{ width: defaultOptions.signature.WIDTH }}>
+                        {signatureType === 'Enter' ? (
+                            <input
+                                autoFocus
+                                type="text"
+                                value={typedSignature}
+                                onChange={e => setTypedSignature(e.target.value)}
+                                placeholder={t('toolbar.message.signatureArea')}
+                                style={{
+                                    height: defaultOptions.signature.HEIGHT,
+                                    width: defaultOptions.signature.WIDTH / 1.1,
+                                    color: currentColor,
+                                    fontFamily: `'${fontFamily}', cursive`,
+                                    fontSize: BASE_FONT_SIZE,
+                                    lineHeight: `${BASE_FONT_SIZE}px`,
+                                }}
+                            />
+                        ) : (
+                            <>
+                                <div className="SignatureTool-Container-info">{t('toolbar.message.signatureArea')}</div>
+                                <div
+                                    ref={containerRef}
                                     style={{
                                         height: defaultOptions.signature.HEIGHT,
-                                        width: defaultOptions.signature.WIDTH / 1.1,
-                                        color: currentColor,
-                                        fontFamily: `'${fontFamily}', cursive`,
-                                        lineHeight: `${BASE_FONT_SIZE}px`,
-                                        fontSize: `${BASE_FONT_SIZE}px`
+                                        width: defaultOptions.signature.WIDTH,
                                     }}
                                 />
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="SignatureTool-Container" style={{ width: defaultOptions.signature.WIDTH }}>
-                            <div className="SignatureTool-Container-info">{t('toolbar.message.signatureArea')}</div>
-                            <div ref={containerRef} style={{ height: defaultOptions.signature.HEIGHT, width: defaultOptions.signature.WIDTH }}></div>
-                        </div>
-                    )}
+                            </>
+                        )}
+                    </div>
 
                     <div className="SignatureTool-Toolbar" style={{ width: defaultOptions.signature.WIDTH }}>
                         <div className="colorPalette">
                             {defaultOptions.signature.COLORS.map(color => (
-                                <div onClick={() => changeColor(color)} className={`cell ${color === currentColor ? 'active' : ''}`} key={color}>
-                                    <span style={{ backgroundColor: color }}></span>
+                                <div key={color} onClick={() => changeColor(color)} className={`cell ${color === currentColor ? 'active' : ''}`}>
+                                    <span style={{ backgroundColor: color }} />
                                 </div>
                             ))}
                         </div>
-                        <div
-                            className="clear"
-                            onClick={() => {
-                                if (konvaStageRef.current) {
-                                    // 清空绘制内容
-                                    konvaStageRef.current.clear()
-                                    konvaStageRef.current.getLayers().forEach(layer => layer.destroyChildren())
-                                    setIsOKButtonDisabled(true) // 禁用 OK 按钮
-                                }
-                            }}
-                        >
-                            {t('normal.clear')}
-                        </div>
+                        {signatureType === 'Draw' && (
+                            <div className="clear" onClick={handleClearDrawing}>
+                                {t('normal.clear')}
+                            </div>
+                        )}
                     </div>
                 </div>
             </Modal>
