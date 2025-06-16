@@ -173,15 +173,6 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
         stage.on('mousemove touchmove', draw)
     }
 
-    const afterOpenChange = useCallback((open: boolean) => {
-        if (open && signatureType === 'Draw') {
-            initializeKonvaStage()
-        } else {
-            konvaStageRef.current?.destroy()
-            konvaStageRef.current = null
-        }
-    }, [signatureType])
-
     const changeColor = (color: string) => {
         setCurrentColor(color)
         const allLines = konvaStageRef.current?.getLayers()[0]
@@ -209,7 +200,6 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
         setTypedSignature('')
         setUploadedImageUrl(null)
         if (signatureType === 'Enter') {
-            3
             setIsOKButtonDisabled(true) // 直到用户输入
         } else if (signatureType === 'Draw') {
             setIsOKButtonDisabled(true) // 直到用户绘制
@@ -219,6 +209,10 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
     }, [signatureType])
 
 
+    useEffect(() => {
+        setIsOKButtonDisabled(typedSignature.trim().length === 0)
+    }, [typedSignature])
+
 
     useEffect(() => {
         if (isModalOpen) {
@@ -227,6 +221,15 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
             setSignatureType(defaultOptions.signature.TYPE)
         }
     }, [isModalOpen])
+
+    useEffect(() => {
+        if (open && signatureType === 'Draw') {
+            initializeKonvaStage()
+        } else {
+            konvaStageRef.current?.destroy()
+            konvaStageRef.current = null
+        }
+    }, [signatureType, open])
 
     return (
         <>
@@ -264,7 +267,6 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
                 onOk={handleOk}
                 onCancel={() => setIsModalOpen(false)}
                 destroyOnHidden
-                afterOpenChange={afterOpenChange}
                 okButtonProps={{ disabled: isOKButtonDisabled }}
                 okText={t('normal.ok')}
                 cancelText={t('normal.cancel')}

@@ -197,18 +197,20 @@
     .ant-popover-inner {
         padding: 5px;
     }
-
+    &-Container{
+        max-height: 200px;
+        overflow: auto;
+    }
     ul,
     li {
         margin: 0;
         list-style: none;
         padding: 0;
 
-        img:hover {
+        li:hover {
             background-color: #ccc;
         }
     }
-
     li {
         display: flex;
         margin: 5px;
