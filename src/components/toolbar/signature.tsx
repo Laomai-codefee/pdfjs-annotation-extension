@@ -14,6 +14,7 @@ import { IAnnotationType } from '../../const/definitions'
 import { useTranslation } from 'react-i18next'
 import { defaultOptions } from '../../const/default_options'
 import Dragger from 'antd/es/upload/Dragger'
+import { formatFileSize } from '../../utils/utils'
 
 interface SignatureToolProps {
     annotation: IAnnotationType
@@ -33,11 +34,13 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
     const [currentColor, setCurrentColor] = useState(colorRef.current)
     const [isOKButtonDisabled, setIsOKButtonDisabled] = useState(true)
     const [signatures, setSignatures] = useState<string[]>([])
-    const [signatureType, setSignatureType] = useState<string>(defaultOptions.signature.TYPE)
+    const [signatureType, setSignatureType] = useState<string| null>(null)
     const [typedSignature, setTypedSignature] = useState('')
     const fontFamily = i18n.language === 'zh' ? 'Zhi Mang Xing' : 'Lavishly_Yours'
 
     const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null)
+
+    const maxSize: number = defaultOptions.signature.MAX_SIZE
 
 
     useEffect(() => {
@@ -121,6 +124,7 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
     }
 
     const initializeKonvaStage = () => {
+        console.log(containerRef)
         if (!containerRef.current) return
 
         const stage = new Konva.Stage({
@@ -185,6 +189,13 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
         const file = info.fileList[0]?.originFileObj
         if (!file || !file.type.startsWith('image/')) return
 
+        if (file.size > maxSize) {
+                // 如果文件大小超过最大限制，显示提示并返回
+                alert(t('normal.fileSizeLimit', { value: formatFileSize(maxSize) }))
+                // alert(`文件大小超出 ${formatFileSize(maxSize)} 限制`)
+                return
+            }
+
         const reader = new FileReader()
         reader.onload = e => {
             const result = e.target?.result
@@ -223,13 +234,13 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
     }, [isModalOpen])
 
     useEffect(() => {
-        if (open && signatureType === 'Draw') {
+        if (isModalOpen && signatureType === 'Draw') {
             initializeKonvaStage()
         } else {
             konvaStageRef.current?.destroy()
             konvaStageRef.current = null
         }
-    }, [signatureType, open])
+    }, [signatureType, isModalOpen])
 
     return (
         <>
@@ -240,7 +251,7 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
                         <ul className="SignaturePop-Container">
                             {signatures.map((s, idx) => (
                                 <li key={idx}>
-                                    <img onClick={() => handleAdd(s)} src={s} height={40} />
+                                    <img onClick={() => handleAdd(s)} src={s} />
                                 </li>
                             ))}
                         </ul>
@@ -338,11 +349,11 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
                                         style={{
                                             height: defaultOptions.signature.HEIGHT,
                                             width: defaultOptions.signature.WIDTH,
-                                        }}
-                                    >
-                                        <p className="ant-upload-drag-icon" />
-                                        <p className="ant-upload-text">{t('toolbar.message.uploadArea')}</p>
-                                        <p className="ant-upload-hint">{t('toolbar.message.uploadHint', { format: defaultOptions.signature.ACCEPT })}</p>
+                                            }}
+                                        >
+                                            <p className="ant-upload-drag-icon" />
+                                            <p className="ant-upload-text">{t('toolbar.message.uploadArea')}</p>
+                                            <p className="ant-upload-hint">{t('toolbar.message.uploadHint', { format: defaultOptions.signature.ACCEPT, maxSize: formatFileSize(defaultOptions.signature.MAX_SIZE) })}</p>
                                     </Dragger>
                                 )}
                             </div>

@@ -19,18 +19,35 @@
     "toolbar": {
         "buttons": {
             "createSignature": "Create signature",
-            "uploadImage": "Upload Image"
+            "uploadImage": "Upload Image",
+            "createStamp": "Create Stamp"
         },
         "message": {
             "selectPosition": "Please select a position",
-            "signatureArea": "Signature Area",
+            "signatureArea": "Signature",
             "uploadArea": "Upload Area",
-            "uploadHint": "Click to upload or drag and drop to here {{format}}"
+            "uploadHint": "Click to upload or drag and drop to here {{format}}, maxSize {{maxSize}}"
         }
     },
     "editor": {
         "text": {
             "startTyping": "Start typing…"
+        },
+        "stamp": {
+            "stampText": "Stamp Text",
+            "fontStyle": "Font Style",
+            "textColor": "Text Color",
+            "backgroundColor": "Background Color",
+            "borderColor": "Border Color",
+            "borderStyle": "Border Style",
+            "timestampText": "Timestamp Text",
+            "username": "Username",
+            "date": "Date",
+            "time": "Time",
+            "dateFormat": "Date Format",
+            "solid": "Solid", 
+            "dashed": "Dashed",
+            "defaultText": "Draft"
         }
     },
     "normal": {
@@ -58,7 +75,9 @@
         "more": "More",
         "draw": "Draw",
         "enter": "Enter",
-        "upload": "Upload"
+        "upload": "Upload",
+        "default": "Default",
+        "custom": "Custom"
     },
     "comment": {
         "total": "Comment {{value}}",

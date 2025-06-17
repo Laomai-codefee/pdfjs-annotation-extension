@@ -198,6 +198,7 @@ class PdfjsAnnotationExtension {
         createRoot(toolbar).render(
             <CustomToolbar
                 ref={this.customToolbarRef}
+                userName={this.getOption(HASH_PARAMS_USERNAME)}
                 onChange={(currentAnnotation, dataTransfer) => {
                     this.painter.activate(currentAnnotation, dataTransfer)
                 }}

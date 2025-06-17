@@ -19,18 +19,35 @@
     "toolbar": {
         "buttons": {
             "createSignature": "创建签名",
-            "uploadImages": "上传图片"
+            "uploadImages": "上传图片",
+            "createStamp": "创建印章"
         },
         "message": {
             "selectPosition": "请选择放置位置",
             "signatureArea": "签名处",
             "uploadArea": "上传区域",
-            "uploadHint": "点击上传或请将图片拖拽到此处 {{format}}"
+            "uploadHint": "点击上传或请将图片拖拽到此处，支持格式{{format}}, 最大 {{maxSize}}"
         }
     },
     "editor": {
         "text": {
             "startTyping": "开始输入..."
+        },
+        "stamp": {
+            "stampText": "印章内容",
+            "fontStyle": "字体样式",
+            "textColor": "文字颜色",
+            "backgroundColor": "背景颜色",
+            "borderColor": "边框颜色",
+            "borderStyle": "边框样式",
+            "timestampText": "时间戳",
+            "username": "用户名",
+            "date": "日期",
+            "time": "时间",
+            "dateFormat": "日期格式",
+            "solid": "实线",
+            "dashed": "虚线",
+            "defaultText": "草稿"
         }
     },
     "normal": {
@@ -58,7 +75,9 @@
         "more": "更多",
         "draw": "绘制",
         "enter": "输入",
-        "upload": "上传"
+        "upload": "上传",
+        "default": "默认",
+        "custom": "自定义"
     },
     "comment": {
         "total": " {{value}} 条批注",

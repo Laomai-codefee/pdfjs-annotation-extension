@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { defaultOptions } from '../../const/default_options'
 
 interface CustomToolbarProps {
+    userName: string
     onChange: (annotation: IAnnotationType | null, dataTransfer: string | null) => void
     onSave: () => void
     onExport: () => void
@@ -67,12 +68,11 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
         const commonProps = {
             className: isSelected ? 'selected' : ''
         }
-
         switch (annotation.type) {
             case AnnotationType.STAMP:
                 return (
                     <li title={t(`annotations.${annotation.name}`)} key={index} {...commonProps}>
-                        <StampTool annotation={annotation} onAdd={(signatureDataUrl) => handleAdd(signatureDataUrl, annotation)} />
+                        <StampTool userName={props.userName} annotation={annotation} onAdd={(signatureDataUrl) => handleAdd(signatureDataUrl, annotation)} />
                     </li>
                 )
 

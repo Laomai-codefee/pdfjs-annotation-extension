@@ -197,7 +197,7 @@
     .ant-popover-inner {
         padding: 5px;
     }
-    &-Container{
+    &-Container {
         max-height: 200px;
         overflow: auto;
     }
@@ -216,7 +216,12 @@
         margin: 5px;
         justify-content: center;
         align-items: center;
-
+        img{
+            height: 48px;
+            max-width: 100px;
+            overflow: clip;
+            object-fit: contain;
+        }
         span {
             margin-left: 5px;
             cursor: pointer;
@@ -228,16 +233,142 @@
     }
 }
 
+.StampPop {
+    width: 300px;
+    .ant-popover-inner {
+        padding: 10px;
+    }
+    &-Container {
+        max-height: 200px;
+        overflow: auto;
+        display: flex;
+        flex-wrap: wrap;
+    }
+    ul,
+    li {
+        margin: 0;
+        list-style: none;
+        padding: 0;
+        li:hover {
+            background-color: #ccc;
+        }
+    }
+    li {
+        display: flex;
+        margin: 5px;
+        padding: 5px;
+        justify-content: center;
+        align-items: center;
+        border-radius: 5px;
+        width: 120px;
+        text-align: center;
+        img{
+            height: 48px;
+            max-width: 100px;
+            overflow: clip;
+            object-fit: contain;
+        }
+        span {
+            margin-left: 5px;
+            cursor: pointer;
+        }
+    }
+    &-Toolbar {
+        padding: 5px;
+    }
+}
+
 .StampTool {
-    position: relative;
-    input {
-        position: absolute;
+    margin: 0 auto;
+    &-Container {
+        position: relative;
+        margin: 0 auto;
+        .ant-form{
+            margin-top: 12px;
+        }
+        .ant-form-item{
+            margin-bottom: 12px;
+        }
+        &-ImagePreview {
+            background-color: #eee;
+            border: 1px solid #ccc;
+            overflow: auto;
+            .konvajs-content {
+                z-index: 99;
+                margin: 0 auto;
+            }
+        }
+        &-info {
+            font-size: 20px;
+            z-index: 0;
+            color: #ccc;
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            transform: translateY(-50%);
+            text-align: center;
+        }
+    }
+
+    &-ImagePreview {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        overflow: hidden;
+        position: relative;
+    }
+    img {
         width: 100%;
         height: 100%;
-        top: 0;
-        left: 0;
-        z-index: 1;
-        opacity: 0;
+        object-fit: contain;
+        display: block;
+    }
+
+    &-Toolbar {
+        border: 1px solid #ccc;
+        border-top: 0;
+        display: flex;
+        justify-content: space-between;
+        margin: 0 auto;
+
+        .colorPalette {
+            display: flex;
+            margin: 8px;
+
+            .cell {
+                cursor: pointer;
+                width: 22px;
+                height: 22px;
+                margin-right: 10px;
+                border-radius: 100px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 1px solid #fff;
+
+                span {
+                    width: 12px;
+                    height: 12px;
+                    display: inline-block;
+                    border-radius: 100px;
+                }
+            }
+
+            .active {
+                border: 1px solid #bbb;
+            }
+        }
+
+        .clear {
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        .clear:hover {
+            text-decoration: underline;
+        }
     }
 }
 

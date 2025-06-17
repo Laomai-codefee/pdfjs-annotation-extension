@@ -19,18 +19,35 @@
     "toolbar": {
         "buttons": {
             "createSignature": "Unterschrift erstellen",
-            "uploadImage": "Bild hochladen"
+            "uploadImage": "Bild hochladen",
+            "createStamp": "Stempel erstellen"
         },
         "message": {
             "selectPosition": "Bitte wählen Sie eine Position",
             "signatureArea": "Unterschriftbereich",
             "uploadArea": "Hochladebereich",
-            "uploadHint": "Klicken Sie zum Hochladen oder ziehen Sie die Bilddatei in diese Zone {{format}}"
+            "uploadHint": "Klicken Sie zum Hochladen oder ziehen Sie die Bilddatei in diese Zone {{format}} {{maxSize}}"
         }
     },
     "editor": {
         "text": {
             "startTyping": "Tippen beginnen…"
+        },
+        "stamp": {
+            "stampText": "Stempelinhalt",
+            "fontStyle": "Schriftart",
+            "textColor": "Textfarbe",
+            "backgroundColor": "Hintergrundfarbe",
+            "borderColor": "Randfarbe",
+            "borderStyle": "Randstil",
+            "timestampText": "Zeitstempel",
+            "username": "Benutzername",
+            "date": "Datum",
+            "time": "Zeit",
+            "dateFormat": "Datumsformat",
+            "solid": "Solide",
+            "dashed": "Gestrichelt",
+            "defaultText": "Entwurf"
         }
     },
     "normal": {
@@ -58,7 +75,9 @@
         "more": "Mehr",
         "draw": "Zeichnen",
         "enter": "Eingeben",
-        "upload": "Hochladen"
+        "upload": "Hochladen",
+        "default": "Standard",
+        "custom": "Benutzerdefiniert"
     },
     "comment": {
         "total": "Kommentare: {{value}}",
