@@ -1,7 +1,7 @@
 import PingFangChangAnTiFont from './fonts/PingFangChangAnTi-2.ttf'
 import qiantubifengshouxietiFont from './fonts/qiantubifengshouxieti.ttf'
 
-const color = ['#ff0000', '#ffbe00', '#ffff00', '#83d33c', '#00b445', '#00b2f4', '#0071c4', '#001f63', '#7828a4', '#ff00ff']
+const color = ['#ff0000', '#ffbe00', '#ffff00', '#83d33c', '#00b445', '#00b2f4', '#1677ff', '#001f63', '#7828a4', '#ff00ff']
 
 const fontSize = [14, 16, 18, 20, 22, 24]
 
@@ -42,7 +42,7 @@ const defaultOptions = {
     ],
     // 签名默认配置
     signature: {
-        COLORS: ['#000000', '#ff0000', '#0000ff'],
+        COLORS: ['#000000', '#ff0000', '#1677ff'],
         WIDTH: 366,
         HEIGHT: 200,
         TYPE: 'Draw', // Draw 绘制， Enter 输入， Upload 上传默认签名模式
@@ -65,7 +65,7 @@ const defaultOptions = {
         editor: {
             // 编辑器默认配置
             DEFAULT_BACKGROUND_COLOR: '#00b445', // 默认背景颜色
-            DEFAULT_BORDER_COLOR: '#00b445', // 默认边框颜色
+            DEFAULT_BORDER_COLOR: null, // 默认边框颜色
             DEFAULT_TEXT_COLOR: '#fff' // 默认文字颜色
         }
     },
