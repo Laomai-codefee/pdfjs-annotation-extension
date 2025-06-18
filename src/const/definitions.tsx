@@ -349,7 +349,7 @@ export const annotationDefinitions: IAnnotationType[] = [
             color: defaultOptions.setting.COLOR, // 默认文字颜色
             fontSize: defaultOptions.setting.FONT_SIZE, // 默认字体大小
         },
-        styleEditable: false // 是否可编辑样式
+        styleEditable: true // 是否可编辑样式
     },
     {
         name: 'signature',

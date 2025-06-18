@@ -1,7 +1,7 @@
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 
-import { AnnotationType } from '../../const/definitions'
+import { AnnotationType, IAnnotationStore, IAnnotationStyle } from '../../const/definitions'
 import { Editor, IEditorOptions } from './editor'
 import React from 'react'
 import { Dropdown, InputRef, Modal } from 'antd'
@@ -200,6 +200,25 @@ export class EditorFreeText extends Editor {
             )
     }
 
-    protected changeStyle(): void {}
+    /**
+         * @description 更改注释样式
+         * @param annotationStore
+         * @param styles
+         */
+        protected changeStyle(annotationStore: IAnnotationStore, styles: IAnnotationStyle): void {
+            const id = annotationStore.id
+            const group = this.getShapeGroupById(id)
+            if (group) {
+                group.getChildren().forEach(shape => {
+                    if (shape instanceof Konva.Text) {
+                        shape.fill(styles.color)
+                    }
+                })
+                this.setChanged(id, {
+                    konvaString: group.toJSON(),
+                    color: styles.color
+                })
+            }
+        }
 
 }
