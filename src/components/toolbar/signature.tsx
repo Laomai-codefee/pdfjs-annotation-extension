@@ -1,5 +1,5 @@
 import './index.scss'
-import { Button, Modal, Popover, Radio } from 'antd'
+import { Button, Modal, Popover, Radio, Select } from 'antd'
 import type { UploadChangeParam } from 'antd/es/upload'
 import type { UploadFile } from 'antd/es/upload/interface'
 import Konva from 'konva'
@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next'
 import { defaultOptions } from '../../const/default_options'
 import Dragger from 'antd/es/upload/Dragger'
 import { formatFileSize } from '../../utils/utils'
+import { loadFontWithFontFace } from '../../utils/fontLoader'
 
 interface SignatureToolProps {
     annotation: IAnnotationType
@@ -33,9 +34,9 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
     const [currentColor, setCurrentColor] = useState(colorRef.current)
     const [isOKButtonDisabled, setIsOKButtonDisabled] = useState(true)
     const [signatures, setSignatures] = useState<string[]>([])
-    const [signatureType, setSignatureType] = useState<string| null>(null)
+    const [signatureType, setSignatureType] = useState<string | null>(null)
     const [typedSignature, setTypedSignature] = useState('')
-    const fontFamily = i18n.language === 'zh' ? 'Zhi Mang Xing' : 'Lavishly_Yours'
+    const [fontFamily, setFontFamily] = useState<string>(defaultOptions.handwritingFontList[0].value || 'Arial')
 
     const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null)
 
@@ -49,6 +50,11 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
     const handleAdd = (signature: string) => {
         onAdd(signature)
         setIsPopoverOpen(false)
+    }
+
+    const loadFont = async (fontValue: string) => {
+        await loadFontWithFontFace(defaultOptions.handwritingFontList.find(item => item.value === fontValue))
+        setFontFamily(fontValue)
     }
 
     const generateTypedSignatureImage = (): string | null => {
@@ -189,11 +195,11 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
         if (!file || !file.type.startsWith('image/')) return
 
         if (file.size > maxSize) {
-                // 如果文件大小超过最大限制，显示提示并返回
-                alert(t('normal.fileSizeLimit', { value: formatFileSize(maxSize) }))
-                // alert(`文件大小超出 ${formatFileSize(maxSize)} 限制`)
-                return
-            }
+            // 如果文件大小超过最大限制，显示提示并返回
+            alert(t('normal.fileSizeLimit', { value: formatFileSize(maxSize) }))
+            // alert(`文件大小超出 ${formatFileSize(maxSize)} 限制`)
+            return
+        }
 
         const reader = new FileReader()
         reader.onload = e => {
@@ -226,6 +232,7 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
 
     useEffect(() => {
         if (isModalOpen) {
+            loadFont(fontFamily)
             setTypedSignature('')
             setUploadedImageUrl(null)
             setSignatureType(defaultOptions.signature.TYPE)
@@ -309,7 +316,7 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
                                     height: defaultOptions.signature.HEIGHT,
                                     width: defaultOptions.signature.WIDTH / 1.1,
                                     color: currentColor,
-                                    fontFamily: `'${fontFamily}', cursive`,
+                                    fontFamily: `${fontFamily}`,
                                     fontSize: BASE_FONT_SIZE,
                                     lineHeight: `${BASE_FONT_SIZE}px`,
                                 }}
@@ -348,11 +355,11 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
                                         style={{
                                             height: defaultOptions.signature.HEIGHT,
                                             width: defaultOptions.signature.WIDTH,
-                                            }}
-                                        >
-                                            <p className="ant-upload-drag-icon" />
-                                            <p className="ant-upload-text">{t('toolbar.message.uploadArea')}</p>
-                                            <p className="ant-upload-hint">{t('toolbar.message.uploadHint', { format: defaultOptions.signature.ACCEPT, maxSize: formatFileSize(defaultOptions.signature.MAX_SIZE) })}</p>
+                                        }}
+                                    >
+                                        <p className="ant-upload-drag-icon" />
+                                        <p className="ant-upload-text">{t('toolbar.message.uploadArea')}</p>
+                                        <p className="ant-upload-hint">{t('toolbar.message.uploadHint', { format: defaultOptions.signature.ACCEPT, maxSize: formatFileSize(defaultOptions.signature.MAX_SIZE) })}</p>
                                     </Dragger>
                                 )}
                             </div>
@@ -373,6 +380,20 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
                                     }
                                 </>
                             }
+                            {
+                                signatureType === 'Enter' && <>
+                                    <Select
+                                        style={{ width: 160 }}
+                                        size='small'
+                                        defaultValue={fontFamily}
+                                        options={defaultOptions.handwritingFontList}
+                                        onChange={async (value) => {
+                                            await loadFont(value)
+                                        }}
+                                    />
+                                </>
+                            }
+
                         </div>
                         <div className="clear" onClick={handleClear}>
                             {t('normal.clear')}

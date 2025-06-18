@@ -94,7 +94,7 @@ const StampTool: React.FC<SignatureToolProps> = ({ annotation, onAdd, userName }
     const DEFAULT_VALUE: FieldType = {
         stampText: t('editor.stamp.defaultText'),
         fontStyle: [],
-        fontFamily: defaultOptions.stamp.editor.DEFAULT_TEXT_FONT_LIST[0].value,
+        fontFamily: defaultOptions.defaultFontList[0].value,
         textColor: defaultOptions.stamp.editor.DEFAULT_TEXT_COLOR,
         backgroundColor: defaultOptions.stamp.editor.DEFAULT_BACKGROUND_COLOR,
         borderColor: defaultOptions.stamp.editor.DEFAULT_BORDER_COLOR,
@@ -478,7 +478,7 @@ const StampTool: React.FC<SignatureToolProps> = ({ annotation, onAdd, userName }
                                 <Col span={7}>
                                     <Form.Item<FieldType> name="fontFamily" label={t('editor.stamp.fontFamily')}>
                                         <Select
-                                            options={defaultOptions.stamp.editor.DEFAULT_TEXT_FONT_LIST}
+                                            options={defaultOptions.defaultFontList}
                                         />
                                     </Form.Item>
                                 </Col>

@@ -1,3 +1,6 @@
+import PingFangChangAnTiFont from './fonts/PingFangChangAnTi-2.ttf'
+import qiantubifengshouxietiFont from './fonts/qiantubifengshouxieti.ttf'
+
 const color = ['#ff0000', '#ffbe00', '#ffff00', '#83d33c', '#00b445', '#00b2f4', '#0071c4', '#001f63', '#7828a4', '#ff00ff']
 
 const fontSize = [14, 16, 18, 20, 22, 24]
@@ -7,6 +10,36 @@ const defaultOptions = {
     colors: color,
     // 默认字体大小
     fontSize: fontSize,
+    defaultFontList: [
+        // 常用英文
+        { label: 'Arial', value: 'Arial' },
+        { label: 'Times New Roman', value: 'Times New Roman' },
+        { label: 'Georgia', value: 'Georgia' },
+        { label: 'Verdana', value: 'Verdana' },
+        { label: 'Tahoma', value: 'Tahoma, Geneva, sans-serif' },
+        { label: 'Trebuchet MS', value: '"Trebuchet MS", sans-serif' },
+        { label: 'Courier New', value: '"Courier New", Courier, monospace' },
+        { label: 'Lucida Console', value: '"Lucida Console", Monaco, monospace' },
+        // 常用中文
+        { label: '宋体', value: 'SimSun, Songti SC, STSong, 宋体, "Noto Serif SC", serif' },
+        { label: '黑体', value: 'Microsoft YaHei, PingFang SC, Heiti SC, SimHei, 黑体, sans-serif' },
+        { label: '楷体', value: 'KaiTi, KaiTi_GB2312, STFangsong, 楷体, "AR PL UKai CN", serif' }
+    ],
+    handwritingFontList: [
+        // 自定义字体
+        {
+            label: '平方长安体',
+            value: 'PingFangChangAnTi-2',
+            external: true,
+            url: PingFangChangAnTiFont
+        },
+        {
+            label: '千图笔锋手写体',
+            value: 'qiantubifengshouxieti',
+            external: true,
+            url: qiantubifengshouxietiFont
+        }
+    ],
     // 签名默认配置
     signature: {
         COLORS: ['#000000', '#ff0000', '#0000ff'],
@@ -33,22 +66,7 @@ const defaultOptions = {
             // 编辑器默认配置
             DEFAULT_BACKGROUND_COLOR: '#00b445', // 默认背景颜色
             DEFAULT_BORDER_COLOR: '#00b445', // 默认边框颜色
-            DEFAULT_TEXT_COLOR: '#fff', // 默认文字颜色
-            DEFAULT_TEXT_FONT_LIST: [
-                // 常用英文
-                { label: 'Arial', value: 'Arial' },
-                { label: 'Times New Roman', value: 'Times New Roman' },
-                { label: 'Georgia', value: 'Georgia' },
-                { label: 'Verdana', value: 'Verdana' },
-                { label: 'Tahoma', value: 'Tahoma, Geneva, sans-serif' },
-                { label: 'Trebuchet MS', value: '"Trebuchet MS", sans-serif' },
-                { label: 'Courier New', value: '"Courier New", Courier, monospace' },
-                { label: 'Lucida Console', value: '"Lucida Console", Monaco, monospace' },
-                // 常用中文
-                { label: '宋体', value: 'SimSun, Songti SC, STSong, 宋体, "Noto Serif SC", serif' },
-                { label: '黑体', value: 'Microsoft YaHei, PingFang SC, Heiti SC, SimHei, 黑体, sans-serif' },
-                { label: '楷体', value: 'KaiTi, KaiTi_GB2312, STFangsong, 楷体, "AR PL UKai CN", serif' }
-            ]
+            DEFAULT_TEXT_COLOR: '#fff' // 默认文字颜色
         }
     },
     // 选择器默认配置
