@@ -36,11 +36,13 @@
         "stamp": {
             "stampText": "Stempelinhalt",
             "fontStyle": "Schriftart",
+            "fontFamily": "Schriftfamilie",
             "textColor": "Textfarbe",
             "backgroundColor": "Hintergrundfarbe",
             "borderColor": "Randfarbe",
             "borderStyle": "Randstil",
             "timestampText": "Zeitstempel",
+            "customTimestamp": "Benutzerdefiniert",
             "username": "Benutzername",
             "date": "Datum",
             "time": "Zeit",

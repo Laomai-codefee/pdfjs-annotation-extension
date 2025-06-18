@@ -1,10 +1,9 @@
 import './index.scss'
-import { Button, Modal, Popover, Radio, Upload } from 'antd'
+import { Button, Modal, Popover, Radio } from 'antd'
 import type { UploadChangeParam } from 'antd/es/upload'
 import type { UploadFile } from 'antd/es/upload/interface'
 import Konva from 'konva'
 import React, {
-    useCallback,
     useEffect,
     useRef,
     useState,

@@ -20,11 +20,13 @@ interface SignatureToolProps {
 type FieldType = {
     stampText: string
     fontStyle: string[]
+    fontFamily: string,
     textColor: string
     backgroundColor: string
     borderColor: string
     borderStyle: 'solid' | 'dashed'
     timestamp: string[]
+    customTimestampText: string
     dateFormat: string
 }
 
@@ -92,11 +94,13 @@ const StampTool: React.FC<SignatureToolProps> = ({ annotation, onAdd, userName }
     const DEFAULT_VALUE: FieldType = {
         stampText: t('editor.stamp.defaultText'),
         fontStyle: [],
+        fontFamily: defaultOptions.stamp.editor.DEFAULT_TEXT_FONT_LIST[0].value,
         textColor: defaultOptions.stamp.editor.DEFAULT_TEXT_COLOR,
         backgroundColor: defaultOptions.stamp.editor.DEFAULT_BACKGROUND_COLOR,
         borderColor: defaultOptions.stamp.editor.DEFAULT_BORDER_COLOR,
         borderStyle: 'solid',
         timestamp: ['username', 'date'],
+        customTimestampText: '',
         dateFormat: 'YYYY-MM-DD'
     }
     const [lastFormValues, setLastFormValues] = useState<FieldType>(DEFAULT_VALUE)
@@ -157,7 +161,7 @@ const StampTool: React.FC<SignatureToolProps> = ({ annotation, onAdd, userName }
     const initializeKonvaStage = (values: FieldType) => {
         if (!containerRef.current) return
 
-        const { stampText, fontStyle, textColor, backgroundColor, borderColor, borderStyle, timestamp, dateFormat } = values
+        const { stampText, fontStyle, textColor, backgroundColor, borderColor, borderStyle, timestamp, dateFormat, fontFamily } = values
 
         // 清除旧 stage
         konvaStageRef.current?.destroy()
@@ -180,7 +184,13 @@ const StampTool: React.FC<SignatureToolProps> = ({ annotation, onAdd, userName }
         const username = userName
         // 使用用户选择的格式来格式化日期
         const formattedDate = dateFormat ? now.format(dateFormat) : ''
-        const timestampText = [timestamp.includes('username') ? username : null, timestamp.includes('date') ? formattedDate : null].filter(Boolean).join(' · ')
+        const customText = values.customTimestampText?.trim()
+        const timestampParts = [
+            timestamp.includes('username') ? username : null,
+            timestamp.includes('date') ? formattedDate : null,
+            customText || null
+        ].filter(Boolean)
+        const timestampText = timestampParts.join(' · ')
         let textFontSize = 30
         const timeFontSize = 16
         const spacing = 10
@@ -190,13 +200,13 @@ const StampTool: React.FC<SignatureToolProps> = ({ annotation, onAdd, userName }
             text: stampText,
             fontSize: textFontSize,
             fontStyle: fontStyleValue,
-            fontFamily: 'Arial'
+            fontFamily: fontFamily
         })
 
         const tempTimestampNode = new Konva.Text({
             text: timestampText,
             fontSize: timeFontSize,
-            fontFamily: 'Arial'
+            fontFamily: fontFamily
         })
 
         const contentWidth = Math.max(tempTextNode.width(), tempTimestampNode.width()) + 60
@@ -241,7 +251,7 @@ const StampTool: React.FC<SignatureToolProps> = ({ annotation, onAdd, userName }
             align: 'center',
             fontSize: textFontSize,
             fontStyle: fontStyleValue,
-            fontFamily: 'Arial',
+            fontFamily: fontFamily,
             fill: textColor
         })
 
@@ -274,7 +284,7 @@ const StampTool: React.FC<SignatureToolProps> = ({ annotation, onAdd, userName }
             width: STAMP_WIDTH,
             align: 'center',
             fontSize: timeFontSize,
-            fontFamily: 'Arial',
+            fontFamily: fontFamily,
             fill: textColor
         })
         if (timestampText) {
@@ -431,6 +441,16 @@ const StampTool: React.FC<SignatureToolProps> = ({ annotation, onAdd, userName }
                                 <Input />
                             </Form.Item>
                             <Row>
+                                <Col span={5}>
+                                    <Form.Item<FieldType> name="textColor" label={t('editor.stamp.textColor')}>
+                                        <ColorPicker
+                                            format="rgb"
+                                            size="small"
+                                            arrow={true}
+                                            presets={[{ label: '', colors: ['#ffffff', '#000000', ...defaultOptions.colors] }]}
+                                        />
+                                    </Form.Item>
+                                </Col>
                                 <Col span={12}>
                                     <Form.Item<FieldType> name="fontStyle" label={t('editor.stamp.fontStyle')}>
                                         <Checkbox.Group
@@ -455,17 +475,14 @@ const StampTool: React.FC<SignatureToolProps> = ({ annotation, onAdd, userName }
                                         />
                                     </Form.Item>
                                 </Col>
-                                <Col span={6}>
-                                    <Form.Item<FieldType> name="textColor" label={t('editor.stamp.textColor')}>
-                                        <ColorPicker
-                                            format="rgb"
-                                            size="small"
-                                            arrow={true}
-                                            disabledAlpha
-                                            presets={[{ label: '', colors: ['#ffffff', '#000000', ...defaultOptions.colors] }]}
+                                <Col span={7}>
+                                    <Form.Item<FieldType> name="fontFamily" label={t('editor.stamp.fontFamily')}>
+                                        <Select
+                                            options={defaultOptions.stamp.editor.DEFAULT_TEXT_FONT_LIST}
                                         />
                                     </Form.Item>
                                 </Col>
+
                             </Row>
                             <Row>
                                 <Col span={8}>
@@ -474,25 +491,23 @@ const StampTool: React.FC<SignatureToolProps> = ({ annotation, onAdd, userName }
                                             allowClear
                                             size="small"
                                             arrow={true}
-                                            disabledAlpha
                                             showText={false}
                                             presets={[{ label: '', colors: defaultOptions.colors }]}
                                         />
                                     </Form.Item>
                                 </Col>
-                                <Col span={6}>
+                                <Col span={8}>
                                     <Form.Item<FieldType> name="borderColor" label={t('editor.stamp.borderColor')}>
                                         <ColorPicker
                                             allowClear
                                             size="small"
                                             arrow={true}
-                                            disabledAlpha
                                             showText={false}
                                             presets={[{ label: '', colors: defaultOptions.colors }]}
                                         />
                                     </Form.Item>
                                 </Col>
-                                <Col span={10}>
+                                <Col span={8}>
                                     <Form.Item<FieldType> name="borderStyle" label={t('editor.stamp.borderStyle')}>
                                         <Radio.Group
                                             block
@@ -505,22 +520,32 @@ const StampTool: React.FC<SignatureToolProps> = ({ annotation, onAdd, userName }
                                 </Col>
                             </Row>
                             <Divider />
-                            <Form.Item<FieldType> name="timestamp" label={t('editor.stamp.timestampText')}>
-                                <Checkbox.Group
-                                    options={[
-                                        {
-                                            value: 'username',
-                                            label: t('editor.stamp.username')
-                                        },
-                                        {
-                                            value: 'date',
-                                            label: t('editor.stamp.date')
-                                        }
-                                    ]}
-                                />
-                            </Form.Item>
-                            <Form.Item<FieldType> name="dateFormat" label={t('editor.stamp.dateFormat')}>
-                                <Select options={DATE_FORMAT_OPTIONS} />
+                            <Row>
+                                <Col span={10}>
+                                    <Form.Item<FieldType> name="timestamp" label={t('editor.stamp.timestampText')}>
+                                        <Checkbox.Group
+                                            options={[
+                                                {
+                                                    value: 'username',
+                                                    label: t('editor.stamp.username')
+                                                },
+                                                {
+                                                    value: 'date',
+                                                    label: t('editor.stamp.date')
+                                                }
+                                            ]}
+                                        />
+                                    </Form.Item>
+                                </Col>
+                                <Col span={14}>
+                                    <Form.Item<FieldType> name="dateFormat" label={t('editor.stamp.dateFormat')}>
+                                        <Select options={DATE_FORMAT_OPTIONS} />
+                                    </Form.Item>
+
+                                </Col>
+                            </Row>
+                            <Form.Item<FieldType> name="customTimestampText" label={t('editor.stamp.customTimestamp')}>
+                                <Input />
                             </Form.Item>
                         </Form>
                     </div>

@@ -36,11 +36,13 @@
         "stamp": {
             "stampText": "印章内容",
             "fontStyle": "字体样式",
+            "fontFamily": "字体",
             "textColor": "文字颜色",
             "backgroundColor": "背景颜色",
             "borderColor": "边框颜色",
             "borderStyle": "边框样式",
             "timestampText": "时间戳",
+            "customTimestamp": "自定义",
             "username": "用户名",
             "date": "日期",
             "time": "时间",

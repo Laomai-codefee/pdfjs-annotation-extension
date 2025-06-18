@@ -36,11 +36,13 @@
         "stamp": {
             "stampText": "Stamp Text",
             "fontStyle": "Font Style",
+            "fontFamily": "Font Family",
             "textColor": "Text Color",
             "backgroundColor": "Background Color",
             "borderColor": "Border Color",
             "borderStyle": "Border Style",
             "timestampText": "Timestamp Text",
+            "customTimestamp": "Custom Text",
             "username": "Username",
             "date": "Date",
             "time": "Time",
