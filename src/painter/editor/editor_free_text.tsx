@@ -10,6 +10,7 @@ import { FontSizeIcon } from '../../const/icon'
 import './editor_free_text.scss'
 import i18n from 'i18next'
 import { defaultOptions } from '../../const/default_options'
+import { isSameColor } from '../../utils/utils'
 
 export async function setInputText(color: string, fontSize: number): Promise<{ inputValue: string, color: string, fontSize: number }> {
     let currentColor = color;
@@ -84,7 +85,7 @@ export async function setInputText(color: string, fontSize: number): Promise<{ i
                     <div className='EditorFreeText-Modal-Toolbar'>
                         <div className="colorPalette">
                             {defaultOptions.colors.map(color => (
-                                <div onClick={() => handleColorChange(color)} className={`cell ${color === currentColor ? 'active' : ''}`} key={color}>
+                                <div onClick={() => handleColorChange(color)} className={`cell ${isSameColor(color, currentColor) ? 'active' : ''}`} key={color}>
                                     <span style={{ backgroundColor: color }}></span>
                                 </div>
                             ))}
@@ -188,16 +189,16 @@ export class EditorFreeText extends Editor {
         this.currentShapeGroup.konvaGroup.add(text)
 
         const id = this.currentShapeGroup.konvaGroup.id()
-            this.setShapeGroupDone(
-                {
-                    id,
-                    contentsObj: {
-                        text: value,
-                    },
-                    color,
-                    fontSize
-                }
-            )
+        this.setShapeGroupDone(
+            {
+                id,
+                contentsObj: {
+                    text: value,
+                },
+                color,
+                fontSize
+            }
+        )
     }
 
     /**
@@ -205,20 +206,31 @@ export class EditorFreeText extends Editor {
          * @param annotationStore
          * @param styles
          */
-        protected changeStyle(annotationStore: IAnnotationStore, styles: IAnnotationStyle): void {
-            const id = annotationStore.id
-            const group = this.getShapeGroupById(id)
-            if (group) {
-                group.getChildren().forEach(shape => {
-                    if (shape instanceof Konva.Text) {
+    protected changeStyle(annotationStore: IAnnotationStore, styles: IAnnotationStyle): void {
+        const id = annotationStore.id
+        const group = this.getShapeGroupById(id)
+        if (group) {
+            group.getChildren().forEach(shape => {
+                if (shape instanceof Konva.Text) {
+                    if (styles.color !== undefined) {
                         shape.fill(styles.color)
                     }
-                })
-                this.setChanged(id, {
-                    konvaString: group.toJSON(),
-                    color: styles.color
-                })
+                    if (styles.opacity !== undefined) {
+                        shape.opacity(styles.opacity)
+                    }
+                }
+            })
+
+            const changedPayload: { konvaString: string; color?: string } = {
+                konvaString: group.toJSON()
             }
+
+            if (styles.color !== undefined) {
+                changedPayload.color = styles.color
+            }
+
+            this.setChanged(id, changedPayload)
         }
+    }
 
 }

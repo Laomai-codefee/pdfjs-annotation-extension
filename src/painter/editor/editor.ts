@@ -197,7 +197,6 @@ export abstract class Editor {
      * @returns
      */
     protected getShapeGroupById(id: string): Konva.Group {
-        console.log(this.konvaStage)
         const group = this.konvaStage.findOne(node => node.getType() === 'Group' && node.id() === id) // 查找对应 ID 的 Konva.Group 对象
         return group as Konva.Group // 返回找到的 Konva.Group 对象
     }

@@ -54,6 +54,26 @@
                 border: 1px solid #bbb;
             }
         }
+        .prototypeSetting {
+            margin: 8px;
+            .ant-form-item{
+                margin-bottom: 8px;
+            }
+            .ant-form-item-label{
+                padding: 0;
+                label {
+                        color: var(--main-color);
+                }
+            }
+            .ant-slider:hover {
+                .ant-slider-rail {
+                    background-color: var(--toolbar-border-color);
+                }
+            }
+            .ant-slider-rail {
+                background-color: var(--toolbar-border-color);
+            }
+        }
     }
 
     .buttons {

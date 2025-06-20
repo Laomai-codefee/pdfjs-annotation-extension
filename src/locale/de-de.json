@@ -79,7 +79,9 @@
         "enter": "Eingeben",
         "upload": "Hochladen",
         "default": "Standard",
-        "custom": "Benutzerdefiniert"
+        "custom": "Benutzerdefiniert",
+        "strokeWidth": "Strichbreite",
+        "opacity": "Deckkraft"
     },
     "comment": {
         "total": "Kommentare: {{value}}",

@@ -791,8 +791,6 @@ export class Painter {
      */
     public updateAnnotationStyle(annotationStore: IAnnotationStore, style: IAnnotationStyle) {
         const editor = this.findEditorForGroupId(annotationStore.id)
-        console.log(this.editorStore)
-        console.log('%c [ editor ]-769-「undefined」', 'font-size:13px; background:#bda24a; color:#ffe68e;', editor)
         if (editor) {
             editor.updateStyle(annotationStore, style) // 更新编辑器样式
         }

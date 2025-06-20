@@ -219,8 +219,8 @@ export class EditorCloud extends Editor {
             y: pos.y - this.startRectSize / 2,
             width: this.startRectSize,
             height: this.startRectSize,
-            stroke: '#999',
-            strokeWidth: 1,
+            stroke: '#000',
+            strokeWidth: 2,
             fill: null,
             cornerRadius: 2,
             hitStrokeWidth: 10, // 增加点击检测区域
@@ -235,11 +235,11 @@ export class EditorCloud extends Editor {
             this.handleDoubleClick()
         })
         this.startRect.on('mousemove', (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
-            this.startRect.stroke('#000')
+            this.startRect.stroke('#1677ff')
             this.startRect.getLayer()?.batchDraw()
         })
         this.startRect.on('mouseout', (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
-            this.startRect.stroke('#999')
+            this.startRect.stroke('#000')
             this.startRect.getLayer()?.batchDraw()
         })
     }
@@ -255,13 +255,27 @@ export class EditorCloud extends Editor {
             if (group) {
                 group.getChildren().forEach(shape => {
                     if (shape instanceof Konva.Path) {
-                        shape.stroke(styles.color)
+                        if (styles.color !== undefined) {
+                            shape.stroke(styles.color)
+                        }
+                        if (styles.strokeWidth !== undefined) {
+                            shape.strokeWidth(styles.strokeWidth)
+                        }
+                        if (styles.opacity !== undefined) {
+                            shape.opacity(styles.opacity)
+                        }
                     }
                 })
-                this.setChanged(id, {
-                    konvaString: group.toJSON(),
-                    color: styles.color
-                })
+    
+                const changedPayload: { konvaString: string; color?: string } = {
+                    konvaString: group.toJSON()
+                }
+    
+                if (styles.color !== undefined) {
+                    changedPayload.color = styles.color
+                }
+    
+                this.setChanged(id, changedPayload)
             }
         }
 }

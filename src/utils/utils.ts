@@ -362,13 +362,15 @@ function getTimestampString(date: Date = new Date()): string {
 function hashArrayOfObjects<T extends Record<string, any>>(arr: T[]): number {
     const jsonString = JSON.stringify(arr, (key, value) => {
         if (value && typeof value === 'object' && !Array.isArray(value)) {
-            return Object.keys(value).sort().reduce((sortedObject: Record<string, any>, k) => {
-                sortedObject[k] = value[k]
-                return sortedObject
-            }, {});
+            return Object.keys(value)
+                .sort()
+                .reduce((sortedObject: Record<string, any>, k) => {
+                    sortedObject[k] = value[k]
+                    return sortedObject
+                }, {})
         }
         return value
-    });
+    })
 
     let hash = 0
     if (jsonString.length === 0) {
@@ -376,10 +378,50 @@ function hashArrayOfObjects<T extends Record<string, any>>(arr: T[]): number {
     }
     for (let i = 0; i < jsonString.length; i++) {
         const char = jsonString.charCodeAt(i)
-        hash = ((hash << 5) - hash) + char
+        hash = (hash << 5) - hash + char
         hash |= 0
     }
     return hash
+}
+
+function normalizeColor(input: string): string {
+    const hexRegex = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/
+    const rgbRegex = /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/
+
+    input = input.trim().toLowerCase()
+
+    if (hexRegex.test(input)) {
+        if (input.length === 4) {
+            return (
+                '#' +
+                input
+                    .slice(1)
+                    .split('')
+                    .map(c => c + c)
+                    .join('')
+            )
+        }
+        return input
+    }
+
+    const match = input.match(rgbRegex)
+    if (match) {
+        const r = Number(match[1])
+        const g = Number(match[2])
+        const b = Number(match[3])
+        const clamp = (n: number) => Math.max(0, Math.min(255, n))
+        return '#' + [r, g, b].map(n => clamp(n).toString(16).padStart(2, '0')).join('')
+    }
+
+    throw new Error(`Unsupported color format: ${input}`)
+}
+
+function isSameColor(color1: string, color2: string): boolean {
+    try {
+        return normalizeColor(color1) === normalizeColor(color2)
+    } catch {
+        return false
+    }
 }
 
 export {
@@ -403,5 +445,6 @@ export {
     convertKonvaRectToPdfRect,
     stringToPDFHexString,
     getTimestampString,
-    hashArrayOfObjects
+    hashArrayOfObjects,
+    isSameColor
 }

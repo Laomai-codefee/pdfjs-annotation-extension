@@ -112,14 +112,37 @@ export class EditorArrow extends Editor {
         if (group) {
             group.getChildren().forEach(shape => {
                 if (shape instanceof Konva.Arrow) {
-                    shape.stroke(styles.color)
-                    shape.fill(styles.color)
+                    if (styles.color !== undefined) {
+                        shape.stroke(styles.color)
+                        shape.fill(styles.color)
+                    }
+                    if (styles.strokeWidth !== undefined) {
+                        const sw = styles.strokeWidth
+                        shape.strokeWidth(sw)
+
+                        const ratio = 5
+                        const minSize = 6
+                        const maxSize = 30
+
+                        const pointerSize = Math.max(minSize, Math.min(maxSize, sw * ratio))
+                        shape.pointerLength(pointerSize)
+                        shape.pointerWidth(pointerSize)
+                    }
+                    if (styles.opacity !== undefined) {
+                        shape.opacity(styles.opacity)
+                    }
                 }
             })
-            this.setChanged(id, {
-                konvaString: group.toJSON(),
-                color: styles.color
-            })
+
+            const changedPayload: { konvaString: string; color?: string } = {
+                konvaString: group.toJSON()
+            }
+
+            if (styles.color !== undefined) {
+                changedPayload.color = styles.color
+            }
+
+            this.setChanged(id, changedPayload)
         }
     }
 }

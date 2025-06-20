@@ -79,7 +79,9 @@
         "enter": "输入",
         "upload": "上传",
         "default": "默认",
-        "custom": "自定义"
+        "custom": "自定义",
+        "strokeWidth": "笔触宽度",
+        "opacity": "透明度"
     },
     "comment": {
         "total": " {{value}} 条批注",

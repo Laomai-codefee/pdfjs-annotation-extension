@@ -147,13 +147,27 @@ export class EditorFreeHand extends Editor {
         if (group) {
             group.getChildren().forEach(shape => {
                 if (shape instanceof Konva.Line) {
-                    shape.stroke(styles.color)
+                    if (styles.color !== undefined) {
+                        shape.stroke(styles.color)
+                    }
+                    if (styles.strokeWidth !== undefined) {
+                        shape.strokeWidth(styles.strokeWidth)
+                    }
+                    if (styles.opacity !== undefined) {
+                        shape.opacity(styles.opacity)
+                    }
                 }
             })
-            this.setChanged(id, {
-                konvaString: group.toJSON(),
-                color: styles.color
-            })
+
+            const changedPayload: { konvaString: string; color?: string } = {
+                konvaString: group.toJSON()
+            }
+
+            if (styles.color !== undefined) {
+                changedPayload.color = styles.color
+            }
+
+            this.setChanged(id, changedPayload)
         }
     }
 }

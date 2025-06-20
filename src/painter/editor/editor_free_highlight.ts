@@ -92,15 +92,13 @@ export class EditorFreeHighlight extends Editor {
             const originalPoints = this.line.points()
             const correctedPoints = this.correctLineIfStraight(originalPoints)
             this.line.points(correctedPoints) // 更新线条点集为修正后的点集
-            this.setShapeGroupDone(
-                {
-                    id: group.id(),
-                    color: this.currentAnnotation.style.color,
-                    contentsObj: {
-                        text: ''
-                    }
+            this.setShapeGroupDone({
+                id: group.id(),
+                color: this.currentAnnotation.style.color,
+                contentsObj: {
+                    text: ''
                 }
-            )
+            })
             this.line = null
         }
     }
@@ -162,24 +160,37 @@ export class EditorFreeHighlight extends Editor {
     }
 
     /**
-         * @description 更改注释样式
-         * @param annotationStore
-         * @param styles
-         */
-        protected changeStyle(annotationStore: IAnnotationStore, styles: IAnnotationStyle): void {
-            const id = annotationStore.id
-            const group = this.getShapeGroupById(id)
-            if (group) {
-                group.getChildren().forEach(shape => {
-                    if (shape instanceof Konva.Line) {
+     * @description 更改注释样式
+     * @param annotationStore
+     * @param styles
+     */
+    protected changeStyle(annotationStore: IAnnotationStore, styles: IAnnotationStyle): void {
+        const id = annotationStore.id
+        const group = this.getShapeGroupById(id)
+        if (group) {
+            group.getChildren().forEach(shape => {
+                if (shape instanceof Konva.Line) {
+                    if (styles.color !== undefined) {
                         shape.stroke(styles.color)
                     }
-                })
-                this.setChanged(id, {
-                    konvaString: group.toJSON(),
-                    color: styles.color
-                })
-            }
-        }
+                    if (styles.strokeWidth !== undefined) {
+                        shape.strokeWidth(styles.strokeWidth)
+                    }
+                    if (styles.opacity !== undefined) {
+                        shape.opacity(styles.opacity)
+                    }
+                }
+            })
 
+            const changedPayload: { konvaString: string; color?: string } = {
+                konvaString: group.toJSON()
+            }
+
+            if (styles.color !== undefined) {
+                changedPayload.color = styles.color
+            }
+
+            this.setChanged(id, changedPayload)
+        }
+    }
 }

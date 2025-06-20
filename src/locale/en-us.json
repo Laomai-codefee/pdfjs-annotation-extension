@@ -47,7 +47,7 @@
             "date": "Date",
             "time": "Time",
             "dateFormat": "Date Format",
-            "solid": "Solid", 
+            "solid": "Solid",
             "dashed": "Dashed",
             "defaultText": "Draft"
         }
@@ -79,7 +79,9 @@
         "enter": "Enter",
         "upload": "Upload",
         "default": "Default",
-        "custom": "Custom"
+        "custom": "Custom",
+        "strokeWidth": "Stroke",
+        "opacity": "Opacity"
     },
     "comment": {
         "total": "Comment {{value}}",

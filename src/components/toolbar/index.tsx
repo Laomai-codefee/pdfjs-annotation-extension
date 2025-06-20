@@ -1,7 +1,7 @@
 import './index.scss'
 import { ColorPicker, message } from 'antd'
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
-import { annotationDefinitions, AnnotationType, IAnnotationType, PdfjsAnnotationEditorType } from '../../const/definitions'
+import { annotationDefinitions, AnnotationType, IAnnotationStyle, IAnnotationType, PdfjsAnnotationEditorType } from '../../const/definitions'
 import { AnnoIcon, ExportIcon, PaletteIcon, SaveIcon } from '../../const/icon'
 import { SignatureTool } from './signature'
 import { StampTool } from './stamp'
@@ -18,6 +18,7 @@ interface CustomToolbarProps {
 
 export interface CustomToolbarRef {
     activeAnnotation(annotation: IAnnotationType): void
+    updateStyle(annotationType: AnnotationType,  style: IAnnotationStyle): void
     toggleSidebarBtn(open: boolean) :void
 }
 
@@ -33,7 +34,8 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
 
     useImperativeHandle(ref, () => ({
         activeAnnotation,
-        toggleSidebarBtn
+        toggleSidebarBtn,
+        updateStyle
     }))
 
     const activeAnnotation = (annotation: IAnnotationType) => {
@@ -43,6 +45,19 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
     const toggleSidebarBtn = (open: boolean) => {
         setSidebarOpen(open)
     }
+
+    const updateStyle = (annotationType: AnnotationType,  style: IAnnotationStyle) => {
+        setAnnotations(annotations.map(annotation => {
+            if (annotation.type === annotationType) {
+                annotation.style = {
+                    ...annotation.style,
+                    ...style
+                }
+            }
+            return annotation
+        }))
+    }
+
 
     const selectedType = currentAnnotation?.type
 
@@ -93,7 +108,7 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
         }
     })
 
-    const isColorDisabled = !currentAnnotation?.style?.color
+    const isColorDisabled = !currentAnnotation?.styleEditable?.color
 
     useEffect(() => {
         // 调用 onChange 并传递当前的 annotation 和 dataTransfer

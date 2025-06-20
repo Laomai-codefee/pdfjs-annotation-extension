@@ -249,6 +249,7 @@ class PdfjsAnnotationExtension {
                 }}
                 onChangeStyle={(currentAnnotation, style) => {
                     this.painter.updateAnnotationStyle(currentAnnotation, style)
+                    this.customToolbarRef.current.updateStyle(currentAnnotation.type, style)
                 }}
                 onDelete={(currentAnnotation) => {
                     this.painter.delete(currentAnnotation.id, true)

@@ -167,8 +167,8 @@ export class EditorHighLight extends Editor {
 
     /**
      * @description 更改注释样式
-     * @param annotationStore 
-     * @param styles 
+     * @param annotationStore
+     * @param styles
      */
     protected changeStyle(annotationStore: IAnnotationStore, styles: IAnnotationStyle): void {
         const id = annotationStore.id
@@ -177,24 +177,53 @@ export class EditorHighLight extends Editor {
             group.getChildren().forEach(shape => {
                 if (annotationStore.type === AnnotationType.HIGHLIGHT) {
                     if (shape instanceof Konva.Rect) {
-                        shape.fill(styles.color)
+                        if (styles.color !== undefined) {
+                            shape.fill(styles.color)
+                        }
+                        if (styles.strokeWidth !== undefined) {
+                            shape.strokeWidth(styles.strokeWidth)
+                        }
+                        if (styles.opacity !== undefined) {
+                            shape.opacity(styles.opacity)
+                        }
                     }
                 }
                 if (annotationStore.type === AnnotationType.UNDERLINE) {
                     if (shape instanceof Konva.Rect) {
-                        shape.stroke(styles.color)
+                        if (styles.color !== undefined) {
+                            shape.stroke(styles.color)
+                        }
+                        if (styles.strokeWidth !== undefined) {
+                            shape.strokeWidth(styles.strokeWidth)
+                        }
+                        if (styles.opacity !== undefined) {
+                            shape.opacity(styles.opacity)
+                        }
                     }
                 }
                 if (annotationStore.type === AnnotationType.STRIKEOUT) {
                     if (shape instanceof Konva.Rect) {
-                        shape.stroke(styles.color)
+                        if (styles.color !== undefined) {
+                            shape.stroke(styles.color)
+                        }
+                        if (styles.strokeWidth !== undefined) {
+                            shape.strokeWidth(styles.strokeWidth)
+                        }
+                        if (styles.opacity !== undefined) {
+                            shape.opacity(styles.opacity)
+                        }
                     }
                 }
             })
-            this.setChanged(id, {
-                konvaString: group.toJSON(),
-                color: styles.color
-            })
+            const changedPayload: { konvaString: string; color?: string } = {
+                konvaString: group.toJSON()
+            }
+
+            if (styles.color !== undefined) {
+                changedPayload.color = styles.color
+            }
+
+            this.setChanged(id, changedPayload)
         }
     }
 }
