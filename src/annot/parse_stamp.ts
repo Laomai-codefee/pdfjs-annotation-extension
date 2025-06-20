@@ -68,7 +68,7 @@ export class StampParser extends AnnotationParser {
             Type: PDFName.of('Annot'),
             Subtype: PDFName.of('Stamp'),
             Rect: rect,
-            NM: PDFHexString.fromText(annotation.id),
+            NM: PDFString.of(annotation.id),
             Contents: stringToPDFHexString(annotation.contentsObj?.text || ''),
             T: stringToPDFHexString(annotation.title || t('normal.unknownUser')),
             M: PDFString.of(annotation.date),
@@ -94,7 +94,7 @@ export class StampParser extends AnnotationParser {
                 M: PDFString.of(comment.date),
                 IRT: stampAnnRef,
                 RT: PDFName.of('R'),
-                NM: PDFHexString.fromText(comment.id),
+                NM: PDFString.of(comment.id),
                 Open: false
             })
             const replyAnnRef = context.register(replyAnn)

@@ -37,9 +37,9 @@ export class HighlightParser extends AnnotationParser {
             QuadPoints: quadPoints,
             C: rgbToPdfColor(annotation.color), // 批注颜色
             T: stringToPDFHexString(annotation.title || t('normal.unknownUser')), // 作者
-            Contents: '', // 主内容
+            Contents: stringToPDFHexString(''), // 主内容
             M: PDFString.of(annotation.date), // 日期
-            NM: PDFHexString.fromText(annotation.id), // 唯一标识
+            NM: PDFString.of(annotation.id), // 唯一标识
         })
         const mainAnnRef = context.register(mainAnn)
         this.addAnnotationToPage(page, mainAnnRef)
@@ -55,7 +55,7 @@ export class HighlightParser extends AnnotationParser {
                 C: rgbToPdfColor(annotation.color),
                 IRT: mainAnnRef,
                 RT: PDFName.of('R'),
-                NM: PDFHexString.fromText(comment.id), // 唯一标识
+                NM: PDFString.of(comment.id), // 唯一标识
                 Open: false
             })
             const replyAnnRef = context.register(replyAnn)

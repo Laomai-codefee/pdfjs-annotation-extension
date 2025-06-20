@@ -18,7 +18,7 @@ export class SquareParser extends AnnotationParser {
             T: stringToPDFHexString(annotation.title || t('normal.unknownUser')), // 作者
             Contents: stringToPDFHexString(annotation.contentsObj?.text || ''), // 说明文字
             M: PDFString.of(annotation.date),
-            NM: PDFHexString.fromText(annotation.id), // 唯一标识
+            NM: PDFString.of(annotation.id), // 唯一标识
             Border: [0, 0, 1] // 可选：设置边框样式为实线宽度1
         })
         const mainAnnRef = context.register(mainAnn)
@@ -36,7 +36,7 @@ export class SquareParser extends AnnotationParser {
                 C: rgbToPdfColor(annotation.color),
                 IRT: mainAnnRef,
                 RT: PDFName.of('R'),
-                NM: PDFHexString.fromText(comment.id),
+                NM: PDFString.of(comment.id),
                 Open: false
             })
             const replyAnnRef = context.register(replyAnn)

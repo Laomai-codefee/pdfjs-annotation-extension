@@ -26,7 +26,7 @@ export class FreeTextParser extends AnnotationParser {
             Type: PDFName.of('Annot'),
             Subtype: PDFName.of('Text'),
             Rect: rect,
-            NM: PDFHexString.fromText(annotation.id), // 唯一标识
+            NM: PDFString.of(annotation.id), // 唯一标识
             Contents: stringToPDFHexString(annotation.contentsObj?.text || ''),
             Name: PDFName.of('Comment'),
             T: stringToPDFHexString(annotation.title || t('normal.unknownUser')),
@@ -48,7 +48,7 @@ export class FreeTextParser extends AnnotationParser {
                 C: rgbToPdfColor(annotation.color),
                 IRT: mainAnnRef,
                 RT: PDFName.of('R'),
-                NM: PDFHexString.fromText(comment.id), // 唯一标识
+                NM: PDFString.of(comment.id), // 唯一标识
                 Open: false
             })
             const replyAnnRef = context.register(replyAnn)

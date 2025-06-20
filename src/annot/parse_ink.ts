@@ -49,7 +49,7 @@ export class InkParser extends AnnotationParser {
             T: stringToPDFHexString(annotation.title || t('normal.unknownUser')),
             Contents: stringToPDFHexString(annotation.contentsObj?.text || ''),
             M: PDFString.of(annotation.date),
-            NM: PDFHexString.fromText(annotation.id),
+            NM: PDFString.of(annotation.id),
             Border: context.obj([0, 0, 0]),
             BS: bs,
             CA: PDFNumber.of(opacity) // Non-stroking opacity (used for drawing)
@@ -69,7 +69,7 @@ export class InkParser extends AnnotationParser {
                 C: context.obj([PDFNumber.of(r), PDFNumber.of(g), PDFNumber.of(b)]),
                 IRT: mainAnnRef,
                 RT: PDFName.of('R'),
-                NM: PDFHexString.fromText(comment.id),
+                NM: PDFString.of(comment.id),
                 Open: false
             })
             const replyAnnRef = context.register(replyAnn)

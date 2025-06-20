@@ -18,7 +18,7 @@ export class CircleParser extends AnnotationParser {
             T: stringToPDFHexString(annotation.title || t('normal.unknownUser')),
             Contents: stringToPDFHexString(annotation.contentsObj?.text || ''),
             M: PDFString.of(annotation.date),
-            NM: PDFHexString.fromText(annotation.id),
+            NM: PDFString.of(annotation.id),
             Border: [0, 0, 1] // 可选：1像素实线边框
         })
         const mainAnnRef = context.register(mainAnn)
@@ -36,7 +36,7 @@ export class CircleParser extends AnnotationParser {
                 C: rgbToPdfColor(annotation.color),
                 IRT: mainAnnRef,
                 RT: PDFName.of('R'),
-                NM: PDFHexString.fromText(comment.id),
+                NM: PDFString.of(comment.id),
                 Open: false
             })
             const replyAnnRef = context.register(replyAnn)

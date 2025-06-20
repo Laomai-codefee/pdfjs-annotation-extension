@@ -34,7 +34,7 @@ export class UnderlineParser extends AnnotationParser {
             // 这里如果置空，写入的批注中就不会出现内容，和 highlight 不一致
             Contents: stringToPDFHexString(annotation.contentsObj?.text || ''),
             M: PDFString.of(annotation.date),
-            NM: PDFHexString.fromText(annotation.id)
+            NM: PDFString.of(annotation.id)
         })
         const mainAnnRef = context.register(mainAnn)
         this.addAnnotationToPage(page, mainAnnRef)
@@ -50,7 +50,7 @@ export class UnderlineParser extends AnnotationParser {
                 C: rgbToPdfColor(annotation.color),
                 IRT: mainAnnRef,
                 RT: PDFName.of('R'),
-                NM: PDFHexString.fromText(comment.id),
+                NM: PDFString.of(comment.id),
                 Open: false
             })
             const replyAnnRef = context.register(replyAnn)
