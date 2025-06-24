@@ -411,7 +411,7 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                     </>
                 )
             }
-            return <Paragraph style={{ marginBottom: '8px', marginTop: '8px' }} ellipsis={{ rows: 3, expandable: true, symbol: t('normal.more') }}>{annotation.contentsObj.text}</Paragraph>
+            return <Paragraph style={{ margin: '8px 0 8px 15px'}} ellipsis={{ rows: 3, expandable: true, symbol: t('normal.more') }}>{annotation.contentsObj.text}</Paragraph>
         },
         [editAnnotation, currentAnnotation]
     )

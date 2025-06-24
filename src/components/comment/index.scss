@@ -56,8 +56,8 @@
             p {
                 white-space: pre-wrap;
                 line-height: 150%;
-                padding: 0 5px;
-                margin-top: 8px;
+                padding: 0;
+                margin-top: 5px;
             }
             .title {
                 display: flex;
@@ -71,7 +71,7 @@
                     span{
                         display: block;
                         font-size: 12px;
-                        line-height: 100%;
+                        line-height: 120%;
                         opacity: 0.5;
                     }
                 }
@@ -97,7 +97,7 @@
             .reply {
                 background-color: var(--dropdown-btn-bg-color);
                 border-radius: 5px;
-                padding: 3px 10px;
+                padding: 5px 10px;
                 margin-top: 8px;
                 margin-left: 15px;
                 .icon:hover {
