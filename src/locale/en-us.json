@@ -103,5 +103,14 @@
         "full": "{{month}}/{{day}}/{{year}} {{hour}}:{{minute}}",
         "dayMonth": "{{month}}/{{day}}",
         "dayMonthYear": "{{month}}/{{day}}/{{year}}"
+    },
+    "save": {
+        "start": "Saving...",
+        "success": "Saved successfully!",
+        "fail": "Failed to save. {{value}}",
+        "noPostUrl": "{{value}} not found."
+    },
+    "load": {
+        "fail": "Annotation Data Load Fail: {{value}}"
     }
 }

@@ -14,7 +14,7 @@ import { CustomComment, CustomCommentRef } from './components/comment'
 import { once, parseQueryString, hashArrayOfObjects } from './utils/utils'
 import { defaultOptions } from './const/default_options'
 import { exportAnnotationsToPdf } from './annot'
-import { Modal, Space } from 'antd'
+import { Modal, Space, message } from 'antd'
 import { CustomAnnotationMenu, CustomAnnotationMenuRef } from './components/menu'
 
 interface AppOptions {
@@ -363,17 +363,31 @@ class PdfjsAnnotationExtension {
             return [];
         }
         try {
+            message.open({
+                type: 'loading',
+                content: t('normal.processing'),
+                duration: 0,
+            });
             const response = await fetch(getUrl, { method: 'GET' });
 
             if (!response.ok) {
-                console.error(`Fetch failed: ${response.status} ${response.statusText}`);
-                return [];
+                const errorMessage = `HTTP Error ${response.status}: ${response.statusText || 'Unknown Status'}`;
+                throw new Error(errorMessage);
             }
-
             return await response.json();
         } catch (error) {
+            Modal.error({
+                content: t('load.fail', { value: error?.message }),
+                closable: false,
+                okButtonProps: {
+                    loading: false
+                },
+                okText: t('normal.ok')
+            })
             console.error('Fetch error:', error);
             return [];
+        } finally {
+            message.destroy();
         }
     }
 
@@ -383,28 +397,49 @@ class PdfjsAnnotationExtension {
      */
     private async saveData(): Promise<void> {
         const dataToSave = this.painter.getData();
-
         console.log('%c [ dataToSave ]', 'font-size:13px; background:#d10d00; color:#ff5144;', dataToSave)
         const postUrl = this.getOption(HASH_PARAMS_POST_URL);
         if (!postUrl) {
+            message.error({
+                content: t('save.noPostUrl', { value: HASH_PARAMS_POST_URL }),
+                key: 'save',
+            });
             return;
         }
-
+        const modal = Modal.info({
+            content: <Space><SyncOutlined spin />{t('save.start')}</Space>,
+            closable: false,
+            okButtonProps: {
+                loading: true
+            },
+            okText: t('normal.ok')
+        })
         try {
             const response = await fetch(postUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dataToSave),
             });
-
             if (!response.ok) {
                 throw new Error(`Failed to save PDF. Status: ${response.status} ${response.statusText}`);
             }
-
             const result = await response.json();
             this.initialDataHash = hashArrayOfObjects(dataToSave)
+            modal.destroy()
+            message.success({
+                content: t('save.success'),
+                key: 'save',
+            });
             console.log('Saved successfully:', result);
         } catch (error) {
+            modal.update({
+                type: 'error',
+                content: t('save.fail', { value: error?.message }),
+                closable: true,
+                okButtonProps: {
+                    loading: false
+                },
+            })
             console.error('Error while saving data:', error);
         }
     }

@@ -103,5 +103,14 @@
         "full": "{{year}}-{{month}}-{{day}} {{hour}}:{{minute}}",
         "dayMonth": "{{month}}-{{day}}",
         "dayMonthYear": "{{year}}-{{month}}-{{day}}"
+    },
+    "save": {
+        "start": "正在保存...",
+        "success": "保存成功！",
+        "fail": "保存失败，错误代码： {{value}}",
+        "noPostUrl": "未找到参数: {{value}}"
+    },
+    "load": {
+        "fail": "外部批注加载失败，{{value}}"
     }
 }

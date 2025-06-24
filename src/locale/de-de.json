@@ -103,5 +103,11 @@
         "full": "{{day}}.{{month}}.{{year}} {{hour}}:{{minute}}",
         "dayMonth": "{{day}}.{{month}}",
         "dayMonthYear": "{{day}}.{{month}}.{{year}}"
+    },
+    "save": {
+        "start": "Speichern...",
+        "success": "Erfolgreich gespeichert!",
+        "fail": "Speichern fehlgeschlagen. {{value}}",
+        "noPostUrl": "{{value}} nicht gefunden."
     }
 }
