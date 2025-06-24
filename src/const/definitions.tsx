@@ -138,6 +138,16 @@ export interface IAnnotationComment {
     title: string; // 批注标题
     date: string; // 批注日期
     content: string; // 批注内容
+    status?: CommentStatus;
+}
+
+export enum CommentStatus {
+    Accepted = 'Accepted',
+    Rejected = 'Rejected',
+    Cancelled = 'Cancelled',
+    Completed = 'Completed',
+    None = 'None',
+    Closed = 'Closed'
 }
 
 export interface IAnnotationContentsObj {

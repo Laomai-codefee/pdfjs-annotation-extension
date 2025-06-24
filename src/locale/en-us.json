@@ -85,12 +85,22 @@
     },
     "comment": {
         "total": "Comment {{value}}",
-        "page": "Page {{value}}"
+        "page": "Page {{value}}",
+        "status": {
+            "accepted": "Accepted",
+            "rejected": "Rejected",
+            "cancelled": "Cancelled",
+            "completed": "Completed",
+            "none": "None",
+            "closed": "Closed"
+        },
+        "statusText": "Set Status: {{value}}"
     },
     "pdf": {
         "generationSuccess": "File has been successfully generated and downloaded"
     },
     "dateFormat": {
+        "full": "{{month}}/{{day}}/{{year}} {{hour}}:{{minute}}",
         "dayMonth": "{{month}}/{{day}}",
         "dayMonthYear": "{{month}}/{{day}}/{{year}}"
     }

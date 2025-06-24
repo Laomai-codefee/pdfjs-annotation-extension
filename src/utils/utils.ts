@@ -254,7 +254,7 @@ function formatTimestamp(timestamp) {
     return `D:${year}${month}${day}${hours}${minutes}${seconds}${timezoneSign}${timezoneHours}'${timezoneMinutes}'`
 }
 
-function formatPDFDate(dateString) {
+function formatPDFDate(dateString, full = false) {
     // 提取日期部分 D:YYYYMMDDHHMMSS+TZD 中的 YYYYMMDDHHMMSS
     const datePart = dateString.slice(2, 16)
 
@@ -264,6 +264,11 @@ function formatPDFDate(dateString) {
     const day = datePart.slice(6, 8)
     const hour = datePart.slice(8, 10)
     const minute = datePart.slice(10, 12)
+
+    // 如果 full 为 true，直接返回完整格式
+    if (full) {
+        return i18n.t('dateFormat.full', { year, month, day, hour, minute });
+    }
 
     const currentDate = new Date()
 

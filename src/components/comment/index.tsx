@@ -1,10 +1,10 @@
 import './index.scss'
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
-import { IAnnotationComment, IAnnotationStore, PdfjsAnnotationSubtype } from '../../const/definitions'
+import { CommentStatus, IAnnotationComment, IAnnotationStore, PdfjsAnnotationSubtype } from '../../const/definitions'
 import { useTranslation } from 'react-i18next'
 import { formatPDFDate, formatTimestamp, generateUUID } from '../../utils/utils'
 import { Button, Checkbox, Dropdown, Input, Popover, Space, Typography } from 'antd'
-import { FilterOutlined, MoreOutlined } from '@ant-design/icons'
+import { CheckCircleOutlined, DislikeOutlined, FilterOutlined, LikeOutlined, MinusCircleOutlined, MinusSquareOutlined, MoreOutlined, StopOutlined } from '@ant-design/icons'
 import {
     CircleIcon,
     FreehandIcon,
@@ -22,6 +22,11 @@ import {
     CloudIcon
 } from '../../const/icon'
 import Paragraph from 'antd/es/typography/Paragraph'
+
+interface StatusOption {
+    labelKey: string; // i18n key
+    icon: React.ReactNode;
+}
 
 const { Text } = Typography
 
@@ -47,6 +52,33 @@ const iconMapping: Record<PdfjsAnnotationSubtype, React.ReactNode> = {
     Note: <NoteIcon />,
     Arrow: <ArrowIcon />
 }
+
+const commentStatusOptions: Record<CommentStatus, StatusOption> = {
+    [CommentStatus.Accepted]: {
+        labelKey: 'comment.status.accepted',
+        icon: <LikeOutlined />,
+    },
+    [CommentStatus.Rejected]: {
+        labelKey: 'comment.status.rejected',
+        icon: <DislikeOutlined />,
+    },
+    [CommentStatus.Cancelled]: {
+        labelKey: 'comment.status.cancelled',
+        icon: <MinusCircleOutlined />,
+    },
+    [CommentStatus.Completed]: {
+        labelKey: 'comment.status.completed',
+        icon: <CheckCircleOutlined />,
+    },
+    [CommentStatus.Closed]: {
+        labelKey: 'comment.status.closed',
+        icon: <StopOutlined />,
+    },
+    [CommentStatus.None]: {
+        labelKey: 'comment.status.none',
+        icon: <MinusSquareOutlined />,
+    }
+};
 
 const getIconBySubtype = (subtype: PdfjsAnnotationSubtype): React.ReactNode => {
     return iconMapping[subtype] || null
@@ -257,6 +289,15 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
         </div>
     )
 
+    const getLastStatusIcon = (annotation: IAnnotationStore): React.ReactNode => {
+        const lastWithStatus = [...(annotation.comments || [])]
+            .reverse()
+            .find(c => c.status !== undefined && c.status !== null)
+
+        const status = lastWithStatus?.status ?? CommentStatus.None
+        return commentStatusOptions[status]?.icon ?? commentStatusOptions[CommentStatus.None].icon
+    }
+
     const handleAnnotationClick = (annotation: IAnnotationStore) => {
         setCurrentAnnotation(annotation)
         props.onSelected(annotation)
@@ -267,15 +308,33 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
         props.onUpdate(annotation)
     }
 
-    const addReply = (annotation: IAnnotationStore, comment: string) => {
-        annotation.comments.push({
+    const addReply = (annotation: IAnnotationStore, comment: string, status?: CommentStatus) => {
+        const newReply = {
             id: generateUUID(),
             title: props.userName,
             date: formatTimestamp(Date.now()),
-            content: comment
-        })
-        props.onUpdate(annotation)
+            content: comment,
+            status
+        }
+
+        setAnnotations(prevAnnotations =>
+            prevAnnotations.map(a => {
+                if (a.id === annotation.id) {
+                    const updatedAnnotation = {
+                        ...a,
+                        comments: [...(a.comments || []), newReply],
+                        date: formatTimestamp(Date.now())
+                    }
+                    props.onUpdate(updatedAnnotation)
+                    return updatedAnnotation
+                }
+                return a
+            })
+        )
+
+        setReplyAnnotation(null)
     }
+
 
     const updateReply = (annotation: IAnnotationStore, reply: IAnnotationComment, comment: string) => {
         reply.date = formatTimestamp(Date.now())
@@ -332,7 +391,7 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                             defaultValue={annotation.contentsObj.text}
                             autoFocus
                             rows={4}
-                            style={{ marginBottom: '8px' }}
+                            style={{ marginBottom: '8px', marginTop: '8px' }}
                             onBlur={() => setEditAnnotation(null)}
                             onChange={e => (comment = e.target.value)}
                             onKeyDown={e => {
@@ -352,7 +411,7 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                     </>
                 )
             }
-            return <Paragraph ellipsis={{ rows: 3, expandable: true, symbol: t('normal.more') }}>{annotation.contentsObj.text}</Paragraph>
+            return <Paragraph style={{ marginBottom: '8px', marginTop: '8px' }} ellipsis={{ rows: 3, expandable: true, symbol: t('normal.more') }}>{annotation.contentsObj.text}</Paragraph>
         },
         [editAnnotation, currentAnnotation]
     )
@@ -455,9 +514,28 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                         >
                             <div className="title">
                                 <AnnotationIcon subtype={annotation.subtype} />
-                                <div className="username">{annotation.title}</div>
+                                <div className="username">{annotation.title}
+                                    <span>{formatPDFDate(annotation.date, true)}</span>
+                                </div>
                                 <span className="tool">
-                                    {formatPDFDate(annotation.date)}
+                                    <Dropdown
+                                        menu={{
+                                            items: Object.entries(commentStatusOptions).map(([statusKey, option]) => ({
+                                                key: statusKey,
+                                                label: t(option.labelKey),
+                                                icon: option.icon,
+                                                onClick: (e) => {
+                                                    addReply(annotation, t('comment.statusText', { value: t(option.labelKey) }), e.key as CommentStatus)
+                                                    setReplyAnnotation(null)
+                                                }
+                                            }))
+                                        }}
+                                        trigger={['click']}
+                                    >
+                                        <span className="icon">
+                                            {getLastStatusIcon(annotation)}
+                                        </span>
+                                    </Dropdown>
                                     <Dropdown
                                         menu={{
                                             items: [
@@ -499,9 +577,10 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                             {annotation.comments?.map((reply, index) => (
                                 <div className="reply" key={index}>
                                     <div className="title">
-                                        <div className="username"> {reply.title}</div>
+                                        <div className="username"> {reply.title}
+                                            <span>{formatPDFDate(reply.date, true)}</span>
+                                        </div>
                                         <span className="tool">
-                                            {formatPDFDate(reply.date)}
                                             <Dropdown
                                                 menu={{
                                                     items: [

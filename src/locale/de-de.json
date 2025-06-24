@@ -85,12 +85,22 @@
     },
     "comment": {
         "total": "Kommentare: {{value}}",
-        "page": "Seite {{value}}"
+        "page": "Seite {{value}}",
+        "status": {
+            "accepted": "Akzeptiert",
+            "rejected": "Abgelehnt",
+            "cancelled": "Abgebrochen",
+            "completed": "Abgeschlossen",
+            "none": "Keine",
+            "closed": "Geschlossen"
+        },
+        "statusText": "Status festlegen: {{value}}"
     },
     "pdf": {
         "generationSuccess": "Datei wurde erfolgreich generiert und heruntergeladen"
     },
     "dateFormat": {
+        "full": "{{day}}.{{month}}.{{year}} {{hour}}:{{minute}}",
         "dayMonth": "{{day}}.{{month}}",
         "dayMonthYear": "{{day}}.{{month}}.{{year}}"
     }

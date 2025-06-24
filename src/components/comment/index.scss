@@ -48,8 +48,8 @@
             border: 1px solid var(--toolbar-border-color);
             background-color: var(--toolbar-bg-color);
             border-radius: 8px;
-            padding: 10px;
-            line-height: 200%;
+            padding:5px 10px 10px 10px;
+            line-height: 150%;
             .ant-typography{
                 color: var(--main-color) !important;
             }
@@ -57,19 +57,27 @@
                 white-space: pre-wrap;
                 line-height: 150%;
                 padding: 0 5px;
+                margin-top: 8px;
             }
             .title {
                 display: flex;
-                align-items: flex-start;
+                align-items: center;
                 cursor: default;
                 .username {
                     min-width: 30px;
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
+                    span{
+                        display: block;
+                        font-size: 12px;
+                        line-height: 100%;
+                        opacity: 0.5;
+                    }
                 }
                 .annotation-icon {
                     margin-right: 5px;
+                    align-self: flex-start;
                 }
                 .tool {
                     margin-left: auto;
@@ -78,6 +86,8 @@
                     .icon {
                         margin-left: 5px;
                         border-radius: 8px;
+                        display: inline-block;
+                        padding: 0 3px !important;
                     }
                     .icon:hover {
                         background-color: var(--dropdown-btn-bg-color);
@@ -89,6 +99,7 @@
                 border-radius: 5px;
                 padding: 3px 10px;
                 margin-top: 8px;
+                margin-left: 15px;
                 .icon:hover {
                     background-color: var(--toggled-btn-bg-color) !important;
                 }

@@ -85,13 +85,23 @@
     },
     "comment": {
         "total": " {{value}} 条批注",
-        "page": "第{{value}}页"
+        "page": "第{{value}}页",
+        "status": {
+            "accepted": "接受",
+            "rejected": "拒绝",
+            "cancelled": "取消",
+            "completed": "完成",
+            "none": "无",
+            "closed": "关闭"
+        },
+        "statusText": "将状态设置为 “{{value}}”"
     },
     "pdf": {
         "generationSuccess": "文件已生成！"
     },
     "dateFormat": {
-        "dayMonth": "{{month}}/{{day}}",
-        "dayMonthYear": "{{month}}/{{day}}/{{year}}"
+        "full": "{{year}}-{{month}}-{{day}} {{hour}}:{{minute}}",
+        "dayMonth": "{{month}}-{{day}}",
+        "dayMonthYear": "{{year}}-{{month}}-{{day}}"
     }
 }
