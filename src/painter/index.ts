@@ -712,12 +712,12 @@ export class Painter {
                 if (annotationMap.has(annotation.id)) {
                     this.updateStore(annotation.id, annotation)
                 } else {
-                    this.saveToStore(annotation, false)
+                    this.saveToStore(annotation, true)
                 }
             })
         } else {
             annotations.forEach(annotation => {
-                this.saveToStore(annotation, false)
+                this.saveToStore(annotation, true)
             })
         }
     }
