@@ -10,6 +10,7 @@ import { Divider, Form, Slider } from 'antd'
 import Konva from 'konva'
 import { isSameColor } from '../../utils/utils'
 import { useTranslation } from 'react-i18next'
+import { PAINTER_WRAPPER_PREFIX } from '../../painter/const'
 
 interface CustomAnnotationMenuProps {
     onOpenComment: (annotation: IAnnotationStore) => void
@@ -63,7 +64,8 @@ const CustomAnnotationMenu = forwardRef<CustomAnnotationMenuRef, CustomAnnotatio
             const menuEl = containerRef.current
             if (!menuEl) return
 
-            const konvaContainer = document.querySelector('.konvajs-content') as HTMLElement
+            const wrapperId = `${PAINTER_WRAPPER_PREFIX}_page_${annotation.pageNumber}`
+            const konvaContainer = document.querySelector(`#${wrapperId} .konvajs-content`) as HTMLElement
             const containerRect = konvaContainer?.getBoundingClientRect?.()
 
             const scaleX = 1
