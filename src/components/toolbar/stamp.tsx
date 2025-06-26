@@ -133,30 +133,66 @@ const StampTool: React.FC<SignatureToolProps> = ({ annotation, onAdd, userName }
 
     // 文件输入变化的事件处理函数
     const onInputFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const target = event.target as HTMLInputElement // 获取事件目标（即文件输入）
-        const files = target.files // 获取文件列表
-        if (files?.length) {
-            const _file = files[0] // 获取第一个文件
-            if (_file.size > maxSize) {
-                // 如果文件大小超过最大限制，显示提示并返回
-                alert(t('normal.fileSizeLimit', { value: formatFileSize(maxSize) }))
-                // alert(`文件大小超出 ${formatFileSize(maxSize)} 限制`)
-                return
-            }
-            const reader = new FileReader() // 创建文件读取器
-            // 文件读取完成后的处理函数
-            reader.onload = e => {
-                if (typeof e.target?.result === 'string') {
-                    target.value = ''
-                    // 如果结果是字符串，调用 onAdd 回调函数
-                    onAdd(e.target.result)
-                    setCustomStamps(prev => [...prev, e.target.result as string])
-                    setIsPopoverOpen(false)
-                }
-            }
-            reader.readAsDataURL(_file) // 以数据 URL 的形式读取文件
+        const target = event.target as HTMLInputElement;
+        const files = target.files;
+
+        if (!files?.length) return;
+        const _file = files[0];
+
+        // 检查文件大小
+        if (_file.size > maxSize) {
+            alert(t('normal.fileSizeLimit', { value: formatFileSize(maxSize) }));
+            return;
         }
-    }
+
+        const reader = new FileReader();
+
+        reader.onload = async (e) => {
+            const imageUrl = e.target?.result as string;
+            const img = new Image();
+            img.src = imageUrl;
+
+            img.onload = () => {
+                // 设置最大宽高
+                const MAX_WIDTH = defaultOptions.setting.MAX_UPLOAD_IMAGE_SIZE;
+                const MAX_HEIGHT = defaultOptions.setting.MAX_UPLOAD_IMAGE_SIZE;
+
+                let { width, height } = img;
+
+                // 等比缩放
+                if (width > height && width > MAX_WIDTH) {
+                    height = Math.round((height * MAX_WIDTH) / width);
+                    width = MAX_WIDTH;
+                } else if (height > MAX_HEIGHT) {
+                    width = Math.round((width * MAX_HEIGHT) / height);
+                    height = MAX_HEIGHT;
+                }
+
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                canvas.width = width;
+                canvas.height = height;
+
+                if (ctx) {
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // 转换为 PNG Data URL
+                    const pngDataUrl = canvas.toDataURL('image/png');
+
+                    // 清空 input 的值，以便重复上传同一文件
+                    target.value = '';
+
+                    // 调用回调并更新状态
+                    onAdd(pngDataUrl);
+                    setCustomStamps(prev => [...prev, pngDataUrl]);
+                    setIsPopoverOpen(false);
+                }
+            };
+        };
+
+        reader.readAsDataURL(_file);
+    };
 
     const initializeKonvaStage = (values: FieldType) => {
         if (!containerRef.current) return

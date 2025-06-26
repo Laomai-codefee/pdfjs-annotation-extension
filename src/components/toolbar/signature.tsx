@@ -24,7 +24,7 @@ interface SignatureToolProps {
 const BASE_FONT_SIZE = 80
 
 const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
-    const { t, i18n } = useTranslation()
+    const { t } = useTranslation()
     const containerRef = useRef<HTMLDivElement>(null)
     const konvaStageRef = useRef<Konva.Stage | null>(null)
     const colorRef = useRef(defaultOptions.signature.COLORS[0])
@@ -191,26 +191,56 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
     }
 
     const handleUploadChange = (info: UploadChangeParam<UploadFile>) => {
-        const file = info.fileList[0]?.originFileObj
-        if (!file || !file.type.startsWith('image/')) return
+        const file = info.file;
+
+        if (!file || !file.type.startsWith('image/')) return;
 
         if (file.size > maxSize) {
-            // 如果文件大小超过最大限制，显示提示并返回
-            alert(t('normal.fileSizeLimit', { value: formatFileSize(maxSize) }))
-            // alert(`文件大小超出 ${formatFileSize(maxSize)} 限制`)
-            return
+            alert(t('normal.fileSizeLimit', { value: formatFileSize(maxSize) }));
+            return;
         }
 
-        const reader = new FileReader()
-        reader.onload = e => {
-            const result = e.target?.result
-            if (typeof result === 'string') {
-                setUploadedImageUrl(result) // 不关闭窗口，显示图片
-                setIsOKButtonDisabled(false)
-            }
-        }
-        reader.readAsDataURL(file)
-    }
+        const reader = new FileReader();
+
+        reader.onload = async (e) => {
+            const imageUrl = e.target?.result as string;
+            const img = new Image();
+            img.src = imageUrl;
+
+            img.onload = () => {
+                // 设置最大显示尺寸
+                const MAX_WIDTH = defaultOptions.setting.MAX_UPLOAD_IMAGE_SIZE;
+                const MAX_HEIGHT = defaultOptions.setting.MAX_UPLOAD_IMAGE_SIZE;
+
+                let { width, height } = img;
+
+                // 等比缩放
+                if (width > height && width > MAX_WIDTH) {
+                    height = Math.round((height * MAX_WIDTH) / width);
+                    width = MAX_WIDTH;
+                } else if (height > MAX_HEIGHT) {
+                    width = Math.round((width * MAX_HEIGHT) / height);
+                    height = MAX_HEIGHT;
+                }
+
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                canvas.width = width;
+                canvas.height = height;
+
+                if (ctx) {
+                    ctx.drawImage(img, 0, 0, width, height);
+                    // 导出为 PNG 图像
+                    const pngDataUrl = canvas.toDataURL('image/png');
+                    setUploadedImageUrl(pngDataUrl);
+                    setIsOKButtonDisabled(false);
+                }
+            };
+        };
+        // @ts-expect-error
+        reader.readAsDataURL(file);
+    };
 
     useEffect(() => {
         setTypedSignature('')
@@ -352,6 +382,7 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
                                         beforeUpload={() => false}
                                         showUploadList={false}
                                         onChange={handleUploadChange}
+                                        multiple={false}
                                         style={{
                                             height: defaultOptions.signature.HEIGHT,
                                             width: defaultOptions.signature.WIDTH,

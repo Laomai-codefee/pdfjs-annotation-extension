@@ -424,6 +424,7 @@ class PdfjsAnnotationExtension {
                 throw new Error(`Failed to save PDF. Status: ${response.status} ${response.statusText}`);
             }
             const result = await response.json();
+            // {"status": "ok", "message": "POST received!"}
             this.initialDataHash = hashArrayOfObjects(dataToSave)
             modal.destroy()
             message.success({
