@@ -1,6 +1,6 @@
 import './index.scss'
 import { ColorPicker, message } from 'antd'
-import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
+import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react'
 import { annotationDefinitions, AnnotationType, IAnnotationStyle, IAnnotationType, PdfjsAnnotationEditorType } from '../../const/definitions'
 import { AnnoIcon, ExportIcon, PaletteIcon, SaveIcon } from '../../const/icon'
 import { SignatureTool } from './signature'
@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { defaultOptions } from '../../const/default_options'
 
 interface CustomToolbarProps {
+    defaultAnnotationName: string
     userName: string
     onChange: (annotation: IAnnotationType | null, dataTransfer: string | null) => void
     onSave: () => void
@@ -18,15 +19,20 @@ interface CustomToolbarProps {
 
 export interface CustomToolbarRef {
     activeAnnotation(annotation: IAnnotationType): void
-    updateStyle(annotationType: AnnotationType,  style: IAnnotationStyle): void
-    toggleSidebarBtn(open: boolean) :void
+    updateStyle(annotationType: AnnotationType, style: IAnnotationStyle): void
+    toggleSidebarBtn(open: boolean): void
 }
 
 /**
  * @description CustomToolbar
  */
 const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function CustomToolbar(props, ref) {
-    const [currentAnnotation, setCurrentAnnotation] = useState<IAnnotationType | null>(null)
+    const defaultAnnotation = useMemo(() => {
+        if (!props.defaultAnnotationName) return null
+        return annotationDefinitions.find(item => item.name === props.defaultAnnotationName) || null
+    }, [props.defaultAnnotationName, annotationDefinitions])
+
+    const [currentAnnotation, setCurrentAnnotation] = useState<IAnnotationType | null>(defaultAnnotation)
     const [annotations, setAnnotations] = useState<IAnnotationType[]>(annotationDefinitions.filter(item => item.pdfjsEditorType !== PdfjsAnnotationEditorType.HIGHLIGHT))
     const [dataTransfer, setDataTransfer] = useState<string | null>(null)
     const [sidebarOpen, setSidebarOpen] = useState<boolean>(defaultOptions.setting.DEFAULT_SIDE_BAR_OPEN)
@@ -46,7 +52,7 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
         setSidebarOpen(open)
     }
 
-    const updateStyle = (annotationType: AnnotationType,  style: IAnnotationStyle) => {
+    const updateStyle = (annotationType: AnnotationType, style: IAnnotationStyle) => {
         setAnnotations(annotations.map(annotation => {
             if (annotation.type === annotationType) {
                 annotation.style = {
@@ -175,8 +181,8 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
             </ul>
             <ul className="buttons right">
                 <li
-                onClick={() => handleSidebarOpen(sidebarOpen)}
-                className={`${sidebarOpen? 'selected': ''}`}
+                    onClick={() => handleSidebarOpen(sidebarOpen)}
+                    className={`${sidebarOpen ? 'selected' : ''}`}
                 >
                     <div className="icon">
                         <AnnoIcon />

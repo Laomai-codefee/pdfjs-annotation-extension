@@ -8,7 +8,7 @@ import { SyncOutlined } from '@ant-design/icons';
 import i18n, { t } from 'i18next'
 import { CustomPopbar, CustomPopbarRef } from './components/popbar'
 import { CustomToolbar, CustomToolbarRef } from './components/toolbar'
-import { annotationDefinitions, HASH_PARAMS_GET_URL, HASH_PARAMS_POST_URL, HASH_PARAMS_USERNAME } from './const/definitions'
+import { annotationDefinitions, HASH_PARAMS_DEFAULT_EDITOR_ACTIVE, HASH_PARAMS_GET_URL, HASH_PARAMS_POST_URL, HASH_PARAMS_USERNAME } from './const/definitions'
 import { Painter } from './painter'
 import { CustomComment, CustomCommentRef } from './components/comment'
 import { once, parseQueryString, hashArrayOfObjects } from './utils/utils'
@@ -19,7 +19,7 @@ import { CustomAnnotationMenu, CustomAnnotationMenuRef } from './components/menu
 import { ConnectorLine } from './painter/connectorLine'
 
 interface AppOptions {
-    [key: string]: string;
+    [key: string]: string ;
 }
 
 class PdfjsAnnotationExtension {
@@ -64,6 +64,7 @@ class PdfjsAnnotationExtension {
             [HASH_PARAMS_USERNAME]: i18n.t('normal.unknownUser'), // 默认用户名
             [HASH_PARAMS_GET_URL]: '', // 默认 GET URL
             [HASH_PARAMS_POST_URL]: '', // 默认 POST URL
+            [HASH_PARAMS_DEFAULT_EDITOR_ACTIVE] : null
         };
 
         // 处理地址栏参数
@@ -164,6 +165,11 @@ class PdfjsAnnotationExtension {
         } else {
             console.warn(`${HASH_PARAMS_POST_URL} is undefined`);
         }
+        if (params.has(HASH_PARAMS_DEFAULT_EDITOR_ACTIVE) && params.get(HASH_PARAMS_DEFAULT_EDITOR_ACTIVE) === 'true') {
+            this.setOption(HASH_PARAMS_DEFAULT_EDITOR_ACTIVE, 'select')
+        } else {
+            console.warn(`${HASH_PARAMS_DEFAULT_EDITOR_ACTIVE} is undefined`);
+        }
 
     }
 
@@ -212,6 +218,7 @@ class PdfjsAnnotationExtension {
         createRoot(toolbar).render(
             <CustomToolbar
                 ref={this.customToolbarRef}
+                defaultAnnotationName={this.getOption(HASH_PARAMS_DEFAULT_EDITOR_ACTIVE)}
                 userName={this.getOption(HASH_PARAMS_USERNAME)}
                 onChange={(currentAnnotation, dataTransfer) => {
                     this.painter.activate(currentAnnotation, dataTransfer)

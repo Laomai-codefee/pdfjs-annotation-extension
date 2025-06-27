@@ -429,9 +429,11 @@ export const annotationDefinitions: IAnnotationType[] = [
 
 export const HASH_PARAMS_PREFIX = 'ae'
 
-export const HASH_PARAMS_USERNAME = `${HASH_PARAMS_PREFIX}_username`
+export const HASH_PARAMS_USERNAME = `${HASH_PARAMS_PREFIX}_username` // 用户名
 
-export const HASH_PARAMS_GET_URL = `${HASH_PARAMS_PREFIX}_get_url`
+export const HASH_PARAMS_GET_URL = `${HASH_PARAMS_PREFIX}_get_url`  // 数据获取默认地址
 
-export const HASH_PARAMS_POST_URL = `${HASH_PARAMS_PREFIX}_post_url`
+export const HASH_PARAMS_POST_URL = `${HASH_PARAMS_PREFIX}_post_url` // 保存地址
+
+export const HASH_PARAMS_DEFAULT_EDITOR_ACTIVE = `${HASH_PARAMS_PREFIX}_default_editor_active` // 默认激活编辑器
 
