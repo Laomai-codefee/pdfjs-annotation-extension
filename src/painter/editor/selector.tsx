@@ -207,7 +207,6 @@ export class Selector {
      */
     private createTransformer(group: Konva.Group, konvaStage: Konva.Stage, flash: boolean) {
         const line = group.children[0] as Konva.Line
-
         const groupId = group.id()
         this.currentTransformerId = groupId
         const rawAnnotationStore = this.getAnnotationStore(groupId)
@@ -234,6 +233,7 @@ export class Selector {
             transformer.resizeEnabled(false)
         }
         group.draggable(rawAnnotationStore.draggable)
+
         transformer.off('transformend')
         transformer.off('transformstart')
         transformer.on('transformend', () => {
@@ -292,7 +292,7 @@ export class Selector {
     private flashNodeWithTransformer(
         group: Konva.Group,
         transformer: Konva.Transformer,
-        onFinish?: () => void 
+        onFinish?: () => void
     ) {
         let flashCount = 0;
         const maxFlashes = 1;
@@ -307,9 +307,11 @@ export class Selector {
                 duration: fadeDuration,
                 opacity: 0,
                 onFinish: () => {
-                    transformer.borderStroke(highlightStroke);
-                    transformer.getLayer()?.batchDraw();
-                    fadeIn();
+                    try {
+                        transformer.borderStroke(highlightStroke);
+                        transformer.getLayer()?.batchDraw();
+                        fadeIn();
+                    } catch { }
                 }
             });
             groupTween.play();
@@ -321,18 +323,20 @@ export class Selector {
                 duration: fadeDuration,
                 opacity: 1,
                 onFinish: () => {
-                    transformer.borderStroke(originalStroke);
-                    transformer.getLayer()?.batchDraw();
-
-                    flashCount++;
-                    if (flashCount < maxFlashes) {
-                        setTimeout(fadeOut, 100);
-                    } else {
-                        // ✅ 动画全部完成，调用回调
-                        if (onFinish) {
-                            onFinish();
+                    try {
+                        transformer.borderStroke(originalStroke);
+                        transformer.getLayer()?.batchDraw();
+                        flashCount++;
+                        if (flashCount < maxFlashes) {
+                            setTimeout(fadeOut, 100);
+                        } else {
+                            // ✅ 动画全部完成，调用回调
+                            if (onFinish) {
+                                onFinish();
+                            }
                         }
-                    }
+                    } catch { }
+
                 }
             });
             groupTween.play();

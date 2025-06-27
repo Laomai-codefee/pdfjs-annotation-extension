@@ -109,5 +109,21 @@
         "success": "Erfolgreich gespeichert!",
         "fail": "Speichern fehlgeschlagen. {{value}}",
         "noPostUrl": "{{value}} nicht gefunden."
+    },
+    "export": {
+        "fields": {
+            "id": "ID",
+            "page": "Seite",
+            "author": "Autor",
+            "date": "Datum",
+            "content": "Inhalt",
+            "status": "Status",
+            "annotationType": "Anmerkungstyp",
+            "recordType": "Typ"
+        },
+        "recordType": {
+            "annotation": "Anmerkung",
+            "reply": "Antwort"
+        }
     }
 }

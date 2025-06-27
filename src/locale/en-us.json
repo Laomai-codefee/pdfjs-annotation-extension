@@ -112,5 +112,21 @@
     },
     "load": {
         "fail": "Annotation Data Load Fail: {{value}}"
+    },
+    "export": {
+        "fields": {
+            "id": "ID",
+            "page": "Page",
+            "author": "Author",
+            "date": "Date",
+            "content": "Content",
+            "status": "Status",
+            "annotationType": "Annotation Type",
+            "recordType": "Type"
+        },
+        "recordType": {
+            "annotation": "Annotation",
+            "reply": "Reply"
+        }
     }
 }

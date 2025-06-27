@@ -293,6 +293,34 @@ function formatPDFDate(dateString, full = false) {
     return i18n.t('dateFormat.dayMonthYear', { day, month, year })
 }
 
+function getPDFDateTimestamp(dateString: string): number {
+    // 提取日期部分 D:YYYYMMDDHHMMSS+TZD 中的 YYYYMMDDHHMMSS
+    const datePart = dateString.slice(2, 16)
+
+    const year = parseInt(datePart.slice(0, 4), 10)
+    const month = parseInt(datePart.slice(4, 6), 10) - 1 // 月份从 0 开始
+    const day = parseInt(datePart.slice(6, 8), 10)
+    const hour = parseInt(datePart.slice(8, 10), 10)
+    const minute = parseInt(datePart.slice(10, 12), 10)
+    const second = parseInt(datePart.slice(12, 14), 10) || 0
+
+    // 构造时区信息
+    const tzMatch = dateString.slice(16).match(/([+-])(\d{2})'?(\d{2})?'/)
+    let tzOffset = 0
+    if (tzMatch) {
+        const sign = tzMatch[1] === '+' ? 1 : -1
+        const hours = parseInt(tzMatch[2], 10) || 0
+        const minutes = parseInt(tzMatch[3] || '0', 10) || 0
+        tzOffset = sign * (hours * 60 + minutes)
+    }
+
+    // 创建本地时间对象（注意：这里是基于提取的时间构造的 Date 对象）
+    const date = new Date(Date.UTC(year, month, day, hour, minute, second))
+
+    // 应用时区偏移（UTC 时间已通过 Date.UTC 创建）
+    return date.getTime() - tzOffset * 60 * 1000
+}
+
 function parseQueryString(query: string): Map<string, string> {
     const params = new Map<string, string>()
     const searchParams = new URLSearchParams(query)
@@ -451,5 +479,6 @@ export {
     stringToPDFHexString,
     getTimestampString,
     hashArrayOfObjects,
-    isSameColor
+    isSameColor,
+    getPDFDateTimestamp
 }

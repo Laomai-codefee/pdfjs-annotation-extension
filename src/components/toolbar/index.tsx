@@ -1,19 +1,21 @@
 import './index.scss'
-import { ColorPicker, message } from 'antd'
+import { Button, ColorPicker, message, Popover, Space } from 'antd'
 import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react'
 import { annotationDefinitions, AnnotationType, IAnnotationStyle, IAnnotationType, PdfjsAnnotationEditorType } from '../../const/definitions'
 import { AnnoIcon, ExportIcon, PaletteIcon, SaveIcon } from '../../const/icon'
 import { SignatureTool } from './signature'
+import { FilePdfOutlined, PlusCircleOutlined } from '@ant-design/icons'
 import { StampTool } from './stamp'
 import { useTranslation } from 'react-i18next'
 import { defaultOptions } from '../../const/default_options'
 
 interface CustomToolbarProps {
     defaultAnnotationName: string
+    defaultSidebarOpen: boolean
     userName: string
     onChange: (annotation: IAnnotationType | null, dataTransfer: string | null) => void
     onSave: () => void
-    onExport: () => void
+    onExport: (type: 'pdf' | 'excel') => void
     onSidebarOpen: (open: boolean) => void
 }
 
@@ -33,9 +35,11 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
     }, [props.defaultAnnotationName, annotationDefinitions])
 
     const [currentAnnotation, setCurrentAnnotation] = useState<IAnnotationType | null>(defaultAnnotation)
-    const [annotations, setAnnotations] = useState<IAnnotationType[]>(annotationDefinitions.filter(item => item.pdfjsEditorType !== PdfjsAnnotationEditorType.HIGHLIGHT))
+    const [annotations, setAnnotations] = useState<IAnnotationType[]>(
+        annotationDefinitions.filter(item => item.pdfjsEditorType !== PdfjsAnnotationEditorType.HIGHLIGHT)
+    )
     const [dataTransfer, setDataTransfer] = useState<string | null>(null)
-    const [sidebarOpen, setSidebarOpen] = useState<boolean>(defaultOptions.setting.DEFAULT_SIDE_BAR_OPEN)
+    const [sidebarOpen, setSidebarOpen] = useState<boolean>(props.defaultSidebarOpen)
     const { t } = useTranslation()
 
     useImperativeHandle(ref, () => ({
@@ -53,17 +57,18 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
     }
 
     const updateStyle = (annotationType: AnnotationType, style: IAnnotationStyle) => {
-        setAnnotations(annotations.map(annotation => {
-            if (annotation.type === annotationType) {
-                annotation.style = {
-                    ...annotation.style,
-                    ...style
+        setAnnotations(
+            annotations.map(annotation => {
+                if (annotation.type === annotationType) {
+                    annotation.style = {
+                        ...annotation.style,
+                        ...style
+                    }
                 }
-            }
-            return annotation
-        }))
+                return annotation
+            })
+        )
     }
-
 
     const selectedType = currentAnnotation?.type
 
@@ -77,7 +82,7 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
     const handleAdd = (signatureDataUrl, annotation) => {
         message.open({
             type: 'info',
-            content: t('toolbar.message.selectPosition'),
+            content: t('toolbar.message.selectPosition')
         })
         setDataTransfer(signatureDataUrl)
         setCurrentAnnotation(annotation)
@@ -93,20 +98,25 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
             case AnnotationType.STAMP:
                 return (
                     <li title={t(`annotations.${annotation.name}`)} key={index} {...commonProps}>
-                        <StampTool userName={props.userName} annotation={annotation} onAdd={(signatureDataUrl) => handleAdd(signatureDataUrl, annotation)} />
+                        <StampTool userName={props.userName} annotation={annotation} onAdd={signatureDataUrl => handleAdd(signatureDataUrl, annotation)} />
                     </li>
                 )
 
             case AnnotationType.SIGNATURE:
                 return (
                     <li title={t(`annotations.${annotation.name}`)} key={index} {...commonProps}>
-                        <SignatureTool annotation={annotation} onAdd={(signatureDataUrl) => handleAdd(signatureDataUrl, annotation)} />
+                        <SignatureTool annotation={annotation} onAdd={signatureDataUrl => handleAdd(signatureDataUrl, annotation)} />
                     </li>
                 )
 
             default:
                 return (
-                    <li title={t(`annotations.${annotation.name}`)} key={index} {...commonProps} onClick={() => handleAnnotationClick(isSelected ? null : annotation)}>
+                    <li
+                        title={t(`annotations.${annotation.name}`)}
+                        key={index}
+                        {...commonProps}
+                        onClick={() => handleAnnotationClick(isSelected ? null : annotation)}
+                    >
                         <div className="icon">{annotation.icon}</div>
                         <div className="name">{t(`annotations.${annotation.name}`)}</div>
                     </li>
@@ -129,7 +139,7 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
         setCurrentAnnotation(updatedAnnotation)
     }
 
-    const handleSidebarOpen = (isOpen) => {
+    const handleSidebarOpen = isOpen => {
         props.onSidebarOpen(!isOpen)
         setSidebarOpen(!isOpen)
     }
@@ -157,33 +167,66 @@ const CustomToolbar = forwardRef<CustomToolbarRef, CustomToolbarProps>(function 
             </ul>
             <div className="splitToolbarButtonSeparator"></div>
             <ul className="buttons">
-                {
-                    defaultOptions.setting.SAVE_BUTTON && <li title={t('normal.save')} onClick={() => {
-                        props.onSave()
-                    }}>
+                {defaultOptions.setting.SAVE_BUTTON && (
+                    <li
+                        title={t('normal.save')}
+                        onClick={() => {
+                            props.onSave()
+                        }}
+                    >
                         <div className="icon">
                             <SaveIcon />
                         </div>
                         <div className="name">{t('normal.save')}</div>
                     </li>
-                }
-                {
-                    defaultOptions.setting.EXPORT_BUTTON && <li title={t('normal.export')} onClick={() => {
-                        props.onExport()
-                    }}>
-                        <div className="icon">
-                            <ExportIcon />
-                        </div>
-                        <div className="name">{t('normal.export')}</div>
+                )}
+                {(defaultOptions.setting.EXPORT_PDF || defaultOptions.setting.EXPORT_EXCEL) && (
+                    <li title={t('normal.export')}>
+                        <Popover
+                            content={
+                                <Space direction="vertical">
+                                    {defaultOptions.setting.EXPORT_PDF && (
+                                        <Button
+                                            block
+                                            color="primary"
+                                            variant="outlined"
+                                            onClick={() => {
+                                                props.onExport('pdf')
+                                            }}
+                                            icon={<FilePdfOutlined />}
+                                        >
+                                            PDF
+                                        </Button>
+                                    )}
+                                    {defaultOptions.setting.EXPORT_EXCEL && (
+                                        <Button
+                                            block
+                                            color="primary"
+                                            variant="outlined"
+                                            onClick={() => {
+                                                props.onExport('excel')
+                                            }}
+                                            icon={<FilePdfOutlined />}
+                                        >
+                                            Excel
+                                        </Button>
+                                    )}
+                                </Space>
+                            }
+                            trigger="click"
+                            placement="bottom"
+                            arrow={false}
+                        >
+                            <div className="icon">
+                                <ExportIcon />
+                            </div>
+                            <div className="name">{t('normal.export')}</div>
+                        </Popover>
                     </li>
-                }
-
+                )}
             </ul>
             <ul className="buttons right">
-                <li
-                    onClick={() => handleSidebarOpen(sidebarOpen)}
-                    className={`${sidebarOpen ? 'selected' : ''}`}
-                >
+                <li onClick={() => handleSidebarOpen(sidebarOpen)} className={`${sidebarOpen ? 'selected' : ''}`}>
                     <div className="icon">
                         <AnnoIcon />
                     </div>

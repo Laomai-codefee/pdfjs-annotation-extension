@@ -8,18 +8,18 @@ import { SyncOutlined } from '@ant-design/icons';
 import i18n, { t } from 'i18next'
 import { CustomPopbar, CustomPopbarRef } from './components/popbar'
 import { CustomToolbar, CustomToolbarRef } from './components/toolbar'
-import { annotationDefinitions, HASH_PARAMS_DEFAULT_EDITOR_ACTIVE, HASH_PARAMS_GET_URL, HASH_PARAMS_POST_URL, HASH_PARAMS_USERNAME } from './const/definitions'
+import { annotationDefinitions, HASH_PARAMS_DEFAULT_EDITOR_ACTIVE, HASH_PARAMS_DEFAULT_SIDEBAR_OPEN, HASH_PARAMS_GET_URL, HASH_PARAMS_POST_URL, HASH_PARAMS_USERNAME } from './const/definitions'
 import { Painter } from './painter'
 import { CustomComment, CustomCommentRef } from './components/comment'
 import { once, parseQueryString, hashArrayOfObjects } from './utils/utils'
 import { defaultOptions } from './const/default_options'
-import { exportAnnotationsToPdf } from './annot'
+import { exportAnnotationsToExcel, exportAnnotationsToPdf } from './annot'
 import { Modal, Space, message } from 'antd'
 import { CustomAnnotationMenu, CustomAnnotationMenuRef } from './components/menu'
 import { ConnectorLine } from './painter/connectorLine'
 
 interface AppOptions {
-    [key: string]: string ;
+    [key: string]: string;
 }
 
 class PdfjsAnnotationExtension {
@@ -64,7 +64,8 @@ class PdfjsAnnotationExtension {
             [HASH_PARAMS_USERNAME]: i18n.t('normal.unknownUser'), // 默认用户名
             [HASH_PARAMS_GET_URL]: '', // 默认 GET URL
             [HASH_PARAMS_POST_URL]: '', // 默认 POST URL
-            [HASH_PARAMS_DEFAULT_EDITOR_ACTIVE] : null
+            [HASH_PARAMS_DEFAULT_EDITOR_ACTIVE]: null,
+            [HASH_PARAMS_DEFAULT_SIDEBAR_OPEN]: 'true'
         };
 
         // 处理地址栏参数
@@ -171,6 +172,12 @@ class PdfjsAnnotationExtension {
             console.warn(`${HASH_PARAMS_DEFAULT_EDITOR_ACTIVE} is undefined`);
         }
 
+        if (params.has(HASH_PARAMS_DEFAULT_SIDEBAR_OPEN) && params.get(HASH_PARAMS_DEFAULT_SIDEBAR_OPEN) === 'false') {
+            this.setOption(HASH_PARAMS_DEFAULT_SIDEBAR_OPEN, 'false')
+        } else {
+            console.warn(`${HASH_PARAMS_DEFAULT_EDITOR_ACTIVE} is undefined`);
+        }
+
     }
 
     private setOption(name: string, value: string) {
@@ -186,7 +193,7 @@ class PdfjsAnnotationExtension {
      */
     private addCustomStyle(): void {
         document.body.classList.add('PdfjsAnnotationExtension')
-        this.toggleComment(defaultOptions.setting.DEFAULT_SIDE_BAR_OPEN)
+        this.toggleComment(this.getOption(HASH_PARAMS_DEFAULT_SIDEBAR_OPEN) === 'true')
     }
 
     /**
@@ -219,6 +226,7 @@ class PdfjsAnnotationExtension {
             <CustomToolbar
                 ref={this.customToolbarRef}
                 defaultAnnotationName={this.getOption(HASH_PARAMS_DEFAULT_EDITOR_ACTIVE)}
+                defaultSidebarOpen={this.getOption(HASH_PARAMS_DEFAULT_SIDEBAR_OPEN) === 'true'}
                 userName={this.getOption(HASH_PARAMS_USERNAME)}
                 onChange={(currentAnnotation, dataTransfer) => {
                     this.painter.activate(currentAnnotation, dataTransfer)
@@ -226,11 +234,19 @@ class PdfjsAnnotationExtension {
                 onSave={() => {
                     this.saveData()
                 }}
-                onExport={async () => {
-                    await this.exportPdf()
+                onExport={async (type) => {
+                    if (type === 'excel') {
+                        this.exportExcel()
+                        return
+                    }
+                    if (type === 'pdf') {
+                        await this.exportPdf()
+                        return
+                    }
                 }}
                 onSidebarOpen={(isOpen) => {
                     this.toggleComment(isOpen)
+                    this.connectorLine.clearConnection()
                 }}
             />
         )
@@ -483,6 +499,20 @@ class PdfjsAnnotationExtension {
         })
         await exportAnnotationsToPdf(this.PDFJS_PDFViewerApplication, dataToSave)
         modal.update({
+            type: 'success',
+            title: t('normal.export'),
+            content: t('pdf.generationSuccess'),
+            closable: true,
+            okButtonProps: {
+                loading: false
+            },
+        })
+    }
+
+    private async exportExcel() {
+        const annotations = this.painter.getData()
+        await exportAnnotationsToExcel(this.PDFJS_PDFViewerApplication, annotations)
+        Modal.info({
             type: 'success',
             title: t('normal.export'),
             content: t('pdf.generationSuccess'),

@@ -112,5 +112,21 @@
     },
     "load": {
         "fail": "外部批注加载失败，{{value}}"
+    },
+    "export": {
+        "fields": {
+            "id": "ID",
+            "page": "页码",
+            "author": "用户",
+            "date": "日期",
+            "content": "内容",
+            "status": "状态",
+            "annotationType": "批注类型",
+            "recordType": "类型"
+        },
+        "recordType": {
+            "annotation": "批注",
+            "reply": "回复"
+        }
     }
 }

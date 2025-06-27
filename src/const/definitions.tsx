@@ -435,5 +435,7 @@ export const HASH_PARAMS_GET_URL = `${HASH_PARAMS_PREFIX}_get_url`  // 数据获
 
 export const HASH_PARAMS_POST_URL = `${HASH_PARAMS_PREFIX}_post_url` // 保存地址
 
-export const HASH_PARAMS_DEFAULT_EDITOR_ACTIVE = `${HASH_PARAMS_PREFIX}_default_editor_active` // 默认激活编辑器
+export const HASH_PARAMS_DEFAULT_EDITOR_ACTIVE = `${HASH_PARAMS_PREFIX}_default_editor_active` // 是否激活编辑器
+
+export const HASH_PARAMS_DEFAULT_SIDEBAR_OPEN = `${HASH_PARAMS_PREFIX}_default_sidebar_open` // 是否打侧边栏
 

@@ -16,8 +16,19 @@ export class ConnectorLine {
      */
     private calculateShapeRect(annotation: IAnnotationStore, selectorRect: IRect): IRect {
         const wrapperId = `${PAINTER_WRAPPER_PREFIX}_page_${annotation.pageNumber}`
-        const konvaContainer = document.querySelector(`#${wrapperId} .konvajs-content`) as HTMLElement
-        const containerRect = konvaContainer?.getBoundingClientRect?.()
+        const konvaContainer = document.querySelector(`#${wrapperId} .konvajs-content`) as HTMLElement | null
+
+        if (!konvaContainer) {
+            console.warn(`[ConnectorLine] 页面容器未找到：${wrapperId}`)
+            return {
+                x: 0,
+                y: 0,
+                width: selectorRect.width,
+                height: selectorRect.height
+            }
+        }
+
+        const containerRect = konvaContainer.getBoundingClientRect()
 
         const scaleX = 1
         const scaleY = 1
@@ -115,8 +126,9 @@ export class ConnectorLine {
     }
 
     public drawConnection(annotation: IAnnotationStore, selectorRect: IRect) {
-        this.clearConnection()
+        
         requestAnimationFrame(() => {
+            this.clearConnection()
             if (!this.shouldDrawBasedOnScreen()) return
 
             const shapeRect = this.calculateShapeRect(annotation, selectorRect)
