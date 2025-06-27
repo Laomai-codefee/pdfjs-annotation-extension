@@ -20,15 +20,24 @@
 --- 
 
 ## 📣 近期更新
-
-* 🔥🔥**2025.5.19  v2.1.1 版本**，主要包含如下内容
-  1. **支持侧边栏折叠** - 增加 DEFAULT_SIDE_BAR_OPEN 控制侧边栏是否隐藏，默认显示
-  2. **支持批注过滤** - 增加批注过滤功能，可通过作者、批注类型进行过滤
-  3. **优化批注加亮逻辑** - 批注即使不选中也会加亮，改善体验
+* 🔥🔥**2025.6.27  v2.2.0 版本**，主要包含如下内容
+1. **增加新的批注类型** - 增加箭头、云线
+2. **签名** - 增加输入、上传图片形成签名，输入文字支持字体选择
+3. **盖章** - 增加默认印章，自定义印章及上传图片作为印章，自定义印章支持文字颜色、样式、字体、背景、边框设置，时间戳支持用户名、日期及自定义文字
+4. **批注状态** - 增加批注状态设置，接受、拒绝、取消、完成、关闭、无
+5. **批注导出** - 增加批注 Excel 导出功能
+6. **批注样式** - 各批注样式设置，支持颜色、笔触宽度、透明度
+7. **连线** - 增加批注与图形间的连线
+8. 一些 BUG 修正及交互优化
+---
+* **2025.5.19  v2.1.1 版本**，主要包含如下内容
+1. **支持侧边栏折叠** - 增加 DEFAULT_SIDE_BAR_OPEN 控制侧边栏是否隐藏，默认显示
+2. **支持批注过滤** - 增加批注过滤功能，可通过作者、批注类型进行过滤
+3. **优化批注加亮逻辑** - 批注即使不选中也会加亮，改善体验
 * **2025.5.16  v2.1.0 版本**，主要包含如下内容
-  1. **支持导出 PDF 功能** - 将所绘制批注导出到新的 PDF 文件，支持批注类型 TEXT、HIGHLIGHT、UNDERLINE、STRIKEOUT、SQUARE、CIRCLE、INK、POLYLINE、FREETEXT、STAMP
-  2. **签名、盖章** - 增加 ALLOW_REPLY_ON_STAMP 控制是否允许评论、回复，默认关闭
-  3. **新增 Note 批注工具** - 对应 PDF Text 类型批注
+1. **支持导出 PDF 功能** - 将所绘制批注导出到新的 PDF 文件，支持批注类型 TEXT、HIGHLIGHT、UNDERLINE、STRIKEOUT、SQUARE、CIRCLE、INK、POLYLINE、FREETEXT、STAMP
+2. **签名、盖章** - 增加 ALLOW_REPLY_ON_STAMP 控制是否允许评论、回复，默认关闭
+3. **新增 Note 批注工具** - 对应 PDF Text 类型批注
 
 --- 
 
@@ -59,14 +68,16 @@
 2. 圆形
 3. 自由绘制，一段时间内的绘制会被归为一组
 4. 自由高亮，有自动修正
-5. 文字
-6. 签名
-7. 盖章，自由上传图片
-8. 文字高亮
-9. 文字删除线
-10. 文字下划线
-11. 注解
-12. 选择，选中对象，可双击删除
+5. 箭头
+6. 云线
+7. 文字
+8. 签名
+9. 盖章
+10. 文字高亮
+11. 文字删除线
+12. 文字下划线
+13. 注解
+14. 选择
 
 ## 3、PDF 文件原有批注编辑，支持类型如下
 
@@ -125,7 +136,15 @@
   ae_post_url= 批注数据提交地址
 ```
 
-使用方式 ： http://localhost:8888/web/viewer.html?#ae_username=老麦&ae_get_url=http://localhost:8888/pdfjs-annotation-extension-testdata.json&ae_post_url=http://localhost:8888/save
+```bash
+  ae_default_editor_active= true | false 是否激活编辑器
+```
+
+```bash
+  ae_default_sidebar_open= true | false 是否打开侧边栏
+```
+
+使用方式 ： http://localhost:8888/web/viewer.html?#ae_username=老麦&ae_get_url=http://localhost:8888/pdfjs-annotation-extension-testdata.json&ae_post_url=http://localhost:8888/save&ae_default_editor_active=true&ae_default_sidebar_open=true
 
 ### 默认配置修改
 
