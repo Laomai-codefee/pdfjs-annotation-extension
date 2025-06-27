@@ -66,11 +66,63 @@ export class ConnectorLine {
         `.trim()
     }
 
+    /**
+     * @description 创建箭头
+     * @param svg
+     */
+    private createArrowMarkerDefs(svg: SVGSVGElement) {
+        const svgNS = 'http://www.w3.org/2000/svg'
+
+        const defs = document.createElementNS(svgNS, 'defs')
+
+        const marker = document.createElementNS(svgNS, 'marker')
+        marker.setAttribute('id', 'arrow')
+        marker.setAttribute('viewBox', '0 0 10 10')
+        marker.setAttribute('refX', '0') // 改为起点对齐
+        marker.setAttribute('refY', '5')
+        marker.setAttribute('markerWidth', '6')
+        marker.setAttribute('markerHeight', '6')
+        marker.setAttribute('orient', 'auto')
+
+        const path = document.createElementNS(svgNS, 'path')
+        path.setAttribute('d', 'M 10 0 L 0 5 L 10 10 z') // 箭头朝左
+        path.setAttribute('fill', defaultOptions.connectorLine.COLOR)
+
+        marker.appendChild(path)
+        defs.appendChild(marker)
+
+        svg.appendChild(defs)
+    }
+
+    /**
+     * @description 只触发动画（用于首次显示）
+     */
+    private animateLine() {
+        if (this.connectionPathElement) {
+            this.connectionPathElement.style.strokeDashoffset = '0'
+        }
+    }
+
+    private shouldDrawBasedOnDistance(shapeRect: IRect, annotationRect: IRect, minDistance = 30): boolean {
+        const shapeRightX = shapeRect.x + shapeRect.width
+        const annotationLeftX = annotationRect.x
+
+        return annotationLeftX - shapeRightX > minDistance
+    }
+
+    private shouldDrawBasedOnScreen(minWidth = 768): boolean {
+        return window.innerWidth > minWidth
+    }
+
     public drawConnection(annotation: IAnnotationStore, selectorRect: IRect) {
         this.clearConnection()
         requestAnimationFrame(() => {
+            if (!this.shouldDrawBasedOnScreen()) return
+
             const shapeRect = this.calculateShapeRect(annotation, selectorRect)
             const annotationRect = this.calculateAnnotationRect(annotation)
+
+            if (!this.shouldDrawBasedOnDistance(shapeRect, annotationRect)) return
 
             const pathData = this.calculateConnectionPath(shapeRect, annotationRect)
 
@@ -120,43 +172,6 @@ export class ConnectorLine {
                 this.connectionPathElement.style.strokeDashoffset = '0'
             }
         })
-    }
-
-    /**
-     * @description 创建箭头
-     * @param svg
-     */
-    private createArrowMarkerDefs(svg: SVGSVGElement) {
-        const svgNS = 'http://www.w3.org/2000/svg'
-
-        const defs = document.createElementNS(svgNS, 'defs')
-
-        const marker = document.createElementNS(svgNS, 'marker')
-        marker.setAttribute('id', 'arrow')
-        marker.setAttribute('viewBox', '0 0 10 10')
-        marker.setAttribute('refX', '0') // 改为起点对齐
-        marker.setAttribute('refY', '5')
-        marker.setAttribute('markerWidth', '6')
-        marker.setAttribute('markerHeight', '6')
-        marker.setAttribute('orient', 'auto')
-
-        const path = document.createElementNS(svgNS, 'path')
-        path.setAttribute('d', 'M 10 0 L 0 5 L 10 10 z') // 箭头朝左
-        path.setAttribute('fill', defaultOptions.connectorLine.COLOR)
-
-        marker.appendChild(path)
-        defs.appendChild(marker)
-
-        svg.appendChild(defs)
-    }
-
-    /**
-     * @description 只触发动画（用于首次显示）
-     */
-    private animateLine() {
-        if (this.connectionPathElement) {
-            this.connectionPathElement.style.strokeDashoffset = '0'
-        }
     }
 
     /**
