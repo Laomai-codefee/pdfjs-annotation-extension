@@ -96,6 +96,7 @@ interface CustomCommentProps {
     onSelected: (annotation: IAnnotationStore) => void
     onUpdate: (annotation: IAnnotationStore) => void
     onDelete: (id: string) => void
+    onScroll?: () => void
 }
 
 export interface CustomCommentRef {
@@ -504,7 +505,7 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
                 </h3>
                 {sortedAnnotations.map(annotation => {
                     const isSelected = annotation.id === currentAnnotation?.id
-                    const commonProps = { className: isSelected ? 'comment selected' : 'comment' }
+                    const commonProps = { className: isSelected ? 'comment selected' : 'comment', id: `annotation-${annotation.id}` }
                     return (
                         <div
                             {...commonProps}
@@ -632,7 +633,7 @@ const CustomComment = forwardRef<CustomCommentRef, CustomCommentProps>(function 
         )
     })
     return (
-        <div className="CustomComment">
+        <div className="CustomComment" onScroll={() => {props.onScroll && props.onScroll() }}>
             <div className="filters">
                 <Popover content={filterContent} trigger="click" placement="bottomLeft">
                     <Button size="small" icon={<FilterOutlined />} />

@@ -71,8 +71,16 @@ const defaultOptions = {
     },
     // 选择器默认配置
     chooseSetting: {
-        COLOR: '#000', // 选择工具的颜色
-        STROKEWIDTH: 1 // 选择工具的线条宽度
+        COLOR: '#1677ff', // 选择工具的颜色
+        STROKEWIDTH: 2, // 选择工具的线条宽度
+        OPACITY: 0.7, // 连线透明度
+    },
+    // 连线配置
+    connectorLine : {
+            ENABLED: true, // 是否启用连线功能
+            COLOR: '#1677ff', // 连线颜色
+            WIDTH: 2, // 连线宽度
+            OPACITY: 0.7, // 连线透明度
     },
     setting: {
         COLOR: color[0], // 默认颜色

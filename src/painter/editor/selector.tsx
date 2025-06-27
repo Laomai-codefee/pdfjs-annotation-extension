@@ -219,6 +219,7 @@ export class Selector {
             borderStroke: defaultOptions.chooseSetting.COLOR,
             anchorFill: defaultOptions.chooseSetting.COLOR,
             anchorStroke: defaultOptions.chooseSetting.COLOR,
+            opacity: defaultOptions.chooseSetting.OPACITY,
             anchorCornerRadius: 5,
             anchorStrokeWidth: 2,
             anchorSize: 8,
@@ -283,16 +284,22 @@ export class Selector {
         this.getBackgroundLayer(konvaStage).add(transformer)
         this.transformerStore.set(groupId, transformer)
         if (flash) {
-            this.flashNodeWithTransformer(group, transformer);
+            this.flashNodeWithTransformer(group, transformer, () => {
+                this.onSelected(group.id(), false, transformer.getClientRect())
+            });
         }
     }
-    private flashNodeWithTransformer(group: Konva.Group, transformer: Konva.Transformer) {
+    private flashNodeWithTransformer(
+        group: Konva.Group,
+        transformer: Konva.Transformer,
+        onFinish?: () => void 
+    ) {
         let flashCount = 0;
-        const maxFlashes = 0;
+        const maxFlashes = 1;
         const fadeDuration = 0.1;
 
         const originalStroke = transformer.borderStroke();
-        const highlightStroke = 'red'; // 你也可以自定义颜色
+        const highlightStroke = 'red';
 
         const fadeOut = () => {
             const groupTween = new Konva.Tween({
@@ -300,7 +307,7 @@ export class Selector {
                 duration: fadeDuration,
                 opacity: 0,
                 onFinish: () => {
-                    transformer.borderStroke(highlightStroke); // 设置边框颜色为闪烁色
+                    transformer.borderStroke(highlightStroke);
                     transformer.getLayer()?.batchDraw();
                     fadeIn();
                 }
@@ -314,12 +321,17 @@ export class Selector {
                 duration: fadeDuration,
                 opacity: 1,
                 onFinish: () => {
-                    transformer.borderStroke(originalStroke); // 恢复原颜色
+                    transformer.borderStroke(originalStroke);
                     transformer.getLayer()?.batchDraw();
 
                     flashCount++;
                     if (flashCount < maxFlashes) {
                         setTimeout(fadeOut, 100);
+                    } else {
+                        // ✅ 动画全部完成，调用回调
+                        if (onFinish) {
+                            onFinish();
+                        }
                     }
                 }
             });

@@ -16,6 +16,7 @@ import { defaultOptions } from './const/default_options'
 import { exportAnnotationsToPdf } from './annot'
 import { Modal, Space, message } from 'antd'
 import { CustomAnnotationMenu, CustomAnnotationMenuRef } from './components/menu'
+import { ConnectorLine } from './painter/connectorLine'
 
 interface AppOptions {
     [key: string]: string;
@@ -37,6 +38,7 @@ class PdfjsAnnotationExtension {
     appOptions: AppOptions
     loadEnd: Boolean
     initialDataHash: number
+    _connectorLine: ConnectorLine | null = null
 
     constructor() {
         this.loadEnd = false
@@ -97,19 +99,31 @@ class PdfjsAnnotationExtension {
                     // 如果是点击事件并且评论栏已打开，则选中批注
                     this.customCommentRef.current.selectedAnnotation(annotation, isClick)
                 }
+
+                this.connectorLine?.drawConnection(annotation, selectorRect)
             },
             onAnnotationChange: (annotation) => {
                 this.customCommentRef.current.updateAnnotation(annotation)
             },
             onAnnotationChanging: () => {
+                this.connectorLine?.clearConnection()
                 this.customerAnnotationMenuRef?.current?.close()
             },
             onAnnotationChanged: (annotation, selectorRect) => {
+                console.log('annotation changed', annotation)
+                this.connectorLine?.drawConnection(annotation, selectorRect)
                 this.customerAnnotationMenuRef?.current?.open(annotation, selectorRect)
             },
         })
         // 初始化操作
         this.init()
+    }
+
+    get connectorLine(): ConnectorLine | null {
+        if (defaultOptions.connectorLine.ENABLED) {
+            this._connectorLine = new ConnectorLine({})
+        }
+        return this._connectorLine
     }
 
     /**
@@ -281,6 +295,9 @@ class PdfjsAnnotationExtension {
                         comments: annotation.comments
                     })
                 }}
+                onScroll={() => {
+                    this.connectorLine?.clearConnection()
+                }}
             />
         )
     }
@@ -330,6 +347,7 @@ class PdfjsAnnotationExtension {
         // 视图更新时隐藏菜单
         this.PDFJS_EventBus._on('updateviewarea', () => {
             this.customerAnnotationMenuRef.current?.close()
+            this.connectorLine?.clearConnection()
         })
 
         // 监听页面渲染完成事件
