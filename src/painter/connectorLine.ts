@@ -46,9 +46,7 @@ export class ConnectorLine {
 
     private calculateAnnotationRect(annotation: IAnnotationStore): IRect {
         const annotationNode = document.getElementById(`annotation-${annotation.id}`) as HTMLDivElement
-
         const annotationRect = annotationNode.getBoundingClientRect()
-
         return {
             x: annotationRect.x,
             y: annotationRect.y,
@@ -126,12 +124,12 @@ export class ConnectorLine {
     }
 
     public drawConnection(annotation: IAnnotationStore, selectorRect: IRect) {
-        
         requestAnimationFrame(() => {
             this.clearConnection()
             if (!this.shouldDrawBasedOnScreen()) return
-
+            if (!document.getElementById(`annotation-${annotation.id}`)) return
             const shapeRect = this.calculateShapeRect(annotation, selectorRect)
+
             const annotationRect = this.calculateAnnotationRect(annotation)
 
             if (!this.shouldDrawBasedOnDistance(shapeRect, annotationRect)) return

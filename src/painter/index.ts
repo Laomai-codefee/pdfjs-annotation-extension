@@ -186,16 +186,8 @@ export class Painter {
     private createPainterWrapper(pageView: PDFPageView, pageNumber: number): HTMLDivElement {
         const wrapper = document.createElement('div') // 创建 div 元素作为绘图容器
         wrapper.id = `${PAINTER_WRAPPER_PREFIX}_page_${pageNumber}` // 设置 id
-        wrapper.setAttribute('data-main-rotation', `${pageView.viewport.rotation}`) // 设置视口旋转角度
         wrapper.classList.add(PAINTER_WRAPPER_PREFIX) // 添加类名
-
-        const { width, height } = { width: pageView.viewport.viewBox[2], height: pageView.viewport.viewBox[3] } // 获取视口宽度和高度
-        const scaleFactor = 'var(--scale-factor)' // 获取缩放因子
-        wrapper.style.width = `calc(${scaleFactor} * ${width}px)` // 设置宽度样式
-        wrapper.style.height = `calc(${scaleFactor} * ${height}px)` // 设置高度样式
-
         pageView.div.appendChild(wrapper)
-
         return wrapper
     }
 
@@ -210,7 +202,6 @@ export class Painter {
             container,
             width: viewport.width,
             height: viewport.height,
-            rotation: viewport.rotation,
             scale: { x: viewport.scale, y: viewport.scale }
         })
 
@@ -767,10 +758,10 @@ export class Painter {
      */
     public async highlight(annotation: IAnnotationStore) {
         // 跳转至对应页面位置
-        const pageView = this.pdfViewerApplication.pdfViewer.getPageView(annotation.pageNumber)
+        const pageView = this.pdfViewerApplication.pdfViewer._pages[annotation.pageNumber - 1] || this.pdfViewerApplication.pdfViewer.getPageView(annotation.pageNumber)
         const { x, y } = annotation.konvaClientRect
         // 把 Konva 的左上角坐标转换为 PDF 内部坐标（以页面左下角为原点）
-        const [pdfX, pdfY] = pageView.viewport.convertToPdfPoint(x, y)
+        const [pdfX, pdfY] = pageView.viewport.convertToPdfPoint(x, y - 200)
         this.pdfViewerApplication.pdfViewer.scrollPageIntoView({
             pageNumber: annotation.pageNumber,
             destArray: [null, { name: 'XYZ' }, pdfX, pdfY, null], // 可以加偏移
