@@ -72,7 +72,8 @@ export class StampParser extends AnnotationParser {
             Contents: stringToPDFHexString(annotation.contentsObj?.text || ''),
             T: stringToPDFHexString(annotation.title || t('normal.unknownUser')),
             M: PDFString.of(annotation.date),
-            Open: false
+            Open: false,
+            F: PDFNumber.of(128) // Locked 锁定移动和调整位置
         }
 
         if (apDict) {
