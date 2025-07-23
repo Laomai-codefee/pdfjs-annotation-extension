@@ -271,7 +271,9 @@ const SignatureTool: React.FC<SignatureToolProps> = ({ annotation, onAdd }) => {
 
     useEffect(() => {
         if (isModalOpen && signatureType === 'Draw') {
-            initializeKonvaStage()
+            setTimeout(() => {
+                initializeKonvaStage()
+            }, 300)
         } else {
             konvaStageRef.current?.destroy()
             konvaStageRef.current = null
