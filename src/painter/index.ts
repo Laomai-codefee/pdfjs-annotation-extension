@@ -346,7 +346,9 @@ export class Painter {
                     onAdd: annotationStore => {
                         this.saveToStore(annotationStore)
                     },
-                    onChange: () => {}
+                    onChange: (id, updates) => {
+                        this.updateStore(id, updates) // 更新存储
+                    }
                 })
                 break
             case AnnotationType.RECTANGLE:
