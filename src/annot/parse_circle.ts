@@ -17,7 +17,7 @@ export class CircleParser extends AnnotationParser {
             C: rgbToPdfColor(annotation.color),
             T: stringToPDFHexString(annotation.title || t('normal.unknownUser')),
             Contents: stringToPDFHexString(annotation.contentsObj?.text || ''),
-            M: PDFString.of(annotation.date),
+            M: PDFString.of(annotation.date || ''),
             NM: PDFString.of(annotation.id),
             Border: [0, 0, 1] // 可选：1像素实线边框
         })
@@ -32,7 +32,7 @@ export class CircleParser extends AnnotationParser {
                 Rect: convertKonvaRectToPdfRect(annotation.konvaClientRect, pageHeight),
                 Contents: stringToPDFHexString(comment.content),
                 T: stringToPDFHexString(comment.title || t('normal.unknownUser')),
-                M: PDFString.of(comment.date),
+                M: PDFString.of(comment.date || ''),
                 C: rgbToPdfColor(annotation.color),
                 IRT: mainAnnRef,
                 RT: PDFName.of('R'),

@@ -38,7 +38,7 @@ export class HighlightParser extends AnnotationParser {
             C: rgbToPdfColor(annotation.color), // 批注颜色
             T: stringToPDFHexString(annotation.title || t('normal.unknownUser')), // 作者
             Contents: stringToPDFHexString(''), // 主内容
-            M: PDFString.of(annotation.date), // 日期
+            M: PDFString.of(annotation.date || ''), // 日期
             NM: PDFString.of(annotation.id), // 唯一标识
         })
         const mainAnnRef = context.register(mainAnn)
@@ -51,7 +51,7 @@ export class HighlightParser extends AnnotationParser {
                 Rect: convertKonvaRectToPdfRect(annotation.konvaClientRect, pageHeight),
                 Contents: stringToPDFHexString(comment.content),
                 T: stringToPDFHexString(comment.title || t('normal.unknownUser')),
-                M: PDFString.of(comment.date),
+                M: PDFString.of(comment.date || ''),
                 C: rgbToPdfColor(annotation.color),
                 IRT: mainAnnRef,
                 RT: PDFName.of('R'),

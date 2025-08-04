@@ -17,7 +17,7 @@ export class SquareParser extends AnnotationParser {
             C: rgbToPdfColor(annotation.color), // 边框颜色
             T: stringToPDFHexString(annotation.title || t('normal.unknownUser')), // 作者
             Contents: stringToPDFHexString(annotation.contentsObj?.text || ''), // 说明文字
-            M: PDFString.of(annotation.date),
+            M: PDFString.of(annotation.date || ''),
             NM: PDFString.of(annotation.id), // 唯一标识
             Border: [0, 0, 1] // 可选：设置边框样式为实线宽度1
         })
@@ -32,7 +32,7 @@ export class SquareParser extends AnnotationParser {
                 Rect: convertKonvaRectToPdfRect(annotation.konvaClientRect, pageHeight),
                 Contents: stringToPDFHexString(comment.content),
                 T: stringToPDFHexString(comment.title || t('normal.unknownUser')),
-                M: PDFString.of(comment.date),
+                M: PDFString.of(comment.date || ''),
                 C: rgbToPdfColor(annotation.color),
                 IRT: mainAnnRef,
                 RT: PDFName.of('R'),
