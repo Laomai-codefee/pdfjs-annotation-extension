@@ -106,9 +106,9 @@ async function loadFontBuffer(url: string): Promise<ArrayBuffer> {
  */
 async function exportAnnotationsToPdf(PDFViewerApplication: PDFViewerApplication, annotations: IAnnotationStore[]) {
     // 加载 PDF 文件为 pdf-lib 可识别的文档对象
-    const response = await fetch(PDFViewerApplication._downloadUrl)
-    const pdfBytes = await response.arrayBuffer()
-    const pdfDoc = await PDFDocument.load(pdfBytes)
+    const pdfData = await PDFViewerApplication.pdfDocument.getData();
+    const pdfDoc = await PDFDocument.load(pdfData);
+
     // ✅ 清除原有的所有批注
     clearAllAnnotations(pdfDoc)
     // 遍历每一个注解并解析应用到对应页面
