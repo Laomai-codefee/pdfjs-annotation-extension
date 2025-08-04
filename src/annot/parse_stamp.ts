@@ -71,7 +71,7 @@ export class StampParser extends AnnotationParser {
             NM: PDFString.of(annotation.id),
             Contents: stringToPDFHexString(annotation.contentsObj?.text || ''),
             T: stringToPDFHexString(annotation.title || t('normal.unknownUser')),
-            M: PDFString.of(annotation.date),
+            M: PDFString.of(annotation.date || ''),
             Open: false,
             F: PDFNumber.of(128) // Locked 锁定移动和调整位置
         }
@@ -92,7 +92,7 @@ export class StampParser extends AnnotationParser {
                 Rect: convertKonvaRectToPdfRect(annotation.konvaClientRect, pageHeight),
                 Contents: stringToPDFHexString(comment.content),
                 T: stringToPDFHexString(comment.title || t('normal.unknownUser')),
-                M: PDFString.of(comment.date),
+                M: PDFString.of(comment.date || ''),
                 IRT: stampAnnRef,
                 RT: PDFName.of('R'),
                 NM: PDFString.of(comment.id),
