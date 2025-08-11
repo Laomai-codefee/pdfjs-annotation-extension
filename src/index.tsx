@@ -58,14 +58,12 @@ class PdfjsAnnotationExtension {
         this.customCommentRef = createRef<CustomCommentRef>()
         // 加载多语言
         initializeI18n(this.PDFJS_PDFViewerApplication.l10n.getLanguage())
-
-        // 设置 appOptions 的默认值
         this.appOptions = {
-            [HASH_PARAMS_USERNAME]: i18n.t('normal.unknownUser'), // 默认用户名
-            [HASH_PARAMS_GET_URL]: '', // 默认 GET URL
-            [HASH_PARAMS_POST_URL]: '', // 默认 POST URL
-            [HASH_PARAMS_DEFAULT_EDITOR_ACTIVE]: null,
-            [HASH_PARAMS_DEFAULT_SIDEBAR_OPEN]: 'true'
+            [HASH_PARAMS_USERNAME]: i18n.t('normal.unknownUser'), // 默认用户名,
+            [HASH_PARAMS_GET_URL]: defaultOptions.setting.HASH_PARAMS_GET_URL, // 默认 GET URL
+            [HASH_PARAMS_POST_URL]: defaultOptions.setting.HASH_PARAMS_POST_URL, // 默认 POST URL
+            [HASH_PARAMS_DEFAULT_EDITOR_ACTIVE]: defaultOptions.setting.HASH_PARAMS_DEFAULT_EDITOR_ACTIVE,
+            [HASH_PARAMS_DEFAULT_SIDEBAR_OPEN]: defaultOptions.setting.HASH_PARAMS_DEFAULT_SIDEBAR_OPEN,
         };
 
         // 处理地址栏参数
