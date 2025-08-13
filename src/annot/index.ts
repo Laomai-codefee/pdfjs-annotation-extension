@@ -16,6 +16,7 @@ import { FreeTextParser } from './parse_freetext'
 import { StampParser } from './parse_stamp'
 import { LineParser } from './parse_line'
 import { PolylineParser } from './parse_polyline'
+import { ActualPolylineParser } from './parse_actual_polyline'
 import { t } from 'i18next'
 
 // import { HighlightParser } from './parse_highlight' // future
@@ -32,10 +33,11 @@ const parserMap: {
     [PdfjsAnnotationType.SQUARE]: SquareParser,
     [PdfjsAnnotationType.CIRCLE]: CircleParser,
     [PdfjsAnnotationType.INK]: InkParser,
-    [PdfjsAnnotationType.POLYLINE]: PolylineParser,
+    [PdfjsAnnotationType.CLOUD]: PolylineParser,
     [PdfjsAnnotationType.FREETEXT]: FreeTextParser,
     [PdfjsAnnotationType.STAMP]: StampParser,
-    [PdfjsAnnotationType.LINE]: LineParser
+    [PdfjsAnnotationType.LINE]: LineParser,
+    [PdfjsAnnotationType.POLYLINE]: ActualPolylineParser
     // 你可以在这里扩展其他类型的解析器
 }
 

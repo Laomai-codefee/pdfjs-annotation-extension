@@ -19,7 +19,8 @@ import {
     NoteIcon,
     ExportIcon,
     ArrowIcon,
-    CloudIcon
+    CloudIcon,
+    PolylineIcon
 } from '../../const/icon'
 import Paragraph from 'antd/es/typography/Paragraph'
 
@@ -42,15 +43,16 @@ const iconMapping: Record<PdfjsAnnotationSubtype, React.ReactNode> = {
     Line: <FreehandIcon />,
     Square: <RectangleIcon />,
     Polygon: <FreehandIcon />,
-    PolyLine: <CloudIcon />,
+    Cloud: <CloudIcon />,
     Caret: <SignatureIcon />,
     Link: <FreehandIcon />,
     Text: <NoteIcon />,
     FileAttachment: <ExportIcon />,
-    Popup: <FreehandIcon />,
+    Popup: <FreehandIcon />, 
     Widget: <FreehandIcon />,
     Note: <NoteIcon />,
-    Arrow: <ArrowIcon />
+    Arrow: <ArrowIcon />,
+    Polyline: <PolylineIcon />
 }
 
 const commentStatusOptions: Record<CommentStatus, StatusOption> = {

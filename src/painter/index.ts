@@ -16,6 +16,7 @@ import { EditorRectangle } from './editor/editor_rectangle'
 import { EditorSignature } from './editor/editor_signature'
 import { EditorStamp } from './editor/editor_stamp'
 import { EditorNote } from './editor/editor_note'
+import { EditorPolyline } from './editor/editor_polyline'
 import { Selector } from './editor/selector'
 import { Store } from './store'
 import { WebSelection } from './webSelection'
@@ -492,6 +493,25 @@ export class Painter {
                     this.tempDataTransfer
                 )
                 break
+            case AnnotationType.POLYLINE:
+                editor = new EditorPolyline({
+                    userName: this.userName,
+                    pdfViewerApplication: this.pdfViewerApplication,
+                    konvaStage,
+                    pageNumber,
+                    annotation,
+                    onAdd: annotationStore => {
+                        this.saveToStore(annotationStore)
+                        if (annotation.isOnce) {
+                            this.setDefaultMode()
+                            this.selector.select(annotationStore.id)
+                        }
+                    },
+                    onChange: (id, updates) => {
+                        this.updateStore(id, updates) // 更新存储
+                    }
+                })
+                break
             case AnnotationType.HIGHLIGHT:
             case AnnotationType.UNDERLINE:
             case AnnotationType.STRIKEOUT:
@@ -659,6 +679,7 @@ export class Painter {
             case AnnotationType.STAMP:
             case AnnotationType.SELECT:
             case AnnotationType.NOTE:
+            case AnnotationType.POLYLINE:
             case AnnotationType.ARROW:
             case AnnotationType.CLOUD:
                 this.setMode('painting') // 设置绘画模式
