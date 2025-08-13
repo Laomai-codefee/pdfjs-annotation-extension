@@ -31,7 +31,7 @@ export class StrikeOutParser extends AnnotationParser {
             T: stringToPDFHexString(annotation.title || t('normal.unknownUser')),
             // 这里如果置空，写入的批注中就不会出现内容，和 highlight 不一致
             Contents: stringToPDFHexString(annotation.contentsObj?.text || ''),
-            M: PDFString.of(annotation.date),
+            M: PDFString.of(annotation.date || ''),
             NM: PDFString.of(annotation.id)
         })
         const mainAnnRef = context.register(mainAnn)
@@ -44,7 +44,7 @@ export class StrikeOutParser extends AnnotationParser {
                 Rect: convertKonvaRectToPdfRect(annotation.konvaClientRect, pageHeight),
                 Contents: stringToPDFHexString(comment.content),
                 T: stringToPDFHexString(comment.title || t('normal.unknownUser')),
-                M: PDFString.of(comment.date),
+                M: PDFString.of(comment.date || ''),
                 C: rgbToPdfColor(annotation.color),
                 IRT: mainAnnRef,
                 RT: PDFName.of('R'),

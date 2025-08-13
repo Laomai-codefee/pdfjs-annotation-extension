@@ -254,44 +254,44 @@ function formatTimestamp(timestamp) {
     return `D:${year}${month}${day}${hours}${minutes}${seconds}${timezoneSign}${timezoneHours}'${timezoneMinutes}'`
 }
 
-function formatPDFDate(dateString, full = false) {
+function formatPDFDate(dateString: string | null, full = false): string {
+    // 若 dateString 无效，直接返回空字符串
+    if (!dateString || typeof dateString !== 'string' || !dateString.startsWith('D:')) {
+        return ''
+    }
+
     // 提取日期部分 D:YYYYMMDDHHMMSS+TZD 中的 YYYYMMDDHHMMSS
     const datePart = dateString.slice(2, 16)
+    if (datePart.length !== 14) {
+        return ''
+    }
 
-    // 使用正则表达式解析日期部分
     const year = datePart.slice(0, 4)
     const month = datePart.slice(4, 6)
     const day = datePart.slice(6, 8)
     const hour = datePart.slice(8, 10)
     const minute = datePart.slice(10, 12)
 
-    // 如果 full 为 true，直接返回完整格式
     if (full) {
-        return i18n.t('dateFormat.full', { year, month, day, hour, minute });
+        return i18n.t('dateFormat.full', { year, month, day, hour, minute })
     }
 
     const currentDate = new Date()
-
-    // 获取当前年份
     const currentYear = currentDate.getFullYear().toString()
-
-    // 获取当天的年月日，用于判断是否为今天
     const currentMonth = (currentDate.getMonth() + 1).toString().padStart(2, '0')
     const currentDay = currentDate.getDate().toString().padStart(2, '0')
 
-    // 如果是当前天，只输出时间
     if (year === currentYear && month === currentMonth && day === currentDay) {
         return `${hour}:${minute}`
     }
 
-    // 如果是当前年，输出月/日
     if (year === currentYear) {
         return i18n.t('dateFormat.dayMonth', { day, month })
     }
 
-    // 不是当前年，输出完整日期
     return i18n.t('dateFormat.dayMonthYear', { day, month, year })
 }
+
 
 function getPDFDateTimestamp(dateString: string): number {
     // 提取日期部分 D:YYYYMMDDHHMMSS+TZD 中的 YYYYMMDDHHMMSS
