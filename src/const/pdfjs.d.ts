@@ -59,7 +59,7 @@ declare module 'pdfjs' {
         | 'Line'
         | 'Square'
         | 'Circle'
-        | 'PolyLine'
+        | 'Polyline'
         | 'Polygon'
         | 'Caret'
         | 'Ink'
@@ -96,6 +96,7 @@ declare module 'pdfjs' {
         | 24 // WATERMARK
         | 25 // THREED
         | 26 // REDACT
+        | 27 // POLYLINE
 
     interface Annotation {
         annotationFlags: number
