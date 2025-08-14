@@ -59,7 +59,7 @@ declare module 'pdfjs' {
         | 'Line'
         | 'Square'
         | 'Circle'
-        | 'Cloud'
+        | 'Polyline'
         | 'Polygon'
         | 'Caret'
         | 'Ink'
@@ -69,7 +69,6 @@ declare module 'pdfjs' {
         | 'StrikeOut'
         | 'Stamp'
         | 'FileAttachment'
-        | 'Polyline'
     type AnnotationType =
         | 1 // TEXT
         | 2 // LINK
@@ -78,7 +77,7 @@ declare module 'pdfjs' {
         | 5 // SQUARE
         | 6 // CIRCLE
         | 7 // POLYGON
-        | 8 // CLOUD
+        | 8 // POLYLINE
         | 9 // HIGHLIGHT
         | 10 // UNDERLINE
         | 11 // SQUIGGLY
@@ -237,8 +236,8 @@ declare module 'pdfjs' {
         vertices: Vertices[]
     }
 
-    // Cloud annotation
-    interface CloudAnnotation extends Annotation {
+    // Polyline annotation
+    interface PolyLineAnnotation extends Annotation {
         annotationType: 8
         lineEndings: [string, string]
         vertices: Vertices[]

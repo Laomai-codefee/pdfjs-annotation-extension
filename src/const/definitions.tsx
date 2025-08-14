@@ -27,7 +27,7 @@ export type PdfjsAnnotationSubtype =
     | 'Line'
     | 'Square'
     | 'Circle'
-    | 'Cloud'
+    | 'Polyline'
     | 'Polygon'
     | 'Caret'
     | 'Ink'
@@ -38,7 +38,6 @@ export type PdfjsAnnotationSubtype =
     | 'Stamp'
     | 'FileAttachment'
     | 'Note'
-    | 'Polyline'
     | 'Arrow'
 
 // PDF.js 批注类型
@@ -352,7 +351,7 @@ export const annotationDefinitions: IAnnotationType[] = [
         type: AnnotationType.CLOUD,
         pdfjsEditorType: PdfjsAnnotationEditorType.INK,
         pdfjsAnnotationType: PdfjsAnnotationType.CLOUD,
-        subtype: 'Cloud',
+        subtype: 'Polyline',
         isOnce: true,
         resizable: true,
         draggable: true,

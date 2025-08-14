@@ -48,7 +48,7 @@ const iconMapping: Record<PdfjsAnnotationSubtype, React.ReactNode> = {
     Link: <FreehandIcon />,
     Text: <NoteIcon />,
     FileAttachment: <ExportIcon />,
-    Popup: <FreehandIcon />, 
+    Popup: <FreehandIcon />,
     Widget: <FreehandIcon />,
     Note: <NoteIcon />,
     Arrow: <ArrowIcon />,
