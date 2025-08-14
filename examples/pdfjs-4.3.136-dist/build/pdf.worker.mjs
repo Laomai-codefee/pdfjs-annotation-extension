@@ -132,7 +132,7 @@ const AnnotationType = {
   SQUARE: 5,
   CIRCLE: 6,
   POLYGON: 7,
-  CLOUD: 8,
+  POLYLINE: 8,
   HIGHLIGHT: 9,
   UNDERLINE: 10,
   SQUIGGLY: 11,
@@ -150,8 +150,7 @@ const AnnotationType = {
   TRAPNET: 23,
   WATERMARK: 24,
   THREED: 25,
-  REDACT: 26,
-  POLYLINE: 27
+  REDACT: 26
 };
 const AnnotationReplyType = {
   GROUP: "Group",

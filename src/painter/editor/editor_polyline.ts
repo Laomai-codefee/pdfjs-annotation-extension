@@ -3,6 +3,7 @@ import { KonvaEventObject } from 'konva/lib/Node';
 import { Editor, IEditorOptions } from './editor';
 import { AnnotationType, IAnnotationStyle, IAnnotationStore } from '../../const/definitions';
 
+
 export class EditorPolyline extends Editor {
   private points: number[] = [];
   private tempLine: Konva.Line | null = null;
