@@ -53,7 +53,7 @@ export class Transform {
             [PdfjsAnnotationType.INK]: InkDecoder,
             [PdfjsAnnotationType.LINE]: LineDecoder,
             [PdfjsAnnotationType.POLYGON]: PolygonDecoder,
-            [PdfjsAnnotationType.POLYLINE]: PolylineDecoder,
+            [PdfjsAnnotationType.CLOUD]: PolylineDecoder,
             [PdfjsAnnotationType.TEXT]: TextDecoder
         }
         const DecoderClass = decoderMap[annotation.annotationType]
