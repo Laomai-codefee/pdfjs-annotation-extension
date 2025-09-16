@@ -16,6 +16,7 @@ import { EditorRectangle } from './editor/editor_rectangle'
 import { EditorSignature } from './editor/editor_signature'
 import { EditorStamp } from './editor/editor_stamp'
 import { EditorNote } from './editor/editor_note'
+import { EditorPolyline } from './editor/editor_polyline'
 import { Selector } from './editor/selector'
 import { Store } from './store'
 import { WebSelection } from './webSelection'
@@ -106,7 +107,46 @@ export class Painter {
             onChanged: async (id, groupString, _rawAnnotationStore, konvaClientRect, transformerRect) => {
                 const editor = this.findEditorForGroupId(id)
                 if (editor) {
-                    this.updateStore(id, { konvaString: groupString, konvaClientRect })
+                    const updates: Partial<IAnnotationStore> = { konvaString: groupString, konvaClientRect }
+                    
+                    // For cloud annotations, also extract and save path data
+                    const annotation = this.store.annotation(id)
+                    if (annotation && annotation.type === AnnotationType.CLOUD) {
+                        try {
+                            const konvaGroup = JSON.parse(groupString)
+                            const pathElement = konvaGroup.children.find((item: any) => 
+                                item.className === 'Path'
+                            )
+                            if (pathElement && pathElement.attrs?.data) {
+                                updates.contentsObj = {
+                                    text: 'Cloud Annotation',
+                                    pathData: pathElement.attrs.data,
+                                }
+                            }
+                        } catch (error) {
+                            console.warn('Failed to extract path data from cloud annotation:', error)
+                        }
+                    }
+                    
+                    // For polyline annotations, also extract and save points data
+                    if (annotation && annotation.type === AnnotationType.POLYLINE) {
+                        try {
+                            const konvaGroup = JSON.parse(groupString)
+                            const lineElement = konvaGroup.children.find((item: any) => 
+                                item.className === 'Line' && !item.attrs?.name?.includes('temp-polyline')
+                            )
+                            if (lineElement && lineElement.attrs?.points) {
+                                updates.contentsObj = {
+                                    text: 'Polyline Annotation',
+                                    points: lineElement.attrs.points,
+                                }
+                            }
+                        } catch (error) {
+                            console.warn('Failed to extract points data from polyline annotation:', error)
+                        }
+                    }
+                    
+                    this.updateStore(id, updates)
                 }
                 this.onAnnotationChanged(this.store.annotation(id), transformerRect)
             },
@@ -485,6 +525,25 @@ export class Painter {
                     this.tempDataTransfer
                 )
                 break
+            case AnnotationType.POLYLINE:
+                editor = new EditorPolyline({
+                    userName: this.userName,
+                    pdfViewerApplication: this.pdfViewerApplication,
+                    konvaStage,
+                    pageNumber,
+                    annotation,
+                    onAdd: annotationStore => {
+                        this.saveToStore(annotationStore)
+                        if (annotation.isOnce) {
+                            this.setDefaultMode()
+                            this.selector.select(annotationStore.id)
+                        }
+                    },
+                    onChange: (id, updates) => {
+                        this.updateStore(id, updates) // 更新存储
+                    }
+                })
+                break
             case AnnotationType.HIGHLIGHT:
             case AnnotationType.UNDERLINE:
             case AnnotationType.STRIKEOUT:
@@ -652,6 +711,7 @@ export class Painter {
             case AnnotationType.STAMP:
             case AnnotationType.SELECT:
             case AnnotationType.NOTE:
+            case AnnotationType.POLYLINE:
             case AnnotationType.ARROW:
             case AnnotationType.CLOUD:
                 this.setMode('painting') // 设置绘画模式

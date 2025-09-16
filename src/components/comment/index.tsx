@@ -19,7 +19,8 @@ import {
     NoteIcon,
     ExportIcon,
     ArrowIcon,
-    CloudIcon
+    CloudIcon,
+    PolylineIcon
 } from '../../const/icon'
 import Paragraph from 'antd/es/typography/Paragraph'
 
