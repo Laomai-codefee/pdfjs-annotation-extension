@@ -12,7 +12,8 @@ import {
     UnderlineIcon,
     NoteIcon,
     ArrowIcon,
-    CloudIcon
+    CloudIcon,
+    PolylineIcon
 } from './icon'
 import { IRect } from 'konva/lib/types'
 import { defaultOptions } from './default_options'
@@ -99,7 +100,8 @@ export enum AnnotationType {
     STAMP = 10, // 盖章批注
     NOTE = 11, // 注释
     ARROW = 12, // 箭头批注
-    CLOUD = 13 // 云线
+    CLOUD = 13, // 云线
+    POLYLINE = 14 // 折线批注
 }
 
 // 定义批注类型的接口
@@ -153,6 +155,8 @@ export enum CommentStatus {
 export interface IAnnotationContentsObj {
     text: string; // 文本内容
     image?: string; // 可选的图片属性
+    points?: number[]; // 可选的点数组，用于描述形状或路径
+    pathData?: string; // 可选的SVG路径数据，用于云线等复杂形状
 }
 
 // 批注存储接口
@@ -299,6 +303,28 @@ export const annotationDefinitions: IAnnotationType[] = [
         draggable: true,
         icon: <NoteIcon />
     },
+    {
+        name: 'polyLine',
+        type: AnnotationType.POLYLINE,
+        pdfjsEditorType: PdfjsAnnotationEditorType.INK,
+        pdfjsAnnotationType: PdfjsAnnotationType.POLYLINE,
+        subtype: 'PolyLine',
+        isOnce: false,
+        resizable: true,
+        draggable: true,
+        icon: <PolylineIcon />, 
+        style: {
+            color: defaultOptions.setting.COLOR, // Default polyline color
+            strokeWidth: defaultOptions.setting.STROKE_WIDTH, // Default line width
+            opacity: defaultOptions.setting.OPACITY // Default opacity
+        },
+        styleEditable: {
+            color: true,
+            opacity: true,
+            strokeWidth: true
+        } // Add this to enable style editing
+    },
+
     {
         name: 'arrow',
         type: AnnotationType.ARROW,

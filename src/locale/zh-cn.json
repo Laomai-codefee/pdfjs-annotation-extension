@@ -14,7 +14,8 @@
         "stamp": "盖章",
         "note": "注解",
         "arrow": "箭头",
-        "cloud": "云线"
+        "cloud": "云线",
+        "polyLine": "折线"
     },
     "toolbar": {
         "buttons": {
