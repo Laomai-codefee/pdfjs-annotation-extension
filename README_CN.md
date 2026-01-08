@@ -1,6 +1,6 @@
 ⚠️ **InkLayer 生态项目**
 
-本仓库是 InkLayer 的组成部分。InkLayer 是一套面向生产系统的 PDF 批注基础设施，用于构建稳定、可扩展的 PDF 批注能力。
+本仓库为 InkLayer 的底层参考实现，包含核心批注模型、坐标体系及导出逻辑。
 
 👉 **主入口仓库：** https://github.com/Laomai-codefee/inklayer
 
