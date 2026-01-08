@@ -1,3 +1,10 @@
+⚠️ **Part of the InkLayer ecosystem**
+
+This repository contains the low-level reference implementation used by InkLayer.
+
+👉 **Main entry point:** https://github.com/Laomai-codefee/inklayer
+
+---
 <div>
     <h1 align="center"><code>pdf.js Annotation Extension</code> ⚡️ </h1>
     <p align="center">

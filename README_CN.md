@@ -1,3 +1,11 @@
+⚠️ **InkLayer 生态项目**
+
+本仓库是 InkLayer 的组成部分。InkLayer 是一套面向生产系统的 PDF 批注基础设施，用于构建稳定、可扩展的 PDF 批注能力。
+
+👉 **主入口仓库：** https://github.com/Laomai-codefee/inklayer
+
+---
+
 <div>
     <h1 align="center"><code>pdf.js Annotation Extension</code> ⚡️ </h1>
     <p align="center">
