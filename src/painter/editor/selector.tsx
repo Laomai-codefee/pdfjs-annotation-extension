@@ -407,6 +407,8 @@ export class Selector {
                     }
                 })
                 transformer.nodes([])
+                transformer.destroy()
+                
             }
         })
         this.transformerStore.clear()
