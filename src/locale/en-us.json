@@ -14,7 +14,8 @@
         "stamp": "Stamp",
         "note": "Note",
         "arrow": "Arrow",
-        "cloud": "Cloud"
+        "cloud": "Cloud",
+        "polyLine": "Polyline"
     },
     "toolbar": {
         "buttons": {
