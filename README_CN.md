@@ -1,8 +1,13 @@
-⚠️ **InkLayer 生态项目**
+# ⚠️ 项目已废弃 — 不再维护
 
-本仓库为 InkLayer 的底层参考实现，包含核心批注模型、坐标体系及导出逻辑。
+本项目已被 **InkLayer** 系列取代，请根据你使用的框架迁移到对应版本：
 
-👉 **主入口仓库：** https://github.com/Laomai-codefee/inklayer
+| 框架 | 仓库 |
+|------|------|
+| **React** | [InkLayer-react](https://github.com/Laomai-codefee/inklayer-react) |
+| **Vue** | [InkLayer-vue](https://github.com/Laomai-codefee/inklayer-vue) |
+
+→ **新项目请勿使用本仓库。**
 
 ---
 

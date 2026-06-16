@@ -1,8 +1,13 @@
-⚠️ **Part of the InkLayer ecosystem**
+# ⚠️ DEPRECATED — No longer maintained
 
-This repository contains the low-level reference implementation used by InkLayer.
+This project has been superseded by the **InkLayer** family. Please migrate to the appropriate framework version:
 
-👉 **Main entry point:** https://github.com/Laomai-codefee/inklayer
+| Framework | Repository |
+|-----------|-----------|
+| **React** | [InkLayer-react](https://github.com/Laomai-codefee/inklayer-react) |
+| **Vue** | [InkLayer-vue](https://github.com/Laomai-codefee/inklayer-vue) |
+
+→ **Do not use this repository for new projects.**
 
 ---
 <div>
