@@ -1,13 +1,21 @@
-# ⚠️ 项目已废弃 — 不再维护
+# ⚠️ 已停止维护 — 后续项目为 InkLayer
 
-本项目已被 **InkLayer** 系列取代，请根据你使用的框架迁移到对应版本：
+本仓库已经归档，不再继续维护。
 
-| 框架 | 仓库 |
-|------|------|
-| **React** | [InkLayer-react](https://github.com/Laomai-codefee/inklayer-react) |
-| **Vue** | [InkLayer-vue](https://github.com/Laomai-codefee/inklayer-vue) |
+本项目最初探索的 PDF 查看与批注能力，现已演进为 **InkLayer PDF 查看与批注生态**。对于新项目，请使用以下持续维护中的继任项目：
 
-→ **新项目请勿使用本仓库。**
+| 项目 | 适用场景 |
+| --- | --- |
+| [InkLayer React](https://github.com/Laomai-codefee/inklayer-react) | 面向 React 应用、开箱即用的 PDF 查看与批注 SDK |
+| [InkLayer Vue](https://github.com/Laomai-codefee/inklayer-vue) | 面向 Vue 3 应用、开箱即用的 PDF 查看与批注 SDK |
+| [InkLayer Core](https://github.com/inklayer-dev/inklayer-core) | 无头、框架无关的 PDF 交互引擎，适合构建自定义查看器、批注、搜索、关键词高亮和审阅工作流 |
+
+**应该选择哪个项目？**
+
+- 如果需要完整、可直接集成的 PDF 查看与批注 SDK，请选择 **InkLayer React** 或 **InkLayer Vue**。
+- 如果需要完全掌控界面、使用其他 Web 框架，或者基于底层引擎构建自定义 PDF 产品，请选择 **InkLayer Core**。
+
+> 本仓库将继续作为历史实现保留，但不建议用于新项目。
 
 ---
 
