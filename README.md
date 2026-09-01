@@ -1,13 +1,21 @@
-# ⚠️ DEPRECATED — No longer maintained
+# ⚠️ Deprecated — Continued as InkLayer
 
-This project has been superseded by the **InkLayer** family. Please migrate to the appropriate framework version:
+This repository is archived and no longer maintained.
 
-| Framework | Repository |
-|-----------|-----------|
-| **React** | [InkLayer-react](https://github.com/Laomai-codefee/inklayer-react) |
-| **Vue** | [InkLayer-vue](https://github.com/Laomai-codefee/inklayer-vue) |
+The ideas and capabilities originally developed here have evolved into the **InkLayer** PDF viewing and annotation ecosystem. For new projects, please use one of the actively maintained successors:
 
-→ **Do not use this repository for new projects.**
+| Project | Best for |
+| --- | --- |
+| [InkLayer React](https://github.com/Laomai-codefee/inklayer-react) | A ready-to-use PDF viewer and annotation SDK for React applications |
+| [InkLayer Vue](https://github.com/Laomai-codefee/inklayer-vue) | A ready-to-use PDF viewer and annotation SDK for Vue 3 applications |
+| [InkLayer Core](https://github.com/inklayer-dev/inklayer-core) | A headless, framework-agnostic PDF interaction engine for custom viewers, annotations, search, keyword highlighting, and review workflows |
+
+**Which project should I choose?**
+
+- Use **InkLayer React** or **InkLayer Vue** when you need a complete, ready-to-integrate PDF viewer and annotation SDK.
+- Use **InkLayer Core** when you need full control of the UI, use another web framework, or want to build a custom PDF product on top of a headless engine.
+
+> This repository remains available as a historical reference, but it is not recommended for new applications.
 
 ---
 <div>
