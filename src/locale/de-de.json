@@ -14,7 +14,8 @@
         "stamp": "Stempel",
         "note": "Notiz",
         "arrow": "Pfeil",
-        "cloud": "Wolke"
+        "cloud": "Wolke",
+        "polyLine": "Polylinie"
     },
     "toolbar": {
         "buttons": {

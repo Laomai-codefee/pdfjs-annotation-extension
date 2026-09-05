@@ -15,7 +15,7 @@ import { formatPDFDate, getPDFDateTimestamp, getTimestampString } from '../utils
 import { FreeTextParser } from './parse_freetext'
 import { StampParser } from './parse_stamp'
 import { LineParser } from './parse_line'
-import { PolylineParser } from './parse_polyline'
+import { ActualPolylineParser } from './parse_actual_polyline'
 import { t } from 'i18next'
 
 // import { HighlightParser } from './parse_highlight' // future
@@ -32,7 +32,7 @@ const parserMap: {
     [PdfjsAnnotationType.SQUARE]: SquareParser,
     [PdfjsAnnotationType.CIRCLE]: CircleParser,
     [PdfjsAnnotationType.INK]: InkParser,
-    [PdfjsAnnotationType.POLYLINE]: PolylineParser,
+    [PdfjsAnnotationType.POLYLINE]: ActualPolylineParser,
     [PdfjsAnnotationType.FREETEXT]: FreeTextParser,
     [PdfjsAnnotationType.STAMP]: StampParser,
     [PdfjsAnnotationType.LINE]: LineParser
@@ -48,6 +48,7 @@ const parserMap: {
  */
 async function parseAnnotationToPdf(annotation: IAnnotationStore, page: PDFPage, pdfDoc: PDFDocument): Promise<void> {
     const ParserClass = parserMap[annotation.pdfjsType]
+    // Use ActualPolylineParser for all polyline annotations since decoder_polyline now handles both vertices and ink types
     if (ParserClass) {
         const parser = new ParserClass(pdfDoc, page, annotation)
         await parser.parse()
@@ -92,7 +93,7 @@ function clearAllAnnotations(pdfDoc: PDFDocument) {
 }
 
 // 动态加载字体文件，返回 ArrayBuffer
-async function loadFontBuffer(url: string): Promise<ArrayBuffer> {
+export async function loadFontBuffer(url: string): Promise<ArrayBuffer> {
     const response = await fetch(url)
     if (!response.ok) throw new Error(`Failed to load font at ${url}`)
     return await response.arrayBuffer()
